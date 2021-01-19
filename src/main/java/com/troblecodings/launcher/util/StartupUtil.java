@@ -24,7 +24,7 @@ public class StartupUtil {
 
 	private static String LIBPATHS =  "";
 	private static String MAINCLASS = null;
-	public static final String DOWNLOADLINK = "https://cdn.discordapp.com/attachments/368492562996264970/646136024921276416/FITE_Client.zip";
+	public static final String DOWNLOADLINK = "";
 
 	public static final String OSSHORTNAME = getOSShortName();
 
@@ -44,24 +44,24 @@ public class StartupUtil {
 	}
 
 	public static void prestart() throws Throwable {
-		String clientName = FileUtil.BASE_DIR + "/FITE.zip";
+		String clientName = FileUtil.BASE_DIR + "/GIR.zip";
 		ConnectionUtil.download(DOWNLOADLINK, clientName);
 		if (Files.exists(Paths.get(clientName))) {
 			unzip(clientName, FileUtil.BASE_DIR);
-			Path clientpath = Paths.get(FileUtil.BASE_DIR + "/FITE Client.jar");
+			Path clientpath = Paths.get(FileUtil.BASE_DIR + "/GIR Client.jar");
 			Files.deleteIfExists(clientpath);
-			Files.copy(Paths.get(FileUtil.BASE_DIR + "/FITE Client/FITE Client.jar"), clientpath);
-			Path clientjson = Paths.get(FileUtil.BASE_DIR + "/FITE Client.json");
+			Files.copy(Paths.get(FileUtil.BASE_DIR + "/GIR Client/GIR Client.jar"), clientpath);
+			Path clientjson = Paths.get(FileUtil.BASE_DIR + "/GIR Client.json");
 			Files.deleteIfExists(clientjson);
-			Files.copy(Paths.get(FileUtil.BASE_DIR + "/FITE Client/FITE Client.json"), clientjson);
+			Files.copy(Paths.get(FileUtil.BASE_DIR + "/GIR Client/GIR Client.json"), clientjson);
 		}
 
-		Path path = Paths.get(FileUtil.BASE_DIR + "/FITE Client.json");
+		Path path = Paths.get(FileUtil.BASE_DIR + "/GIR Client.json");
 		String content = new String(Files.readAllBytes(path));
 		JSONObject object = new JSONObject(content);
 
 		MAINCLASS = object.getString("mainClass");
-		LIBPATHS = FileUtil.BASE_DIR + "/FITE Client.jar;";
+		LIBPATHS = FileUtil.BASE_DIR + "/GIR Client.jar;";
 
 		// This part downloads the texture index and so on
 		JSONObject assetIndex = object.getJSONObject("assetIndex");
