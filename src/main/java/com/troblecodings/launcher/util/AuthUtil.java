@@ -49,7 +49,7 @@ public class AuthUtil {
 
 	private static String[] make(Profile profile, Session session) {
 		return START_PARAMS = new String[] { "--username", profile.getName(), "--version", "1.12.2", "--gameDir",
-				FileUtil.BASE_DIR, "--assetsDir", FileUtil.ASSET_DIR, "--assetIndex", "1.12.2", "--uuid",
+				FileUtil.BASE_DIR, "--assetsDir", FileUtil.ASSET_DIR, "--assetIndex", "1.12", "--uuid",
 				session.getUuid().toString(), "--accessToken", session.getAccessToken(), "--userProperties",
 				unpackProperties(profile), "--userType", "mojang", "--tweakClass",
 				"net.minecraftforge.fml.common.launcher.FMLTweaker", "--versionType", "Forge" };

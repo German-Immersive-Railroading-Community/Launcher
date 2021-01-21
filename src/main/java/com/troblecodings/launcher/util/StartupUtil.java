@@ -22,14 +22,13 @@ import com.troblecodings.launcher.ErrorDialog;
 
 public class StartupUtil {
 
-	private static String LIBPATHS =  "";
+	private static String LIBPATHS = "";
 	private static String MAINCLASS = null;
-	public static final String DOWNLOADLINK = "https://seafile.media-dienste.de/seafhttp/files/c3d99456-647c-4991-b53d-8abb1bbd78d3/GIR.zip";
 
 	public static final String OSSHORTNAME = getOSShortName();
 
-	public static String LWIDTH = "1280", LHEIGHT = "720"; 
-	public static int RAM = 1024; 
+	public static String LWIDTH = "1280", LHEIGHT = "720";
+	public static int RAM = 1024;
 
 	private static String getOSShortName() {
 		String longname = System.getProperty("os.name").toLowerCase();
@@ -42,25 +41,17 @@ public class StartupUtil {
 		}
 		return "unknown";
 	}
+	
+	public static void prestart() throws Throwable {		
+		String clientJson = FileUtil.BASE_DIR + "/GIR.json";
+		ConnectionUtil.download("https://seafile.media-dienste.de/f/10b9346b6dfb4738a8b8/?dl=1", clientJson);
+		if (Files.notExists(Paths.get(clientJson)))
+			throw new VerifyError("Couldn't download GIR.json");
 
-	public static void prestart() throws Throwable {
-		String clientName = FileUtil.BASE_DIR + "/GIR.zip";
-		ConnectionUtil.validateDownloadRetry(DOWNLOADLINK, clientName, "BC2FB1C2DF78350A0ED56E4C64ED0749160649DC");
-		Path clientjson = Paths.get(FileUtil.BASE_DIR + "/1.12.2-forge-14.23.5.2854.json");
-		Path clientpath = Paths.get(FileUtil.BASE_DIR + "/1.12.2-forge-14.23.5.2854.jar");
-		if (Files.exists(Paths.get(clientName))) {
-			//unzip(clientName, FileUtil.BASE_DIR);
-			//Files.deleteIfExists(clientpath);
-			//Files.copy(Paths.get(FileUtil.BASE_DIR + "/GIR/1.12.2-forge-14.23.5.2854.jar"), clientpath);
-			//Files.deleteIfExists(clientjson);
-			//Files.copy(Paths.get(FileUtil.BASE_DIR + "/GIR/1.12.2-forge-14.23.5.2854.json"), clientjson);
-		}
-
-		String content = new String(Files.readAllBytes(clientjson));
+		String content = new String(Files.readAllBytes(Paths.get(clientJson)));
 		JSONObject object = new JSONObject(content);
 
 		MAINCLASS = object.getString("mainClass");
-		LIBPATHS = clientpath.toString() + ";";
 
 		// This part downloads the texture index and so on
 		JSONObject assetIndex = object.getJSONObject("assetIndex");
@@ -73,6 +64,13 @@ public class StartupUtil {
 		String indexurl = assetIndex.getString("url");
 		String indexsha1 = assetIndex.getString("sha1");
 		ConnectionUtil.validateDownloadRetry(indexurl, indexpath, indexsha1);
+
+		Path ogMC = Paths.get(FileUtil.BASE_DIR + "/versions/" + object.getString("inheritsFrom") + "/"
+				+ object.getString("inheritsFrom") + ".jar");
+		Files.createDirectories(ogMC.getParent());
+		JSONObject clientDL = object.getJSONObject("downloads").getJSONObject("client");
+		ConnectionUtil.validateDownloadRetry(clientDL.getString("url"), ogMC.toString(), clientDL.getString("sha1"));
+		LIBPATHS = ogMC.toString() + ";";
 
 		// This part is to download the libs
 		for (Object libentry : object.getJSONArray("libraries")) {
@@ -161,7 +159,8 @@ public class StartupUtil {
 	public static Process start(String[] parameter) throws Throwable {
 		String[] preparameter = new String[] { "java", "-Xmx" + RAM + "M", "-Xms" + RAM + "M",
 				"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
-				"-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", LWIDTH, "-height", LHEIGHT};
+				"-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", LWIDTH, "-height",
+				LHEIGHT };
 		ProcessBuilder builder = new ProcessBuilder(
 				Stream.concat(Arrays.stream(preparameter), Arrays.stream(parameter)).toArray(String[]::new));
 		builder.directory(new File(FileUtil.BASE_DIR));

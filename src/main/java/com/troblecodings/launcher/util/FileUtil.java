@@ -35,18 +35,18 @@ public class FileUtil {
 	
 	// Initiates all folders and reads the remember file
 	public static void init() throws Throwable {
-		Path settingpath = Paths.get(System.getProperty("user.home") + "/.launcher/Settings.txt");
+		Path settingpath = Paths.get(System.getenv("APPDATA") + "/gir/Settings.txt");
 		try {
 			if (Files.exists(settingpath)) {
 				List<String> settings = Files.readAllLines(settingpath);
 				StartupUtil.LWIDTH = settings.size() < 1 ?  "1280":settings.get(0);
 				StartupUtil.LHEIGHT = settings.size() < 2 ?  "720":settings.get(1);
 				StartupUtil.RAM = Integer.valueOf(settings.size() < 3 ?  "1024":settings.get(2));
-				BASE_DIR = settings.size() < 4 ?  (System.getenv("APPDATA") + "/.minecraft"):settings.get(3);
+				BASE_DIR = settings.size() < 4 ?  (System.getenv("APPDATA") + "/gir"):settings.get(3);
 			} else {
 				Files.createDirectories(settingpath.getParent());
 				Files.createFile(settingpath);
-				BASE_DIR = System.getenv("APPDATA") + "/.minecraft";
+				BASE_DIR = System.getenv("APPDATA") + "/gir";
 			}
 		} catch (IOException e) {
 			ErrorDialog.createDialog(e);
