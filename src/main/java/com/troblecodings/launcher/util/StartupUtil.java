@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
+import java.net.URISyntaxException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
@@ -40,6 +41,16 @@ public class StartupUtil {
 			return "linux";
 		}
 		return "unknown";
+	}
+	
+	public static void update() {
+		try {
+			String location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toString();
+			System.out.println(location);
+			ConnectionUtil.download("https://seafile.media-dienste.de/f/7809609498a940bfb2f4/?dl=1", location);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void prestart() throws Throwable {		

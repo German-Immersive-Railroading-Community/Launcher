@@ -53,6 +53,7 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 	public static void main(String[] args) {
 		FontUtil.init();
 		try {
+			StartupUtil.update();
 			FileUtil.init();
 			AuthUtil.auth(null, null);
 		} catch (TooManyRequestsException e) {
