@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
-import java.net.URISyntaxException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
@@ -16,6 +15,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -23,6 +23,8 @@ import com.troblecodings.launcher.ErrorDialog;
 
 public class StartupUtil {
 
+	private static final String RELEASE_API = "https://api.github.com/repos/German-Immersive-Railroading-Community/Launcher/releases";
+	
 	private static String LIBPATHS = "";
 	private static String MAINCLASS = null;
 
@@ -45,10 +47,14 @@ public class StartupUtil {
 	
 	public static void update() {
 		try {
+			JSONArray obj = new JSONArray(ConnectionUtil.getStringFromURL(RELEASE_API));
+			String downloadURL = obj.getJSONObject(0).getJSONArray("assets").getJSONObject(0).getString("browser_download_url");
 			File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+			System.out.println(downloadURL);
 			if(!location.isFile())
 				return;
-			ConnectionUtil.download("https://seafile.media-dienste.de/f/7809609498a940bfb2f4/?dl=1", location.toString());
+			ConnectionUtil.download(downloadURL, location.toString());
+			System.out.println("TEEST2");
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}

@@ -1,12 +1,12 @@
 package com.troblecodings.launcher.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,10 +23,36 @@ public class ConnectionUtil {
 		connection.addRequestProperty("User-Agent",
 				"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101 Firefox/64.0");
 	}
-	
+
+	public static void openConnection(String url, OutputStream channel) throws Throwable {
+		URL urlcon = new URL(url);
+
+		HttpURLConnection connection = (HttpURLConnection) urlcon.openConnection();
+		addHeader(connection);
+		int resp = connection.getResponseCode();
+		if (resp == HttpURLConnection.HTTP_MOVED_PERM || resp == HttpURLConnection.HTTP_MOVED_TEMP
+				|| resp == HttpURLConnection.HTTP_SEE_OTHER) {
+			String newUrl = connection.getHeaderField("Location");
+			connection = (HttpURLConnection) new URL(newUrl).openConnection();
+			addHeader(connection);
+		}
+		InputStream stream = connection.getInputStream();
+		byte[] buf = new byte[8192];
+		int length;
+		while ((length = stream.read(buf)) > 0) {
+			channel.write(buf, 0, length);
+		}
+		stream.close();
+	}
+
+	public static String getStringFromURL(String url) throws Throwable {
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		openConnection(url, output);
+		return new String(output.toByteArray());
+	}
+
 	// Downloads a given file from the given URL onto the machine
 	public static void download(String url, String name) throws Throwable {
-		URL urlcon = new URL(url);
 
 		Path pathtofile = Paths.get(name);
 		if (!Files.exists(pathtofile)) {
@@ -36,19 +62,8 @@ public class ConnectionUtil {
 			Files.createFile(pathtofile);
 		}
 
-		HttpURLConnection connection = (HttpURLConnection) urlcon.openConnection();
-		addHeader(connection);
-		if(connection.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM) {
-			String newUrl = connection.getHeaderField("Location");
-			connection = (HttpURLConnection) new URL(newUrl).openConnection();
-			addHeader(connection);
-		}
-		InputStream stream = connection.getInputStream();
-		ReadableByteChannel rbc = Channels.newChannel(stream);
 		FileOutputStream fos = new FileOutputStream(name);
-		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-
-		stream.close();
+		openConnection(url, fos);
 		fos.close();
 	}
 
@@ -62,7 +77,8 @@ public class ConnectionUtil {
 		try (DigestInputStream stream = new DigestInputStream(Files.newInputStream(pathtofile), digest)) {
 			while (true) {
 				byte[] buffer = new byte[1028];
-				if(stream.read(buffer, 0, 1028) <= 0) break;
+				if (stream.read(buffer, 0, 1028) <= 0)
+					break;
 			}
 			byte[] digestreturn = digest.digest();
 			BigInteger sha1bigintegers = new BigInteger(1, digestreturn);
@@ -77,8 +93,8 @@ public class ConnectionUtil {
 	// This attempts to download a file if it isn't valid
 	public static void validateDownloadRetry(String url, String name, String sha1) throws Throwable {
 		byte times = 0;
-		if(url.isEmpty()) {
-			if(!ConnectionUtil.validate(name, sha1))
+		if (url.isEmpty()) {
+			if (!ConnectionUtil.validate(name, sha1))
 				throw new VerifyError("Couldn't verify " + name);
 			return;
 		}
