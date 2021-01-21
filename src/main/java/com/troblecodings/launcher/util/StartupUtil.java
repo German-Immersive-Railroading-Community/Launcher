@@ -24,7 +24,7 @@ public class StartupUtil {
 
 	private static String LIBPATHS =  "";
 	private static String MAINCLASS = null;
-	public static final String DOWNLOADLINK = "";
+	public static final String DOWNLOADLINK = "https://seafile.media-dienste.de/seafhttp/files/c3d99456-647c-4991-b53d-8abb1bbd78d3/GIR.zip";
 
 	public static final String OSSHORTNAME = getOSShortName();
 
@@ -45,23 +45,22 @@ public class StartupUtil {
 
 	public static void prestart() throws Throwable {
 		String clientName = FileUtil.BASE_DIR + "/GIR.zip";
-		ConnectionUtil.download(DOWNLOADLINK, clientName);
+		ConnectionUtil.validateDownloadRetry(DOWNLOADLINK, clientName, "BC2FB1C2DF78350A0ED56E4C64ED0749160649DC");
+		Path clientjson = Paths.get(FileUtil.BASE_DIR + "/1.12.2-forge-14.23.5.2854.json");
+		Path clientpath = Paths.get(FileUtil.BASE_DIR + "/1.12.2-forge-14.23.5.2854.jar");
 		if (Files.exists(Paths.get(clientName))) {
-			unzip(clientName, FileUtil.BASE_DIR);
-			Path clientpath = Paths.get(FileUtil.BASE_DIR + "/GIR Client.jar");
-			Files.deleteIfExists(clientpath);
-			Files.copy(Paths.get(FileUtil.BASE_DIR + "/GIR Client/GIR Client.jar"), clientpath);
-			Path clientjson = Paths.get(FileUtil.BASE_DIR + "/GIR Client.json");
-			Files.deleteIfExists(clientjson);
-			Files.copy(Paths.get(FileUtil.BASE_DIR + "/GIR Client/GIR Client.json"), clientjson);
+			//unzip(clientName, FileUtil.BASE_DIR);
+			//Files.deleteIfExists(clientpath);
+			//Files.copy(Paths.get(FileUtil.BASE_DIR + "/GIR/1.12.2-forge-14.23.5.2854.jar"), clientpath);
+			//Files.deleteIfExists(clientjson);
+			//Files.copy(Paths.get(FileUtil.BASE_DIR + "/GIR/1.12.2-forge-14.23.5.2854.json"), clientjson);
 		}
 
-		Path path = Paths.get(FileUtil.BASE_DIR + "/GIR Client.json");
-		String content = new String(Files.readAllBytes(path));
+		String content = new String(Files.readAllBytes(clientjson));
 		JSONObject object = new JSONObject(content);
 
 		MAINCLASS = object.getString("mainClass");
-		LIBPATHS = FileUtil.BASE_DIR + "/GIR Client.jar;";
+		LIBPATHS = clientpath.toString() + ";";
 
 		// This part downloads the texture index and so on
 		JSONObject assetIndex = object.getJSONObject("assetIndex");
@@ -73,8 +72,7 @@ public class StartupUtil {
 		String indexpath = indexes.toString() + "/" + assetIndex.getString("id") + ".json";
 		String indexurl = assetIndex.getString("url");
 		String indexsha1 = assetIndex.getString("sha1");
-		int indexsize = assetIndex.getInt("size");
-		ConnectionUtil.validateDownloadRetry(indexurl, indexpath, indexsha1, indexsize);
+		ConnectionUtil.validateDownloadRetry(indexurl, indexpath, indexsha1);
 
 		// This part is to download the libs
 		for (Object libentry : object.getJSONArray("libraries")) {
@@ -85,10 +83,9 @@ public class StartupUtil {
 				String url = artifact.getString("url");
 				String name = FileUtil.LIB_DIR + "/" + artifact.getString("path");
 				String sha1 = artifact.getString("sha1");
-				int size = artifact.getInt("size");
 
 				LIBPATHS += name + ";";
-				ConnectionUtil.validateDownloadRetry(url, name, sha1, size);
+				ConnectionUtil.validateDownloadRetry(url, name, sha1);
 			} else {
 				JSONObject natives = libobj.getJSONObject("natives");
 				if (natives.has(OSSHORTNAME)) {
@@ -99,9 +96,8 @@ public class StartupUtil {
 					String url = artifact.getString("url");
 					String name = FileUtil.LIB_DIR + "/" + artifact.getString("path");
 					String sha1 = artifact.getString("sha1");
-					int size = artifact.getInt("size");
 
-					ConnectionUtil.validateDownloadRetry(url, name, sha1, size);
+					ConnectionUtil.validateDownloadRetry(url, name, sha1);
 
 					// Extract the natives
 					unzip(name, FileUtil.LIB_DIR);
@@ -123,17 +119,16 @@ public class StartupUtil {
 			String hash = asset.getString("hash");
 			String folder = hash.substring(0, 2);
 			Path folderpath = Paths.get(ojectspath.toString() + "/" + folder);
-			if (!Files.exists(folderpath))
+			if (!Files.exists(folderpath)) {
 				try {
 					Files.createDirectories(folderpath);
 				} catch (IOException e) {
 					ErrorDialog.createDialog(e);
 				}
-			int size = asset.getInt("size");
-
+			}
 			try {
 				ConnectionUtil.validateDownloadRetry(baseurl + folder + "/" + hash, folderpath.toString() + "/" + hash,
-						hash, size);
+						hash);
 			} catch (Throwable e) {
 				ErrorDialog.createDialog(e);
 			}

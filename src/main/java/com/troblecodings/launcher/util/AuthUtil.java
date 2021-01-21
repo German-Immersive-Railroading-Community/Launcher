@@ -17,7 +17,7 @@ public class AuthUtil {
 
 	private static YggdrasilClient client = new YggdrasilClient();
 	private static MojangClient mclient = new MojangClient();
-	
+
 	public static String[] START_PARAMS = null;
 
 	public static String[] auth(String username, String passw) throws Throwable {
@@ -48,10 +48,11 @@ public class AuthUtil {
 	}
 
 	private static String[] make(Profile profile, Session session) {
-		return START_PARAMS = new String[] { "--username", profile.getName(), "--version", "1.12.2", "--gameDir", FileUtil.BASE_DIR,
-				"--assetsDir", FileUtil.ASSET_DIR, "--assetIndex", "1.12.2", "--uuid", session.getUuid().toString(),
-				"--accessToken", session.getAccessToken(), "--userProperties", unpackProperties(profile), "--userType",
-				"mojang" };
+		return START_PARAMS = new String[] { "--username", profile.getName(), "--version", "1.12.2", "--gameDir",
+				FileUtil.BASE_DIR, "--assetsDir", FileUtil.ASSET_DIR, "--assetIndex", "1.12.2", "--uuid",
+				session.getUuid().toString(), "--accessToken", session.getAccessToken(), "--userProperties",
+				unpackProperties(profile), "--userType", "mojang", "--tweakClass",
+				"net.minecraftforge.fml.common.launcher.FMLTweaker", "--versionType", "Forge" };
 	}
 
 }
