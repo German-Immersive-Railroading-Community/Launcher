@@ -45,9 +45,10 @@ public class StartupUtil {
 	
 	public static void update() {
 		try {
-			String location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI()).toString();
-			System.out.println(location);
-			ConnectionUtil.download("https://seafile.media-dienste.de/f/7809609498a940bfb2f4/?dl=1", location);
+			File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+			if(!location.isFile())
+				return;
+			ConnectionUtil.download("https://seafile.media-dienste.de/f/7809609498a940bfb2f4/?dl=1", location.toString());
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
