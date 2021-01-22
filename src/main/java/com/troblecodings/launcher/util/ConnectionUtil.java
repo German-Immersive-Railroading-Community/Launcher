@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.util.function.Consumer;
 
 import com.troblecodings.launcher.ErrorDialog;
 
@@ -24,7 +25,11 @@ public class ConnectionUtil {
 				"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101 Firefox/64.0");
 	}
 
-	public static void openConnection(String url, OutputStream channel) throws Throwable {
+	public static void openConnection(final String url, final OutputStream channel) throws Throwable {
+		openConnection(url, channel, null);
+	}
+	
+	public static void openConnection(final String url, final OutputStream channel, final Consumer<Long> update) throws Throwable {
 		URL urlcon = new URL(url);
 
 		HttpURLConnection connection = (HttpURLConnection) urlcon.openConnection();
@@ -38,9 +43,14 @@ public class ConnectionUtil {
 		}
 		InputStream stream = connection.getInputStream();
 		byte[] buf = new byte[8192];
-		int length;
+		int length = 0;
+		long bytesread = 0;
 		while ((length = stream.read(buf)) > 0) {
 			channel.write(buf, 0, length);
+			if(update != null) {
+				bytesread += length;
+				update.accept(bytesread);
+			}
 		}
 		stream.close();
 	}
@@ -53,6 +63,10 @@ public class ConnectionUtil {
 
 	// Downloads a given file from the given URL onto the machine
 	public static void download(String url, String name) throws Throwable {
+		download(url, name, null);
+	}
+	
+	public static void download(String url, String name, final Consumer<Long> update) throws Throwable {
 
 		Path pathtofile = Paths.get(name);
 		if (!Files.exists(pathtofile)) {
@@ -63,7 +77,7 @@ public class ConnectionUtil {
 		}
 
 		FileOutputStream fos = new FileOutputStream(name);
-		openConnection(url, fos);
+		openConnection(url, fos, update);
 		fos.close();
 	}
 

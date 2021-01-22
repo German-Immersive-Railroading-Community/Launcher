@@ -15,6 +15,9 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
 
+import javax.swing.JButton;
+import javax.swing.ProgressMonitor;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -52,10 +55,12 @@ public class StartupUtil {
 			String downloadURL = newversion.getString("browser_download_url");
 			File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 			long size = Files.size(Paths.get(location.toURI()));
-			if(newversion.getNumber("size").longValue() == size || !location.isFile())
+			long newsize = newversion.getNumber("size").longValue();
+			if(newsize == size || !location.isFile())
 				return;
 			System.out.println("Updating Launcher!");
-			ConnectionUtil.download(downloadURL, location.toString());
+			ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
+			ConnectionUtil.download(downloadURL, location.toString(), bytesize -> progress.setProgress(bytesize.intValue()));
 			new ProcessBuilder("java", "-jar", location.toString()).start().waitFor();
 			System.exit(0);
 		} catch (Throwable e) {
