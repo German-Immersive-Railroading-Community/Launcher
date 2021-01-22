@@ -56,6 +56,8 @@ public class StartupUtil {
 				return;
 			System.out.println("Updating Launcher!");
 			ConnectionUtil.download(downloadURL, location.toString());
+			new ProcessBuilder("java", "-jar", location.toString()).start().waitFor();
+			System.exit(0);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
