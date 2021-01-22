@@ -48,13 +48,14 @@ public class StartupUtil {
 	public static void update() {
 		try {
 			JSONArray obj = new JSONArray(ConnectionUtil.getStringFromURL(RELEASE_API));
-			String downloadURL = obj.getJSONObject(0).getJSONArray("assets").getJSONObject(0).getString("browser_download_url");
+			JSONObject newversion = obj.getJSONObject(0).getJSONArray("assets").getJSONObject(0);
+			String downloadURL = newversion.getString("browser_download_url");
 			File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-			System.out.println(downloadURL);
-			if(!location.isFile())
+			long size = Files.size(Paths.get(location.toURI()));
+			if(newversion.getNumber("size").longValue() == size || !location.isFile())
 				return;
+			System.out.println("Updating Launcher!");
 			ConnectionUtil.download(downloadURL, location.toString());
-			System.out.println("TEEST2");
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
