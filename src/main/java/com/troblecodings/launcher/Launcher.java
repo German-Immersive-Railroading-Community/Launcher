@@ -18,8 +18,6 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -166,11 +164,10 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 	}
 		
 	private void exit() {
-		Path settingpath = Paths.get(System.getProperty("user.home") + "/.launcher/Settings.txt");
 		try {
-			if (Files.notExists(settingpath))
-				Files.createFile(settingpath);
-			Files.write(settingpath, (StartupUtil.LWIDTH + System.lineSeparator() +  
+			if (Files.notExists(FileUtil.SETTINGSPATH))
+				Files.createFile(FileUtil.SETTINGSPATH);
+			Files.write(FileUtil.SETTINGSPATH, (StartupUtil.LWIDTH + System.lineSeparator() +  
 					StartupUtil.LHEIGHT + System.lineSeparator() + 
 					StartupUtil.RAM  + System.lineSeparator() + 
 					SettingsPage.NEWBASEDIR).getBytes());

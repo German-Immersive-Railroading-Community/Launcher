@@ -24,7 +24,9 @@ public class FileUtil {
 
 	public static String TRANSFORM = "AES";
 	public static Path REMEMBERFILE;
-
+	
+	public static final Path SETTINGSPATH = Paths.get(System.getProperty("user.home") + "/.launcher/Settings.txt");
+	
 	private static String setCreateIfNotExists(String pathstr) throws Throwable {
 		Path path = Paths.get(pathstr);
 		if (!Files.exists(path)) {
@@ -35,17 +37,17 @@ public class FileUtil {
 	
 	// Initiates all folders and reads the remember file
 	public static void init() throws Throwable {
-		Path settingpath = Paths.get(System.getenv("APPDATA") + "/gir/Settings.txt");
 		try {
-			if (Files.exists(settingpath)) {
-				List<String> settings = Files.readAllLines(settingpath);
+			if (Files.exists(SETTINGSPATH)) {
+				List<String> settings = Files.readAllLines(SETTINGSPATH);
 				StartupUtil.LWIDTH = settings.size() < 1 ?  "1280":settings.get(0);
 				StartupUtil.LHEIGHT = settings.size() < 2 ?  "720":settings.get(1);
-				StartupUtil.RAM = Integer.valueOf(settings.size() < 3 ?  "1024":settings.get(2));
+				if(settings.size() >= 3)
+					StartupUtil.RAM = Integer.valueOf(settings.get(2));
 				BASE_DIR = settings.size() < 4 ?  (System.getenv("APPDATA") + "/gir"):settings.get(3);
 			} else {
-				Files.createDirectories(settingpath.getParent());
-				Files.createFile(settingpath);
+				Files.createDirectories(SETTINGSPATH.getParent());
+				Files.createFile(SETTINGSPATH);
 				BASE_DIR = System.getenv("APPDATA") + "/gir";
 			}
 		} catch (IOException e) {
