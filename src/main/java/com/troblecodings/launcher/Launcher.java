@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.node.Button;
 import com.troblecodings.launcher.node.ImageView;
 import com.troblecodings.launcher.node.MiddlePart;
@@ -76,7 +77,7 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 				INSTANCE.setBounds((screensize.width - WIDTH) / 2, (screensize.height - HEIGHT) / 2, WIDTH, HEIGHT);
 				INSTANCE.setUndecorated(true);
 				INSTANCE.setLayout(null);
-				//INSTANCE.setIconImage(Assets.getImage("icon.png"));
+				INSTANCE.setIconImage(Assets.getImage("icon.png"));
 				INSTANCE.setBackground(new Color(0, 0, 0, 0));
 
 				INSTANCEL = new Launcher();
