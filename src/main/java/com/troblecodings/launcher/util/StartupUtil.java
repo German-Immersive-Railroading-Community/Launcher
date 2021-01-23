@@ -161,20 +161,16 @@ public class StartupUtil {
 
 		JSONObject additional = object.getJSONObject("additional");
 		additional.keySet().forEach(key -> {
-			try {
-				Files.createDirectories(Paths.get(key));
-				additional.getJSONArray(key).forEach(fileobj -> {
-					try {
-						JSONObject jfileobj = (JSONObject) fileobj;
-						Path path = Paths.get(FileUtil.BASE_DIR, key, jfileobj.getString("name"));
-						ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(), jfileobj.getString("sha1"));
-					} catch (Throwable e) {
-						ErrorDialog.createDialog(e);
-					}
-				});
-			} catch (IOException e) {
-				ErrorDialog.createDialog(e);
-			}
+			additional.getJSONArray(key).forEach(fileobj -> {
+				try {
+					JSONObject jfileobj = (JSONObject) fileobj;
+					Path path = Paths.get(FileUtil.BASE_DIR, key, jfileobj.getString("name"));
+					ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
+							jfileobj.getString("sha1"));
+				} catch (Throwable e) {
+					ErrorDialog.createDialog(e);
+				}
+			});
 		});
 	}
 
