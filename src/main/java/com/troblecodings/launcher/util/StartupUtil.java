@@ -27,14 +27,14 @@ import com.troblecodings.launcher.ErrorDialog;
 public class StartupUtil {
 
 	private static final String RELEASE_API = "https://api.github.com/repos/German-Immersive-Railroading-Community/Launcher/releases";
-	
+
 	private static String LIBPATHS = "";
 	private static String MAINCLASS = null;
 
 	public static final String OSSHORTNAME = getOSShortName();
 
 	public static String LWIDTH = "1280", LHEIGHT = "720";
-	public static int RAM = 1024;
+	public static int RAM = 2048;
 
 	private static String getOSShortName() {
 		String longname = System.getProperty("os.name").toLowerCase();
@@ -47,7 +47,7 @@ public class StartupUtil {
 		}
 		return "unknown";
 	}
-	
+
 	public static void update() {
 		try {
 			JSONArray obj = new JSONArray(ConnectionUtil.getStringFromURL(RELEASE_API));
@@ -56,19 +56,20 @@ public class StartupUtil {
 			File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 			long size = Files.size(Paths.get(location.toURI()));
 			long newsize = newversion.getNumber("size").longValue();
-			if(newsize == size || !location.isFile())
+			if (newsize == size || !location.isFile())
 				return;
 			System.out.println("Updating Launcher!");
 			ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
-			ConnectionUtil.download(downloadURL, location.toString(), bytesize -> progress.setProgress(bytesize.intValue()));
+			ConnectionUtil.download(downloadURL, location.toString(),
+					bytesize -> progress.setProgress(bytesize.intValue()));
 			new ProcessBuilder("java", "-jar", location.toString()).start().waitFor();
 			System.exit(0);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void prestart() throws Throwable {		
+
+	public static void prestart() throws Throwable {
 		String clientJson = FileUtil.BASE_DIR + "/GIR.json";
 		ConnectionUtil.download("https://seafile.media-dienste.de/f/10b9346b6dfb4738a8b8/?dl=1", clientJson);
 		if (Files.notExists(Paths.get(clientJson)))
@@ -154,6 +155,24 @@ public class StartupUtil {
 				ConnectionUtil.validateDownloadRetry(baseurl + folder + "/" + hash, folderpath.toString() + "/" + hash,
 						hash);
 			} catch (Throwable e) {
+				ErrorDialog.createDialog(e);
+			}
+		});
+
+		JSONObject additional = object.getJSONObject("additional");
+		additional.keySet().forEach(key -> {
+			try {
+				Files.createDirectories(Paths.get(key));
+				additional.getJSONArray(key).forEach(fileobj -> {
+					try {
+						JSONObject jfileobj = (JSONObject) fileobj;
+						Path path = Paths.get(FileUtil.BASE_DIR, key, jfileobj.getString("name"));
+						ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(), jfileobj.getString("sha1"));
+					} catch (Throwable e) {
+						ErrorDialog.createDialog(e);
+					}
+				});
+			} catch (IOException e) {
 				ErrorDialog.createDialog(e);
 			}
 		});
