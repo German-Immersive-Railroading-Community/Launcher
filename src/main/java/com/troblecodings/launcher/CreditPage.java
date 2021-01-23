@@ -29,6 +29,20 @@ public class CreditPage extends MiddlePart {
 				ErrorDialog.createDialog(e);
 			}
 		}));
+		this.add(new Label((Launcher.WIDTH - 412) / 2, 320, (Launcher.WIDTH + 412) / 2, 340, Color.GRAY, "MineCrafter Font by MadPixel [Dafont]", () -> {
+			try {
+				Desktop.getDesktop().browse(new URI("https://www.dafont.com/de/minecrafter.font"));
+			} catch (IOException | URISyntaxException e) {
+				ErrorDialog.createDialog(e);
+			}
+		}));
+		this.add(new Label((Launcher.WIDTH - 412) / 2, 400, (Launcher.WIDTH + 412) / 2, 420, Color.GRAY, "Graphics by Mc_Jeronimo [Twitter]", () -> {
+			try {
+				Desktop.getDesktop().browse(new URI("https://twitter.com/Jer0nimo_97"));
+			} catch (IOException | URISyntaxException e) {
+				ErrorDialog.createDialog(e);
+			}
+		}));
 		this.add(new Label((Launcher.WIDTH - 412) / 2, 440, (Launcher.WIDTH + 412) / 2, 460, Color.GRAY, "Programming by MrTroble [Twitter]", () -> {
 			try {
 				Desktop.getDesktop().browse(new URI("https://twitter.com/TherealMrTroble"));
