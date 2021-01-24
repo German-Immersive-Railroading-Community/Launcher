@@ -28,8 +28,9 @@ public class ConnectionUtil {
 	public static void openConnection(final String url, final OutputStream channel) throws Throwable {
 		openConnection(url, channel, null);
 	}
-	
-	public static void openConnection(final String url, final OutputStream channel, final Consumer<Long> update) throws Throwable {
+
+	public static void openConnection(final String url, final OutputStream channel, final Consumer<Long> update)
+			throws Throwable {
 		URL urlcon = new URL(url);
 
 		HttpURLConnection connection = (HttpURLConnection) urlcon.openConnection();
@@ -47,7 +48,7 @@ public class ConnectionUtil {
 		long bytesread = 0;
 		while ((length = stream.read(buf)) > 0) {
 			channel.write(buf, 0, length);
-			if(update != null) {
+			if (update != null) {
 				bytesread += length;
 				update.accept(bytesread);
 			}
@@ -65,18 +66,14 @@ public class ConnectionUtil {
 	public static void download(String url, String name) throws Throwable {
 		download(url, name, null);
 	}
-	
+
 	public static void download(String url, String name, final Consumer<Long> update) throws Throwable {
-
 		Path pathtofile = Paths.get(name);
-		if (!Files.exists(pathtofile)) {
-			Path parent = pathtofile.getParent();
-			if (parent != null)
-				Files.createDirectories(parent);
-			Files.createFile(pathtofile);
-		}
+		Path parent = pathtofile.getParent();
+		if (parent != null)
+			Files.createDirectories(parent);
 
-		FileOutputStream fos = new FileOutputStream(name);
+		OutputStream fos = Files.newOutputStream(pathtofile);
 		openConnection(url, fos, update);
 		fos.close();
 	}
@@ -90,8 +87,8 @@ public class ConnectionUtil {
 			return false;
 		try (DigestInputStream stream = new DigestInputStream(Files.newInputStream(pathtofile), digest)) {
 			while (true) {
-				byte[] buffer = new byte[1028];
-				if (stream.read(buffer, 0, 1028) <= 0)
+				byte[] buffer = new byte[8192];
+				if (stream.read(buffer, 0, 8192) <= 0)
 					break;
 			}
 			byte[] digestreturn = digest.digest();
