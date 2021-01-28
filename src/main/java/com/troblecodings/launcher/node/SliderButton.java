@@ -20,7 +20,7 @@ public class SliderButton extends Button {
 	}
 
 	@Override
-	public void update(int mousex, int mousey, int mousebtn) {
+	public boolean update(int mousex, int mousey, int mousebtn) {
 		super.update(mousex, mousey, mousebtn);
 		if (clicked) {
 			x = mousex - x1;
@@ -29,6 +29,7 @@ public class SliderButton extends Button {
 		if (mousebtn != MouseEvent.BUTTON1) {
 			wasover = false;
 		}
+		return wasover;
 	}
 
 	@Override

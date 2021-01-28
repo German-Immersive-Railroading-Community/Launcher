@@ -111,10 +111,10 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 		close.scaleFactor = 1.1f;
 		nodes.add(close);
 
-		home = new Button((WIDTH - 120) / 2, 20, (WIDTH - 120) / 2 + 120, 42, "homebuttonoff.png", null, null,
-				"homebuttonon.png", this::home);
-		settings = new Button((WIDTH - 167) / 2, 58, (WIDTH - 167) / 2 + 167, 80, "settingbuttonoff.png", null, null,
-				"settingbuttonon.png", this::settings);
+		home = new Button((WIDTH - 120) / 2, 20, (WIDTH - 120) / 2 + 120, 42, "homebuttonoff.png", this::home);
+		settings = new Button((WIDTH - 167) / 2, 20, (WIDTH - 167) / 2 + 167, 42, "settingbuttonoff.png", this::settings);
+		home.setEnabled(false);
+		
 		nodes.add(home);
 		nodes.add(settings);
 
@@ -138,7 +138,7 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 	public void paint(Graphics g) {
 		Graphics2D g2 = (Graphics2D)g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
 		g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
@@ -148,13 +148,15 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 	}
 	
 	private void settings() {
-		home.setActivated(false);
+		settings.setEnabled(false);
 		this.setPart(new SettingsPage());
+		home.setEnabled(true);
 	}
 	
 	private void home() {
-		settings.setActivated(false);
+		home.setEnabled(false);
 		this.setPart(new HomePage());
+		settings.setEnabled(true);
 	}
 
 	public void setPart(MiddlePart part) {
@@ -194,12 +196,20 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 	@Override
 	public void mouseExited(MouseEvent e) {
 	}
+	
+	private static boolean enablePress = true;
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+		if(!enablePress)
+			return;
+		enablePress = false;
 		dx = e.getX();
 		dy = e.getY();
-		nodes.forEach(node -> node.update(e.getX(), e.getY(), e.getButton()));
+		for(Node n : nodes) {
+			if(n.update(e.getX(), e.getY(), e.getButton()))
+				break;
+		}
 		part.mousePressed(e);
 	}
 
@@ -207,6 +217,7 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 	public void mouseReleased(MouseEvent e) {
 		nodes.forEach(node -> node.update(e.getX(), e.getY(), MouseEvent.NOBUTTON));
 		part.mouseReleased(e);
+		enablePress = true;
 	}
 
 	@Override

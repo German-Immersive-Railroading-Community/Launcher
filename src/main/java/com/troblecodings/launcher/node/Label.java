@@ -38,11 +38,13 @@ public class Label extends Node{
 	}
 	
 	@Override
-	public void update(int mousex, int mousey, int mousebtn) {
+	public boolean update(int mousex, int mousey, int mousebtn) {
 		super.update(mousex, mousey, mousebtn);
 		if(clicked && run != null) {
 			this.run.run();
+			return true;
 		}
+		return false;
 	}
 	
 	@Override

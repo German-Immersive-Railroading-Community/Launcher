@@ -43,7 +43,7 @@ public class InputField extends Label {
 	}
 
 	@Override
-	public void update(int mousex, int mousey, int mousebtn) {
+	public boolean update(int mousex, int mousey, int mousebtn) {
 		super.update(mousex, mousey, mousebtn);
 		if (clicked) {
 			if (!focused)
@@ -51,7 +51,9 @@ public class InputField extends Label {
 			parent.unfocuse();
 			this.setFocused(true);
 			Launcher.INSTANCE.repaint(1);
+			return true;
 		}
+		return false;
 	}
 
 	@Override

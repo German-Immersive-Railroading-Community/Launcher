@@ -32,15 +32,19 @@ public class Button extends Node {
 	}
 
 	@Override
-	public void update(int mousex, int mousey, int mousebtn) {
+	public boolean update(int mousex, int mousey, int mousebtn) {
 		super.update(mousex, mousey, mousebtn);
+		if (!enabled)
+			return false;
 		if (clicked) {
 			active = true;
 			onAction.run();
 			Launcher.INSTANCE.repaint(x1, y1, x2 - x1, y2 - y1);
+			return true;
 		}
 		if(hovered && onHover != null)
 			onHover.run();
+		return false;
 	}
 	
 	public void setActivated(boolean b) {
@@ -49,7 +53,7 @@ public class Button extends Node {
 
 	@Override
 	public void draw(Graphics gr) {
-		if(!visible)
+		if(!visible || !enabled)
 			return;
 		
 		float dx = (x2 - x1) * 0.5f, dy = (y2 - y1) * 0.5f;

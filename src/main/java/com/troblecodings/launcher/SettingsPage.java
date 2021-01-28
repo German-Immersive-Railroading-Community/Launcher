@@ -41,6 +41,8 @@ public class SettingsPage extends MiddlePart{
 		directory.setText(SettingsPage.NEWBASEDIR);
 		directory.setRun(() -> NEWBASEDIR = directory.getText());
 		this.add(directory);
+		
+		this.add(new Label((Launcher.WIDTH - 412) / 2, 685, (Launcher.WIDTH + 412) / 2, 705, Color.GRAY, "Lizenzen & Kredits", () -> Launcher.INSTANCEL.setPart(new CreditPage(this))));
 	}
 	
 }

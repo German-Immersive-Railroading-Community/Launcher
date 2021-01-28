@@ -27,39 +27,42 @@ public class Node {
 
 	public void setEnabled(boolean b) {
 		enabled = b;
+		clicked = false;
+		hovered = false;
 	}
 
 	public boolean isMouseOver(int mousex, int mousey) {
 		return mousex > x1 && mousex < x2 && mousey > y1 && mousey < y2;
 	}
-
-	public void update(int mousex, int mousey, int mousebtn) {
+	
+	public boolean update(int mousex, int mousey, int mousebtn) {
 		if (enabled) {
 			hovered = isMouseOver(mousex, mousey);
 			clicked = mousebtn == MouseEvent.BUTTON1 && hovered;
-			
-			if(lastHover != hovered && scaleChange) {
+
+			if (lastHover != hovered && scaleChange) {
 				lastHover = hovered;
-				if(hovered)
+				if (hovered)
 					this.scaleY = this.scaleX = scaleFactor;
 				else
 					this.scaleY = this.scaleX = 1f;
 				Launcher.INSTANCE.repaint();
 			}
 		}
+		return false;
 	}
 
 	public void keyTyped(char key, int keycode, boolean ctrl) {
-		
+
 	}
-	
+
 	public void drag(int mousex, int mousey) {
-		
+
 	}
-	
+
 	public void draw(Graphics gr) {
 	}
-	
+
 	public void setVisible(boolean bool) {
 		visible = bool;
 		Launcher.INSTANCE.repaint();

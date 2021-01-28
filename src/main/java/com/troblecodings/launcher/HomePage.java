@@ -1,7 +1,10 @@
 package com.troblecodings.launcher;
 
+import java.awt.Color;
+
 import com.troblecodings.launcher.node.Button;
 import com.troblecodings.launcher.node.ImageView;
+import com.troblecodings.launcher.node.Label;
 import com.troblecodings.launcher.node.MiddlePart;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.StartupUtil;
@@ -32,6 +35,8 @@ public class HomePage extends MiddlePart {
 			connect.setVisible(true);
 		}
 		this.add(connect);
+		
+		this.add(new Label((Launcher.WIDTH - 412) / 2, 685, (Launcher.WIDTH + 412) / 2, 705, Color.GRAY, "Lizenzen & Kredits", () -> Launcher.INSTANCEL.setPart(new CreditPage(this))));
 	}
 
 	@Override

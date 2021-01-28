@@ -13,7 +13,7 @@ import com.troblecodings.launcher.util.FontUtil;
 
 public class CreditPage extends MiddlePart {
 
-	public CreditPage() {
+	public CreditPage(MiddlePart last) {
 		this.add(new ImageView(240, 176, 1040, 545, "credits.png"));
 		this.add(new Label((Launcher.WIDTH - 412) / 2, 240, (Launcher.WIDTH + 412) / 2, 260, Color.GRAY, "Nidhogg by Cydhra [Github]", () -> {
 			try {
@@ -51,7 +51,7 @@ public class CreditPage extends MiddlePart {
 			}
 		}));
 		Label lab = new Label((Launcher.WIDTH - 412) / 2, 510, (Launcher.WIDTH + 412) / 2, 530, Color.GRAY, "Back",
-				() -> Launcher.INSTANCEL.setPart(new LoginPage()));
+				() -> Launcher.INSTANCEL.setPart(last));
 		lab.setFont(FontUtil.getFont(20f));
 		this.add(lab);
 	}

@@ -40,7 +40,7 @@ public class LoginPage extends MiddlePart{
 		this.add(email);
 		this.add(pass);
 		this.add(label);
-		this.add(new Label((Launcher.WIDTH - 412) / 2, 510, (Launcher.WIDTH + 412) / 2, 530, Color.GRAY, "Lizenzen & Kredits", () -> Launcher.INSTANCEL.setPart(new CreditPage())));
+		this.add(new Label((Launcher.WIDTH - 412) / 2, 685, (Launcher.WIDTH + 412) / 2, 705, Color.GRAY, "Lizenzen & Kredits", () -> Launcher.INSTANCEL.setPart(new CreditPage(this))));
 	}
 	
 	private void login() {
