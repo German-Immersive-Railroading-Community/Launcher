@@ -71,7 +71,7 @@ public class StartupUtil {
 
 	public static void prestart() throws Throwable {
 		String clientJson = FileUtil.BASE_DIR + "/GIR.json";
-		ConnectionUtil.download("https://girc.eu/Launcher/GIR.json", clientJson);
+		ConnectionUtil.download("http://girc.eu/Launcher/config/GIR.json", clientJson);
 		if (Files.notExists(Paths.get(clientJson)))
 			throw new VerifyError("Couldn't download GIR.json");
 
