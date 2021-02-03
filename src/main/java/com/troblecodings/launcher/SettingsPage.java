@@ -1,12 +1,16 @@
 package com.troblecodings.launcher;
 
 import java.awt.Color;
-
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import com.troblecodings.launcher.node.Button;
 import com.troblecodings.launcher.node.ImageView;
 import com.troblecodings.launcher.node.InputField;
 import com.troblecodings.launcher.node.Label;
 import com.troblecodings.launcher.node.MiddlePart;
 import com.troblecodings.launcher.node.SliderButton;
+import com.troblecodings.launcher.util.FileUtil;
 import com.troblecodings.launcher.util.StartupUtil;
 
 public class SettingsPage extends MiddlePart{
@@ -42,7 +46,47 @@ public class SettingsPage extends MiddlePart{
 		directory.setRun(() -> NEWBASEDIR = directory.getText());
 		this.add(directory);
 		
+		this.add(new Button(540, 577, 730, 600, "settingbuttonoff.png", () -> resetFiles()));
+		
 		this.add(new Label((Launcher.WIDTH - 412) / 2, 685, (Launcher.WIDTH + 412) / 2, 705, Color.GRAY, "Lizenzen & Kredits", () -> Launcher.INSTANCEL.setPart(new CreditPage(this))));
 	}
+	
+	private void resetFiles() {
+		ArrayList<File> files = new ArrayList<>();
+		files.add(Paths.get(FileUtil.BASE_DIR + "/options.txt").toFile());
+		files.add(Paths.get(FileUtil.BASE_DIR + "/optionsof.txt").toFile());
+		files.add(Paths.get(FileUtil.BASE_DIR + "/GIR.json").toFile());
+		File[] modfiles = Paths.get(FileUtil.BASE_DIR + "/mods").toFile().listFiles();
+		for(int i = 0; i < modfiles.length; i++) {
+			files.add(modfiles[i]);
+		}
+		files.add(Paths.get(FileUtil.BASE_DIR + "/mods").toFile());
+		File[] assets = Paths.get(FileUtil.BASE_DIR + "/assets").toFile().listFiles();
+		for(int i = 0; i < assets.length; i++) {
+			files.add(assets[i]);
+		}
+		files.add(Paths.get(FileUtil.BASE_DIR + "/assets").toFile());
+		File[] libraries = Paths.get(FileUtil.BASE_DIR + "/libraries").toFile().listFiles();
+		for(int i = 0; i < libraries.length; i++) {
+			files.add(libraries[i]);
+		}
+		files.add(Paths.get(FileUtil.BASE_DIR + "/libraries").toFile());
+		File[] config = Paths.get(FileUtil.BASE_DIR + "/config").toFile().listFiles();
+		for(int i = 0; i < config.length; i++) {
+			files.add(config[i]);
+		}
+		files.add(Paths.get(FileUtil.BASE_DIR + "/config").toFile());
+		for (File file : files) {
+			if(file != null && file.exists()) {
+				file.delete();
+			}
+		}
+		try {
+			FileUtil.init();
+		} catch (Throwable e) {
+		}
+		Launcher.INSTANCEL.setPart(new HomePage());
+	}
+	
 	
 }
