@@ -3,6 +3,8 @@ package com.troblecodings.launcher.node;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import com.troblecodings.launcher.Launcher;
+
 public class ProgressBar extends Node {
 
 	private final int max;
@@ -15,7 +17,9 @@ public class ProgressBar extends Node {
 	}
 
 	public void update(float percentage) {
+		System.out.println(percentage);
 		this.x2 = (int) (percentage * max);
+		Launcher.INSTANCE.repaint();
 	}
 	
 	@Override
