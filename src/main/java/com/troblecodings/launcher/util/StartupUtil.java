@@ -111,7 +111,7 @@ public class StartupUtil {
 		JSONTokener tokener = new JSONTokener(Files.newInputStream(Paths.get(indexpath)));
 		JSONObject index = new JSONObject(tokener);
 		JSONObject objects = index.getJSONObject("objects");
-		int maxLevel = arr.length() + objects.length()
+		final int maxLevel = arr.length() + objects.length()
 				+ additional.keySet().stream().collect(Collectors.summingInt(key -> additional.getJSONArray(key).length()));
 		AtomicInteger counter = new AtomicInteger(0);
 		

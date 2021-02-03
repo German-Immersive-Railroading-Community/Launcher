@@ -17,7 +17,6 @@ public class ProgressBar extends Node {
 	}
 
 	public void update(float percentage) {
-		System.out.println(percentage);
 		this.x2 = (int) (percentage * max);
 		Launcher.INSTANCE.repaint();
 	}
