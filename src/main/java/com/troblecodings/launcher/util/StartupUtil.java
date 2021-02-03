@@ -11,8 +11,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.swing.JButton;
@@ -23,6 +25,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.troblecodings.launcher.ErrorDialog;
+import com.troblecodings.launcher.Launcher;
 
 public class StartupUtil {
 
@@ -99,8 +102,21 @@ public class StartupUtil {
 		ConnectionUtil.validateDownloadRetry(clientDL.getString("url"), ogMC.toString(), clientDL.getString("sha1"));
 		LIBPATHS = ogMC.toString() + ";";
 
+		JSONObject additional = object.getJSONObject("additional");
+		JSONArray arr = object.getJSONArray("libraries");
+		Path ojectspath = Paths.get(FileUtil.ASSET_DIR + "/objects");
+		if (!Files.exists(ojectspath))
+			Files.createDirectories(ojectspath);
+
+		JSONTokener tokener = new JSONTokener(Files.newInputStream(Paths.get(indexpath)));
+		JSONObject index = new JSONObject(tokener);
+		JSONObject objects = index.getJSONObject("objects");
+		final int maxLevel = arr.length() + objects.length()
+				+ additional.keySet().stream().collect(Collectors.summingInt(key -> additional.getJSONArray(key).length()));
+		AtomicInteger counter = new AtomicInteger(0);
+		
 		// This part is to download the libs
-		for (Object libentry : object.getJSONArray("libraries")) {
+		for (Object libentry : arr) {
 			JSONObject libobj = (JSONObject) libentry;
 			JSONObject downloadobj = libobj.getJSONObject("downloads");
 			if (downloadobj.has("artifact")) {
@@ -128,16 +144,11 @@ public class StartupUtil {
 					unzip(name, FileUtil.LIB_DIR);
 				}
 			}
+			counter.incrementAndGet();
+			Launcher.bar.update(counter.floatValue()/maxLevel);
 		}
 
 		// Asset lockup and download
-		Path ojectspath = Paths.get(FileUtil.ASSET_DIR + "/objects");
-		if (!Files.exists(ojectspath))
-			Files.createDirectories(ojectspath);
-
-		JSONTokener tokener = new JSONTokener(Files.newInputStream(Paths.get(indexpath)));
-		JSONObject index = new JSONObject(tokener);
-		JSONObject objects = index.getJSONObject("objects");
 		String baseurl = "http://resources.download.minecraft.net/";
 		objects.keySet().forEach((key) -> {
 			JSONObject asset = objects.getJSONObject(key);
@@ -157,9 +168,10 @@ public class StartupUtil {
 			} catch (Throwable e) {
 				ErrorDialog.createDialog(e);
 			}
+			counter.incrementAndGet();
+			Launcher.bar.update(counter.floatValue()/maxLevel);
 		});
 
-		JSONObject additional = object.getJSONObject("additional");
 		additional.keySet().forEach(key -> {
 			additional.getJSONArray(key).forEach(fileobj -> {
 				try {
@@ -170,8 +182,11 @@ public class StartupUtil {
 				} catch (Throwable e) {
 					ErrorDialog.createDialog(e);
 				}
+				counter.incrementAndGet();
+				Launcher.bar.update(counter.floatValue()/maxLevel);
 			});
 		});
+		Launcher.bar.update(0);
 	}
 
 	private static void unzip(String name, String base) throws Throwable {
