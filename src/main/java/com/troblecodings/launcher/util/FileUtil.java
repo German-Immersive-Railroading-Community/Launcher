@@ -1,15 +1,16 @@
 package com.troblecodings.launcher.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Key;
 import java.util.List;
-
 import javax.crypto.Cipher;
-
 import com.troblecodings.launcher.ErrorDialog;
+import com.troblecodings.launcher.HomePage;
+import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.SettingsPage;
 
 import net.cydhra.nidhogg.data.Session;
@@ -90,6 +91,45 @@ public class FileUtil {
 
 		byte[] encrypted = cipher.doFinal(sessionstring.getBytes());
 		Files.write(REMEMBERFILE, encrypted);
+	}
+	
+	// Delete option files and mod, assets and libraries folder
+	public static void resetFiles() {
+		deleteFile(Paths.get(FileUtil.BASE_DIR + "/options.txt").toFile());
+		deleteFile(Paths.get(FileUtil.BASE_DIR + "/optionsof.txt").toFile());
+		deleteFile(Paths.get(FileUtil.BASE_DIR + "/GIR.json").toFile());
+		deleteDirectory(Paths.get(FileUtil.BASE_DIR + "/mods").toFile());
+		deleteDirectory(Paths.get(FileUtil.BASE_DIR + "/assets").toFile());
+		deleteDirectory(Paths.get(FileUtil.BASE_DIR + "/libraries").toFile());
+		deleteDirectory(Paths.get(FileUtil.BASE_DIR + "/config").toFile());
+		try {
+			FileUtil.init();
+		} catch (Throwable e) {
+		}
+		Launcher.INSTANCEL.setPart(new HomePage());
+	}
+	
+	private static void deleteDirectory(File directory) {
+		if(directory != null && directory.exists()){
+	        File[] files = directory.listFiles();
+	        if(null!=files){
+	            for(int i = 0; i < files.length; i++) {
+	                if(files[i].isDirectory()) {
+	                    deleteDirectory(files[i]);
+	                }
+	                else {
+	                    files[i].delete();
+	                }
+	            }
+	        }
+	        directory.delete();
+	    }
+	}
+	
+	private static void deleteFile(File file) {
+		if(file != null && file.exists() && !file.isDirectory()) {
+			file.delete();
+		}
 	}
 
 }
