@@ -27,6 +27,7 @@ import com.troblecodings.launcher.node.Button;
 import com.troblecodings.launcher.node.ImageView;
 import com.troblecodings.launcher.node.MiddlePart;
 import com.troblecodings.launcher.node.Node;
+import com.troblecodings.launcher.node.ProgressBar;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 import com.troblecodings.launcher.util.FontUtil;
@@ -98,6 +99,8 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 
 	protected Button settings, home, launch;
 
+	public static final ProgressBar bar = new ProgressBar(0, 630, WIDTH, 10, Color.GREEN.darker().darker());
+	
 	public void init() {
 		part = new HomePage();
 
@@ -106,6 +109,8 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 		addKeyListener(this);
 		
 		nodes.add(new ImageView(0, 0, WIDTH, HEIGHT, "background.png"));
+		nodes.add(bar);
+		
 		Button close = new Button(WIDTH - 79, 20, WIDTH - 27, 87, "closebutton.png", this::exit);
 		close.scaleChange = true;
 		close.scaleFactor = 1.1f;
