@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.troblecodings.launcher.ErrorDialog;
+import com.troblecodings.launcher.ErrorPart;
 import com.troblecodings.launcher.Launcher;
 
 public class StartupUtil {
@@ -53,7 +54,10 @@ public class StartupUtil {
 
 	public static void update() {
 		try {
-			JSONArray obj = new JSONArray(ConnectionUtil.getStringFromURL(RELEASE_API));
+			String str = ConnectionUtil.getStringFromURL(RELEASE_API);
+			if(str == null)
+				return;
+			JSONArray obj = new JSONArray();
 			JSONObject newversion = obj.getJSONObject(0).getJSONArray("assets").getJSONObject(0);
 			String downloadURL = newversion.getString("browser_download_url");
 			File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -69,6 +73,7 @@ public class StartupUtil {
 			System.exit(0);
 		} catch (Throwable e) {
 			e.printStackTrace();
+			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Update error!", "General error!"));
 		}
 	}
 

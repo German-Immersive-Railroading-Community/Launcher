@@ -1,22 +1,20 @@
 package com.troblecodings.launcher.util;
 
 import java.awt.Font;
-import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
-import java.io.IOException;
 
 import com.troblecodings.launcher.assets.Assets;
 
 public class FontUtil {
 
-	private static Font defaultFont = null;
+	private static Font defaultFont = init();
 	
-	public static void init() {
+	private static Font init() {
 		try {
-			defaultFont = Font.createFont(Font.TRUETYPE_FONT, Assets.getResourceAsStream("font.otf"));
-		} catch (FontFormatException | IOException e) {
+			return Font.createFont(Font.TRUETYPE_FONT, Assets.getResourceAsStream("font.otf"));
+		} catch (Throwable e) {
 			// Fallback font
-			defaultFont = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts()[0];
+			return GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts()[0];
 		}
 	}
 
