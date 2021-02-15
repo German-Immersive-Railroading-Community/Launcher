@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
@@ -28,6 +29,8 @@ public class ConnectionUtil {
 	public static final String URL = "";
 
 	private static void addHeader(HttpURLConnection connection) {
+		connection.setConnectTimeout(10000);
+		connection.setReadTimeout(10000);
 		connection.addRequestProperty("User-Agent",
 				"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101 Firefox/64.0");
 	}
@@ -63,12 +66,13 @@ public class ConnectionUtil {
 			stream.close();
 			return true;
 		} catch (Exception e) {
-			if(e instanceof ConnectException )
+			if(e instanceof ConnectException || e instanceof SocketTimeoutException)
 				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Connection error!", "No connection could be established!"));
 			else if(e instanceof MalformedURLException)
 				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "URL error!", "The URL was mallformed!"));
 			else if(e instanceof UnknownHostException)
 				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Couldn't resolve host " + e.getMessage(), "Are you connected? No connection could be established!"));
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -152,11 +156,11 @@ public class ConnectionUtil {
 			return;
 		}
 		while (!ConnectionUtil.validate(name, sha1)) {
-			ConnectionUtil.download(url, name);
-			if (times == 5) {
-				ErrorDialog.createDialog(new VerifyError("Couldn't verify " + name));
+			if (times == 3) {
+				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Error verifying " + Paths.get(name).getFileName().toString(), "The file failed to download correctly after 3 tries!"));
 				break;
 			}
+			ConnectionUtil.download(url, name);
 			times++;
 		}
 	}
