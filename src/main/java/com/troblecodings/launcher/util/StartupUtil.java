@@ -58,7 +58,7 @@ public class StartupUtil {
 			String str = ConnectionUtil.getStringFromURL(RELEASE_API);
 			if (str == null)
 				return;
-			JSONArray obj = new JSONArray();
+			JSONArray obj = new JSONArray(str);
 			JSONObject newversion = obj.getJSONObject(0).getJSONArray("assets").getJSONObject(0);
 			String downloadURL = newversion.getString("browser_download_url");
 			File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());

@@ -18,9 +18,10 @@ import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
-import com.troblecodings.launcher.ErrorDialog;
 import com.troblecodings.launcher.ErrorPart;
 import com.troblecodings.launcher.Launcher;
 
@@ -110,12 +111,13 @@ public class ConnectionUtil {
 		Path normalFile = Paths.get(name);
 		try {
 			Files.move(pathtofile, normalFile, StandardCopyOption.REPLACE_EXISTING);
-			Files.deleteIfExists(pathtofile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return true;
 	}
+	
+	private static ExecutorService executors = Executors.newCachedThreadPool();
 
 	// Checks if the file exist and that its sha1 hash equals the given
 	// returns true if all the checks pass
@@ -149,20 +151,22 @@ public class ConnectionUtil {
 
 	// This attempts to download a file if it isn't valid
 	public static void validateDownloadRetry(String url, String name, String sha1) {
-		byte times = 0;
-		if (url.isEmpty()) {
-			if (!ConnectionUtil.validate(name, sha1))
-				throw new VerifyError("Couldn't verify " + name);
-			return;
-		}
-		while (!ConnectionUtil.validate(name, sha1)) {
-			if (times == 3) {
-				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Error verifying " + Paths.get(name).getFileName().toString(), "The file failed to download correctly after 3 tries!"));
-				break;
+		executors.submit(() -> {
+			byte times = 0;
+			if (url.isEmpty()) {
+				if (!ConnectionUtil.validate(name, sha1))
+					throw new VerifyError("Couldn't verify " + name);
+				return;
 			}
-			ConnectionUtil.download(url, name);
-			times++;
-		}
+			while (!ConnectionUtil.validate(name, sha1)) {
+				if (times == 3) {
+					Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Error verifying " + Paths.get(name).getFileName().toString(), "The file failed to download correctly after 3 tries!"));
+					break;
+				}
+				ConnectionUtil.download(url, name);
+				times++;
+			}
+		});
 	}
 
 }
