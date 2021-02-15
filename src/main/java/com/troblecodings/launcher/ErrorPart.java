@@ -13,6 +13,7 @@ public class ErrorPart extends MiddlePart{
 		this.add(new ImageView(0, 0, Launcher.WIDTH, Launcher.HEIGHT, "error.png"));
 		
 		Label lab1 = new Label((Launcher.WIDTH - 412) / 2, 310, (Launcher.WIDTH + 412) / 2, 330, Color.RED, errorHeader);
+		lab1.setFont(FontUtil.getFont(30f));
 		this.add(lab1);
 
 		Label lab2 = new Label((Launcher.WIDTH - 412) / 2, 360, (Launcher.WIDTH + 412) / 2, 380, Color.RED, error);

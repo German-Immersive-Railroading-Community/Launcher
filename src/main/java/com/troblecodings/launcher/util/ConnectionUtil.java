@@ -9,9 +9,11 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -61,10 +63,12 @@ public class ConnectionUtil {
 			stream.close();
 			return true;
 		} catch (Exception e) {
-			if(e instanceof ConnectException)
+			if(e instanceof ConnectException )
 				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Connection error!", "No connection could be established!"));
 			else if(e instanceof MalformedURLException)
 				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "URL error!", "The URL was mallformed!"));
+			else if(e instanceof UnknownHostException)
+				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Couldn't resolve host " + e.getMessage(), "Are you connected? No connection could be established!"));
 			return false;
 		}
 	}
@@ -77,12 +81,12 @@ public class ConnectionUtil {
 	}
 
 	// Downloads a given file from the given URL onto the machine
-	public static void download(String url, String name) {
-		download(url, name, null);
+	public static boolean download(String url, String name) {
+		return download(url, name, null);
 	}
 
-	public static void download(String url, String name, final Consumer<Long> update) {
-		Path pathtofile = Paths.get(name);
+	public static boolean download(String url, String name, final Consumer<Long> update) {
+		Path pathtofile = Paths.get(name + ".tmp");
 		Path parent = pathtofile.getParent();
 		if (parent != null) {
 			try {
@@ -95,10 +99,18 @@ public class ConnectionUtil {
 		
 		try (OutputStream fos = Files.newOutputStream(pathtofile)) {
 			if(!openConnection(url, fos, update))
-				throw new IOException();
+				return false;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		Path normalFile = Paths.get(name);
+		try {
+			Files.move(pathtofile, normalFile, StandardCopyOption.REPLACE_EXISTING);
+			Files.deleteIfExists(pathtofile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
 	}
 
 	// Checks if the file exist and that its sha1 hash equals the given

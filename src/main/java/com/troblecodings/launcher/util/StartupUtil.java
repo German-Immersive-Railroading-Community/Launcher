@@ -21,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.ProgressMonitor;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -55,7 +56,7 @@ public class StartupUtil {
 	public static void update() {
 		try {
 			String str = ConnectionUtil.getStringFromURL(RELEASE_API);
-			if(str == null)
+			if (str == null)
 				return;
 			JSONArray obj = new JSONArray();
 			JSONObject newversion = obj.getJSONObject(0).getJSONArray("assets").getJSONObject(0);
@@ -77,14 +78,24 @@ public class StartupUtil {
 		}
 	}
 
-	public static void prestart() throws Throwable {
+	public static boolean prestart() throws Throwable {
 		String clientJson = FileUtil.BASE_DIR + "/GIR.json";
 		ConnectionUtil.download("https://girc.eu/Launcher/GIR.json", clientJson);
-		if (Files.notExists(Paths.get(clientJson)))
-			throw new VerifyError("Couldn't download GIR.json");
+		if (Files.notExists(Paths.get(clientJson))) {
+			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Missing version information!",
+					"The GIR version json could not be found."));
+			return false;
+		}
 
 		String content = new String(Files.readAllBytes(Paths.get(clientJson)));
-		JSONObject object = new JSONObject(content);
+		JSONObject object;
+		try {
+			object = new JSONObject(content);
+		} catch (JSONException e) {
+			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Corrupted version information!",
+					"The GIR version json could not be read."));
+			return false;
+		}
 
 		MAINCLASS = object.getString("mainClass");
 
@@ -116,10 +127,10 @@ public class StartupUtil {
 		JSONTokener tokener = new JSONTokener(Files.newInputStream(Paths.get(indexpath)));
 		JSONObject index = new JSONObject(tokener);
 		JSONObject objects = index.getJSONObject("objects");
-		final int maxLevel = arr.length() + objects.length()
-				+ additional.keySet().stream().collect(Collectors.summingInt(key -> additional.getJSONArray(key).length()));
+		final int maxLevel = arr.length() + objects.length() + additional.keySet().stream()
+				.collect(Collectors.summingInt(key -> additional.getJSONArray(key).length()));
 		AtomicInteger counter = new AtomicInteger(0);
-		
+
 		// This part is to download the libs
 		for (Object libentry : arr) {
 			JSONObject libobj = (JSONObject) libentry;
@@ -150,7 +161,7 @@ public class StartupUtil {
 				}
 			}
 			counter.incrementAndGet();
-			Launcher.bar.update(counter.floatValue()/maxLevel);
+			Launcher.bar.update(counter.floatValue() / maxLevel);
 		}
 
 		// Asset lockup and download
@@ -174,7 +185,7 @@ public class StartupUtil {
 				ErrorDialog.createDialog(e);
 			}
 			counter.incrementAndGet();
-			Launcher.bar.update(counter.floatValue()/maxLevel);
+			Launcher.bar.update(counter.floatValue() / maxLevel);
 		});
 
 		additional.keySet().forEach(key -> {
@@ -188,10 +199,11 @@ public class StartupUtil {
 					ErrorDialog.createDialog(e);
 				}
 				counter.incrementAndGet();
-				Launcher.bar.update(counter.floatValue()/maxLevel);
+				Launcher.bar.update(counter.floatValue() / maxLevel);
 			});
 		});
 		Launcher.bar.update(0);
+		return true;
 	}
 
 	private static void unzip(String name, String base) throws Throwable {

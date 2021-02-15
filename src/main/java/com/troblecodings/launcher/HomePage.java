@@ -22,7 +22,7 @@ public class HomePage extends MiddlePart {
 		this.add(new ImageView(0, 0, Launcher.WIDTH, Launcher.HEIGHT, "launchback.png"));
 		logo.scaleChange = true;
 		this.add(logo);
-		
+
 		if (launch == null)
 			launch = new Button(465, 577, 465 + 350, 677, "launchbutton.png", this::launch);
 		launch.scaleChange = true;
@@ -35,42 +35,42 @@ public class HomePage extends MiddlePart {
 			connect.setVisible(true);
 		}
 		this.add(connect);
-		
-		this.add(new Label((Launcher.WIDTH - 412) / 2, 685, (Launcher.WIDTH + 412) / 2, 705, Color.GRAY, "Lizenzen & Kredits", () -> Launcher.INSTANCEL.setPart(new CreditPage(this))));
+
+		this.add(new Label((Launcher.WIDTH - 412) / 2, 685, (Launcher.WIDTH + 412) / 2, 705, Color.GRAY,
+				"Lizenzen & Kredits", () -> Launcher.INSTANCEL.setPart(new CreditPage(this))));
 	}
 
 	@Override
-	public void onExit() {}
-	
+	public void onExit() {
+	}
+
 	private void launch() {
 		isLaunching = true;
 		launch.setActivated(false);
 		connect.setVisible(true);
 		new Thread(() -> {
 			try {
-				StartupUtil.prestart();
-				if (AuthUtil.START_PARAMS != null) {
-					Process pro = StartupUtil.start(AuthUtil.START_PARAMS);
-					Launcher.INSTANCE.setVisible(false);
-					pro.waitFor();
-					Launcher.INSTANCE.setVisible(true);
-					connect.setVisible(false);
-					launch.setActivated(true);
-					isLaunching = false;
-					return;
+				if (StartupUtil.prestart()) {
+					if (AuthUtil.START_PARAMS != null) {
+						Process pro = StartupUtil.start(AuthUtil.START_PARAMS);
+						Launcher.INSTANCE.setVisible(false);
+						pro.waitFor();
+						Launcher.INSTANCE.setVisible(true);
+						connect.setVisible(false);
+						launch.setActivated(true);
+						isLaunching = false;
+						return;
+					}
+					LoginPage page = new LoginPage();
+					LoginPage.label.setText("There was an error with your credentials!");
+					Launcher.INSTANCEL.setPart(page);
 				}
-				LoginPage page = new LoginPage();
-				LoginPage.label.setText("There was an error with your credentials!");
-				Launcher.INSTANCEL.setPart(page);
-				connect.setVisible(false);
-				launch.setActivated(true);
-				isLaunching = false;
 			} catch (Throwable e) {
 				ErrorDialog.createDialog(e);
-				connect.setVisible(false);
-				launch.setActivated(true);
-				isLaunching = false;
 			}
+			connect.setVisible(false);
+			launch.setActivated(true);
+			isLaunching = false;
 		}).start();
 	}
 
