@@ -1,12 +1,13 @@
 package com.troblecodings.launcher;
 
 import java.awt.Color;
-
+import com.troblecodings.launcher.node.Button;
 import com.troblecodings.launcher.node.ImageView;
 import com.troblecodings.launcher.node.InputField;
 import com.troblecodings.launcher.node.Label;
 import com.troblecodings.launcher.node.MiddlePart;
 import com.troblecodings.launcher.node.SliderButton;
+import com.troblecodings.launcher.util.FileUtil;
 import com.troblecodings.launcher.util.StartupUtil;
 
 public class SettingsPage extends MiddlePart{
@@ -41,6 +42,8 @@ public class SettingsPage extends MiddlePart{
 		directory.setText(SettingsPage.NEWBASEDIR);
 		directory.setRun(() -> NEWBASEDIR = directory.getText());
 		this.add(directory);
+		
+		this.add(new Button(520, 565, 770, 617, "reset.png", () -> FileUtil.resetFiles()));
 		
 		this.add(new Label((Launcher.WIDTH - 412) / 2, 685, (Launcher.WIDTH + 412) / 2, 705, Color.GRAY, "Lizenzen & Kredits", () -> Launcher.INSTANCEL.setPart(new CreditPage(this))));
 	}

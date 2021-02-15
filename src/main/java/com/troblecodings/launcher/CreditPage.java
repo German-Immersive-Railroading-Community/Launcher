@@ -50,6 +50,13 @@ public class CreditPage extends MiddlePart {
 				ErrorDialog.createDialog(e);
 			}
 		}));
+		this.add(new Label((Launcher.WIDTH - 412) / 2, 480, (Launcher.WIDTH + 412) / 2, 500, Color.GRAY, "and Der_Zauberer [Twitter]", () -> {
+			try {
+				Desktop.getDesktop().browse(new URI("https://twitter.com/Der_Zauberer_DA"));
+			} catch (IOException | URISyntaxException e) {
+				ErrorDialog.createDialog(e);
+			}
+		}));
 		Label lab = new Label((Launcher.WIDTH - 412) / 2, 510, (Launcher.WIDTH + 412) / 2, 530, Color.GRAY, "Back",
 				() -> Launcher.INSTANCEL.setPart(last));
 		lab.setFont(FontUtil.getFont(20f));
