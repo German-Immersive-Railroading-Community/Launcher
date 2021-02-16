@@ -15,11 +15,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import com.troblecodings.launcher.ErrorPart;
@@ -30,8 +29,6 @@ public class ConnectionUtil {
 	public static final String URL = "";
 
 	private static void addHeader(HttpURLConnection connection) {
-		connection.setConnectTimeout(10000);
-		connection.setReadTimeout(10000);
 		connection.addRequestProperty("User-Agent",
 				"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101 Firefox/64.0");
 	}
@@ -67,12 +64,16 @@ public class ConnectionUtil {
 			stream.close();
 			return true;
 		} catch (Exception e) {
-			if(e instanceof ConnectException || e instanceof SocketTimeoutException)
-				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Connection error!", "No connection could be established!"));
-			else if(e instanceof MalformedURLException)
-				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "URL error!", "The URL was mallformed!"));
-			else if(e instanceof UnknownHostException)
-				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Couldn't resolve host " + e.getMessage(), "Are you connected? No connection could be established!"));
+			if (e instanceof ConnectException || e instanceof SocketTimeoutException)
+				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Connection error!",
+						"No connection could be established!"));
+			else if (e instanceof MalformedURLException)
+				Launcher.INSTANCEL
+						.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "URL error!", "The URL was mallformed!"));
+			else if (e instanceof UnknownHostException)
+				Launcher.INSTANCEL
+						.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Couldn't resolve host " + e.getMessage(),
+								"Are you connected? No connection could be established!"));
 			e.printStackTrace();
 			return false;
 		}
@@ -101,9 +102,9 @@ public class ConnectionUtil {
 				e1.printStackTrace();
 			}
 		}
-		
-		try (OutputStream fos = Files.newOutputStream(pathtofile)) {
-			if(!openConnection(url, fos, update))
+
+		try (OutputStream fos = Files.newOutputStream(pathtofile, StandardOpenOption.CREATE)) {
+			if (!openConnection(url, fos, update))
 				return false;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -116,8 +117,6 @@ public class ConnectionUtil {
 		}
 		return true;
 	}
-	
-	private static ExecutorService executors = Executors.newCachedThreadPool();
 
 	// Checks if the file exist and that its sha1 hash equals the given
 	// returns true if all the checks pass
@@ -148,25 +147,29 @@ public class ConnectionUtil {
 		}
 		return false;
 	}
+	
+	public static void validateDownloadRetry(final String url, final String name, final String sha1) {
+		validateDownloadRetry(url, name, sha1, null);
+	}
 
 	// This attempts to download a file if it isn't valid
-	public static void validateDownloadRetry(String url, String name, String sha1) {
-		executors.submit(() -> {
-			byte times = 0;
-			if (url.isEmpty()) {
-				if (!ConnectionUtil.validate(name, sha1))
-					throw new VerifyError("Couldn't verify " + name);
-				return;
+	public static void validateDownloadRetry(final String url, final String name, final String sha1, final Consumer<Long> update) {
+		byte times = 0;
+		if (url.isEmpty()) {
+			if (!ConnectionUtil.validate(name, sha1))
+				throw new VerifyError("Couldn't verify " + name);
+			return;
+		}
+		while (!ConnectionUtil.validate(name, sha1)) {
+			if (times == 3) {
+				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(),
+						"Error verifying " + Paths.get(name).getFileName().toString(),
+						"The file failed to download correctly after 3 tries!"));
+				break;
 			}
-			while (!ConnectionUtil.validate(name, sha1)) {
-				if (times == 3) {
-					Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Error verifying " + Paths.get(name).getFileName().toString(), "The file failed to download correctly after 3 tries!"));
-					break;
-				}
-				ConnectionUtil.download(url, name);
-				times++;
-			}
-		});
+			ConnectionUtil.download(url, name, update);
+			times++;
+		}
 	}
 
 }

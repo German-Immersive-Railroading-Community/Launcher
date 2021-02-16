@@ -11,10 +11,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.swing.JButton;
@@ -109,13 +107,16 @@ public class StartupUtil {
 		String indexpath = indexes.toString() + "/" + assetIndex.getString("id") + ".json";
 		String indexurl = assetIndex.getString("url");
 		String indexsha1 = assetIndex.getString("sha1");
-		ConnectionUtil.validateDownloadRetry(indexurl, indexpath, indexsha1);
+		long sizeAsset = assetIndex.getLong("size");
+		ConnectionUtil.validateDownloadRetry(indexurl, indexpath, indexsha1, l -> Launcher.bar.update(l / sizeAsset));
 
 		Path ogMC = Paths.get(FileUtil.BASE_DIR + "/versions/" + object.getString("inheritsFrom") + "/"
 				+ object.getString("inheritsFrom") + ".jar");
 		Files.createDirectories(ogMC.getParent());
 		JSONObject clientDL = object.getJSONObject("downloads").getJSONObject("client");
-		ConnectionUtil.validateDownloadRetry(clientDL.getString("url"), ogMC.toString(), clientDL.getString("sha1"));
+		long sizeClient = clientDL.getLong("size");
+		ConnectionUtil.validateDownloadRetry(clientDL.getString("url"), ogMC.toString(), clientDL.getString("sha1"), 
+				l -> Launcher.bar.update(l / sizeClient));
 		LIBPATHS = ogMC.toString() + ";";
 
 		JSONObject additional = object.getJSONObject("additional");
@@ -127,10 +128,7 @@ public class StartupUtil {
 		JSONTokener tokener = new JSONTokener(Files.newInputStream(Paths.get(indexpath)));
 		JSONObject index = new JSONObject(tokener);
 		JSONObject objects = index.getJSONObject("objects");
-		final int maxLevel = arr.length() + objects.length() + additional.keySet().stream()
-				.collect(Collectors.summingInt(key -> additional.getJSONArray(key).length()));
-		AtomicInteger counter = new AtomicInteger(0);
-
+		
 		// This part is to download the libs
 		for (Object libentry : arr) {
 			JSONObject libobj = (JSONObject) libentry;
@@ -142,7 +140,8 @@ public class StartupUtil {
 				String sha1 = artifact.getString("sha1");
 
 				LIBPATHS += name + ";";
-				ConnectionUtil.validateDownloadRetry(url, name, sha1);
+				long size = artifact.getLong("size");
+				ConnectionUtil.validateDownloadRetry(url, name, sha1, l -> Launcher.bar.update(l / size));
 			} else {
 				JSONObject natives = libobj.getJSONObject("natives");
 				if (natives.has(OSSHORTNAME)) {
@@ -153,15 +152,13 @@ public class StartupUtil {
 					String url = artifact.getString("url");
 					String name = FileUtil.LIB_DIR + "/" + artifact.getString("path");
 					String sha1 = artifact.getString("sha1");
-
-					ConnectionUtil.validateDownloadRetry(url, name, sha1);
+					long size = artifact.getLong("size");
+					ConnectionUtil.validateDownloadRetry(url, name, sha1, l -> Launcher.bar.update(l / size));
 
 					// Extract the natives
 					unzip(name, FileUtil.LIB_DIR);
 				}
 			}
-			counter.incrementAndGet();
-			Launcher.bar.update(counter.floatValue() / maxLevel);
 		}
 
 		// Asset lockup and download
@@ -179,27 +176,25 @@ public class StartupUtil {
 				}
 			}
 			try {
+				long size = asset.getLong("size");
 				ConnectionUtil.validateDownloadRetry(baseurl + folder + "/" + hash, folderpath.toString() + "/" + hash,
-						hash);
+						hash, l -> Launcher.bar.update(l / size));
 			} catch (Throwable e) {
 				ErrorDialog.createDialog(e);
 			}
-			counter.incrementAndGet();
-			Launcher.bar.update(counter.floatValue() / maxLevel);
 		});
 
 		additional.keySet().forEach(key -> {
 			additional.getJSONArray(key).forEach(fileobj -> {
 				try {
 					JSONObject jfileobj = (JSONObject) fileobj;
+					long size = jfileobj.getLong("size");
 					Path path = Paths.get(FileUtil.BASE_DIR, key, jfileobj.getString("name"));
 					ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
-							jfileobj.getString("sha1"));
+							jfileobj.getString("sha1"), l -> Launcher.bar.update(l / size));
 				} catch (Throwable e) {
 					ErrorDialog.createDialog(e);
 				}
-				counter.incrementAndGet();
-				Launcher.bar.update(counter.floatValue() / maxLevel);
 			});
 		});
 		Launcher.bar.update(0);

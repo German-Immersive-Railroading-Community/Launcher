@@ -46,7 +46,7 @@ public class HomePage extends MiddlePart {
 
 	private void launch() {
 		isLaunching = true;
-		launch.setActivated(false);
+		launch.setEnabled(false);
 		connect.setVisible(true);
 		new Thread(() -> {
 			try {
