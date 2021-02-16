@@ -6,13 +6,27 @@ import java.awt.image.BufferedImage;
 import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
 
-public class ImageView extends Node{
+public class ImageView extends Node {
 
 	protected final BufferedImage image;
+	protected final Runnable onButton;
 	
 	public ImageView(int x1, int y1, int x2, int y2, String name) {
+		this(x1, y1, x2, y2, name, null);
+	}
+	
+	public ImageView(int x1, int y1, int x2, int y2, String name, Runnable btn) {
 		super(x1, y1, x2, y2);
 		this.image = Assets.getImage(name);
+		this.onButton = btn;
+	}
+	
+	@Override
+	public boolean update(int mousex, int mousey, int mousebtn) {
+		boolean b = super.update(mousex, mousey, mousebtn);
+		if(clicked && onButton != null)
+			onButton.run();
+		return b;
 	}
 	
 	@Override
