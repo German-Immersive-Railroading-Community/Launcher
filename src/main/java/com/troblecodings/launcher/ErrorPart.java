@@ -32,7 +32,8 @@ public class ErrorPart extends MiddlePart{
 	}
 	
 	@Override
-	public void onExit() {
+	protected void finalize() throws Throwable {
+		super.finalize();
 		counter--;
 	}
 	
