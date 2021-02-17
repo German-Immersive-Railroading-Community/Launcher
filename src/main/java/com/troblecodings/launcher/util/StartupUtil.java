@@ -3,12 +3,14 @@ package com.troblecodings.launcher.util;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Optional;
@@ -140,8 +142,15 @@ public class StartupUtil {
 				return;
 			System.out.println("Updating Launcher!");
 			ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
-			ConnectionUtil.download(downloadURL, location.toString(),
-					bytesize -> progress.setProgress(bytesize.intValue()));
+			Path pth = Paths.get(location.toURI());
+			Files.copy(pth, Paths.get(pth.toString() + ".tmp"), StandardCopyOption.REPLACE_EXISTING);
+			OutputStream stream = Files.newOutputStream(pth);
+			if(!ConnectionUtil.openConnection(downloadURL, stream, bytesize -> progress.setProgress(bytesize.intValue()))) {
+				stream.close();
+				Files.copy(Paths.get(pth.toString() + ".tmp"), pth, StandardCopyOption.REPLACE_EXISTING);
+				return;
+			}
+			stream.close();
 			new ProcessBuilder("java", "-jar", location.toString()).start().waitFor();
 			System.exit(0);
 		} catch (Throwable e) {
