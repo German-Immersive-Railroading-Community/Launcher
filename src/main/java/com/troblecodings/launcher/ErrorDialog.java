@@ -6,6 +6,7 @@ import javax.swing.JTextArea;
 public class ErrorDialog {
 
 	public static void createDialog(Throwable th) {
+		Launcher.LOGGER.trace(th.getMessage(), th);
 		JTextArea area = new JTextArea();
 		area.setEditable(false);
 		String message = "Message: " + th.getMessage() + System.lineSeparator() +

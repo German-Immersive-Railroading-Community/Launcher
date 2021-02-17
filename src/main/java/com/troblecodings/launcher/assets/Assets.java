@@ -7,6 +7,7 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 import com.troblecodings.launcher.ErrorDialog;
+import com.troblecodings.launcher.Launcher;
 
 public class Assets {
 
@@ -18,6 +19,7 @@ public class Assets {
 		try {
 			return ImageIO.read(getResourceAsStream(name));
 		} catch (IOException e) {
+			Launcher.LOGGER.trace(e.getMessage(), e);
 			ErrorDialog.createDialog(e);
 			return null;
 		}

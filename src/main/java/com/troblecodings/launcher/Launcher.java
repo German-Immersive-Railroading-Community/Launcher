@@ -54,6 +54,7 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		LOGGER.info("Starting Launcher!");
 		INSTANCEL = new Launcher();
 		INSTANCE = new JFrame();
 		INSTANCEL.setPart(new HomePage());

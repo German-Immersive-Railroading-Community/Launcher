@@ -64,7 +64,7 @@ public class StartupUtil {
 			long newsize = newversion.getNumber("size").longValue();
 			if (newsize == size || !location.isFile())
 				return;
-			System.out.println("Updating Launcher!");
+			Launcher.LOGGER.info("Updating Launcher!");
 			ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
 			ConnectionUtil.download(downloadURL, location.toString(),
 					bytesize -> progress.setProgress(bytesize.intValue()));

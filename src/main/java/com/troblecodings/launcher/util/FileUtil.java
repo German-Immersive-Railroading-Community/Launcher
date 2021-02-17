@@ -73,7 +73,9 @@ public class FileUtil {
 					String[] session = new String(encrypted).split(System.lineSeparator());
 					if (session.length == 4)
 						DEFAULT = new Session(session[0], session[1], session[2], session[3]);
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					Launcher.LOGGER.trace(e.getMessage(), e);
+				}
 			}
 		}
 		
@@ -105,6 +107,7 @@ public class FileUtil {
 		try {
 			FileUtil.init();
 		} catch (Throwable e) {
+			Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		Launcher.INSTANCEL.setPart(new HomePage());
 	}
