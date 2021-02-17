@@ -11,6 +11,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Optional;
+import java.util.Scanner;
+import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
@@ -26,6 +29,9 @@ import org.json.JSONTokener;
 import com.troblecodings.launcher.ErrorDialog;
 import com.troblecodings.launcher.ErrorPart;
 import com.troblecodings.launcher.Launcher;
+
+import mslinks.ShellLink;
+import mslinks.ShellLinkException;
 
 public class StartupUtil {
 
@@ -49,6 +55,74 @@ public class StartupUtil {
 			return "linux";
 		}
 		return "unknown";
+	}
+	
+	private static boolean isJavaAnd8(Path pathToDictionary) {
+		Path pathtoJava = pathToDictionary.resolve("java.exe");
+		if(Files.notExists(pathtoJava))
+			return false;
+		try {
+			ProcessBuilder builder = new ProcessBuilder(pathtoJava.toString(), "-version");
+			builder.redirectErrorStream(true);
+			Process process = builder.start();
+			Scanner scanner = new Scanner(process.getInputStream());
+			if(!scanner.hasNextLine())
+				return false;
+			String version = scanner.nextLine();
+			scanner.close();
+			if(version.split("\"")[1].startsWith("1.8.0"))
+				return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	
+	public static Optional<String> findJavaVersion() {
+		Optional<String> opt1 = Arrays.stream(System.getenv("path").split(";")).filter(str -> {
+			Path pathto = Paths.get(str);
+			if(Files.notExists(pathto))
+				return false;
+			return isJavaAnd8(pathto);
+		}).findFirst();
+		if(opt1.isPresent())
+			return opt1;
+		String home = System.getenv("JAVA_HOME");
+		if(home != null) {
+			Path pathToHome = Paths.get(home).resolve("bin");
+			if(isJavaAnd8(pathToHome))
+				return Optional.of(pathToHome.toString());
+		}
+		// This is just fallback
+		Path commonStartup = Paths.get("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\");
+		Path userStartup = Paths.get("%appdata%\\Microsoft\\Windows\\Start Menu\\Programs\\");
+		try {
+			Predicate<Path> pathPred = pth -> { 
+				try {
+					if(!Files.isRegularFile(pth) || !pth.toString().endsWith(".lnk"))
+						return false;
+					Path path = Paths.get(new ShellLink(pth).resolveTarget()).getParent();
+					System.out.println(path);
+					return isJavaAnd8(path);
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ShellLinkException e) {
+					e.printStackTrace();
+				}
+				return false;
+			};
+			Optional<Path> opt2 = Files.walk(commonStartup).filter(pathPred).findFirst();
+			if(opt2.isPresent())
+				return Optional.of(opt2.get().toString());
+			
+			Optional<Path> opt3 = Files.walk(userStartup).filter(pathPred).findFirst();
+			if(opt3.isPresent())
+				return Optional.of(opt3.get().toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return Optional.empty();
 	}
 
 	public static void update() {
@@ -225,6 +299,11 @@ public class StartupUtil {
 	}
 
 	public static Process start(String[] parameter) throws Throwable {
+		Optional<String> javaVers = findJavaVersion();
+		if(!javaVers.isPresent()) {
+			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Couldn't find valid Java 8 installation!", "Check that you installed the correct java versions!"));
+			return null;
+		}
 		String[] preparameter = new String[] { "java", "-Xmx" + RAM + "M", "-Xms" + RAM + "M",
 				"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
 				"-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", LWIDTH, "-height",
