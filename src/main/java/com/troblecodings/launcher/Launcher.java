@@ -22,6 +22,9 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.node.Button;
 import com.troblecodings.launcher.node.ImageView;
@@ -45,6 +48,8 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 	public static JFrame INSTANCE;
 	public static Launcher INSTANCEL;
 
+	public static final Logger LOGGER = LoggerFactory.getLogger(Launcher.class);
+	
 	/**
 	 * Launch the application.
 	 */
