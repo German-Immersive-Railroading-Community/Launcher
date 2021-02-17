@@ -114,11 +114,11 @@ public class StartupUtil {
 			};
 			Optional<Path> opt2 = Files.walk(commonStartup).filter(pathPred).findFirst();
 			if(opt2.isPresent())
-				return Optional.of(opt2.get().toString());
+				return Optional.of(opt2.get().getParent().toString());
 			
 			Optional<Path> opt3 = Files.walk(userStartup).filter(pathPred).findFirst();
 			if(opt3.isPresent())
-				return Optional.of(opt3.get().toString());
+				return Optional.of(opt3.get().getParent().toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -304,7 +304,7 @@ public class StartupUtil {
 			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Couldn't find valid Java 8 installation!", "Check that you installed the correct java versions!"));
 			return null;
 		}
-		String[] preparameter = new String[] { "java", "-Xmx" + RAM + "M", "-Xms" + RAM + "M",
+		String[] preparameter = new String[] { javaVers.get() + "/java", "-Xmx" + RAM + "M", "-Xms" + RAM + "M",
 				"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
 				"-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", LWIDTH, "-height",
 				LHEIGHT };
