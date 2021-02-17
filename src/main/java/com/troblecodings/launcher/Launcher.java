@@ -19,11 +19,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.node.Button;
@@ -48,7 +46,7 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 	public static JFrame INSTANCE;
 	public static Launcher INSTANCEL;
 
-	public static final Logger LOGGER = LoggerFactory.getLogger(Launcher.class);
+	public static final Logger LOGGER = Logger.getLogger("Launcher!");
 	
 	/**
 	 * Launch the application.
