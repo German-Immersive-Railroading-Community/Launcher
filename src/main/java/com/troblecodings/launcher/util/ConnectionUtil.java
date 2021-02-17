@@ -50,6 +50,12 @@ public class ConnectionUtil {
 				connection = (HttpURLConnection) new URL(newUrl).openConnection();
 				addHeader(connection);
 			}
+			if(resp == HttpURLConnection.HTTP_FORBIDDEN) {
+				Launcher.INSTANCEL
+				.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Connection was rejected!",
+						"The operation was forbidden! Rate limit? Retry later."));
+				return false;
+			}
 			InputStream stream = connection.getInputStream();
 			byte[] buf = new byte[8192];
 			int length = 0;
