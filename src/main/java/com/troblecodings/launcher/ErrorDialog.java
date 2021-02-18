@@ -1,14 +1,12 @@
 package com.troblecodings.launcher;
 
-import java.util.logging.Level;
-
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 public class ErrorDialog {
 
 	public static void createDialog(Throwable th) {
-		Launcher.LOGGER.log(Level.SEVERE, th.getMessage(), th);
+		Launcher.LOGGER.trace(th.getMessage(), th);
 		JTextArea area = new JTextArea();
 		area.setEditable(false);
 		String message = "Message: " + th.getMessage() + System.lineSeparator() + "Exception: "

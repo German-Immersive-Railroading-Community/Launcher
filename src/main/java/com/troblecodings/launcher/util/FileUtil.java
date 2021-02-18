@@ -7,9 +7,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Key;
 import java.util.List;
-import java.util.logging.Level;
 
 import javax.crypto.Cipher;
+
 import com.troblecodings.launcher.ErrorDialog;
 import com.troblecodings.launcher.HomePage;
 import com.troblecodings.launcher.Launcher;
@@ -76,7 +76,7 @@ public class FileUtil {
 					if (session.length == 4)
 						DEFAULT = new Session(session[0], session[1], session[2], session[3]);
 				} catch (Exception e) {
-					Launcher.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+					Launcher.LOGGER.trace(e.getMessage(), e);
 				}
 			}
 		}
@@ -109,7 +109,7 @@ public class FileUtil {
 		try {
 			FileUtil.init();
 		} catch (Throwable e) {
-			Launcher.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		Launcher.INSTANCEL.setPart(new HomePage());
 	}

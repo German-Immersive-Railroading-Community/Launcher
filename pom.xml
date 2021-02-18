@@ -19,6 +19,18 @@
 					<include>com/troblecodings/launcher/assets/*.png</include>
 				</includes>
 			</resource>
+			<resource>
+				<directory>src/main/java/</directory>
+				<includes>
+					<include>com/troblecodings/launcher/*.xml</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/java/</directory>
+				<includes>
+					<include>com/troblecodings/launcher/*.txt</include>
+				</includes>
+			</resource>
 		</resources>
 
 

@@ -20,7 +20,6 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.function.Consumer;
-import java.util.logging.Level;
 
 import com.troblecodings.launcher.ErrorPart;
 import com.troblecodings.launcher.Launcher;
@@ -75,7 +74,7 @@ public class ConnectionUtil {
 				Launcher.INSTANCEL
 						.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Couldn't resolve host " + e.getMessage(),
 								"Are you connected? No connection could be established!"));
-			Launcher.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			Launcher.LOGGER.trace(e.getMessage(), e);
 			return false;
 		}
 	}
@@ -108,13 +107,13 @@ public class ConnectionUtil {
 			if (!openConnection(url, fos, update))
 				return false;
 		} catch (Exception e) {
-			Launcher.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		Path normalFile = Paths.get(name);
 		try {
 			Files.move(pathtofile, normalFile, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			Launcher.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		return true;
 	}
@@ -141,10 +140,10 @@ public class ConnectionUtil {
 				}
 				return sha1result.equalsIgnoreCase(sha1);
 			} catch (IOException e) {
-				Launcher.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+				Launcher.LOGGER.trace(e.getMessage(), e);
 			}
 		} catch (NoSuchAlgorithmException e) {
-			Launcher.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		return false;
 	}

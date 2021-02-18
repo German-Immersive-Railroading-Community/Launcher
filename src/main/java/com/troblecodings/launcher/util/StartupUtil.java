@@ -18,7 +18,6 @@ import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import javax.swing.JButton;
@@ -76,7 +75,7 @@ public class StartupUtil {
 			if (version.split("\"")[1].startsWith("1.8.0"))
 				return true;
 		} catch (Exception e) {
-			Launcher.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		return false;
 	}
@@ -108,9 +107,9 @@ public class StartupUtil {
 					Launcher.LOGGER.info(path.toString());
 					return isJavaAnd8(path);
 				} catch (IOException e) {
-					Launcher.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+					Launcher.LOGGER.trace(e.getMessage(), e);
 				} catch (ShellLinkException e) {
-					Launcher.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+					Launcher.LOGGER.trace(e.getMessage(), e);
 				}
 				return false;
 			};
@@ -122,12 +121,14 @@ public class StartupUtil {
 			if (opt3.isPresent())
 				return Optional.of(opt3.get().getParent().toString());
 		} catch (IOException e) {
-			Launcher.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		return Optional.empty();
 	}
 
 	public static void update() {
+		if(!Launcher.UPDATE)
+			return;
 		try {
 			String str = ConnectionUtil.getStringFromURL(RELEASE_API);
 			if (str == null)
@@ -155,7 +156,7 @@ public class StartupUtil {
 			new ProcessBuilder("java", "-jar", location.toString()).start().waitFor();
 			System.exit(0);
 		} catch (Throwable e) {
-			Launcher.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			Launcher.LOGGER.trace(e.getMessage(), e);
 			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Update error!", "General error!"));
 		}
 	}
