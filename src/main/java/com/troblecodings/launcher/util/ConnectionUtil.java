@@ -80,7 +80,7 @@ public class ConnectionUtil {
 				Launcher.INSTANCEL
 						.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Couldn't resolve host " + e.getMessage(),
 								"Are you connected? No connection could be established!"));
-			e.printStackTrace();
+			Launcher.LOGGER.trace(e.getMessage(), e);
 			return false;
 		}
 	}
@@ -113,13 +113,13 @@ public class ConnectionUtil {
 			if (!openConnection(url, fos, update))
 				return false;
 		} catch (Exception e) {
-			e.printStackTrace();
+			Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		Path normalFile = Paths.get(name);
 		try {
 			Files.move(pathtofile, normalFile, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		return true;
 	}
@@ -146,20 +146,21 @@ public class ConnectionUtil {
 				}
 				return sha1result.equalsIgnoreCase(sha1);
 			} catch (IOException e) {
-				e.printStackTrace();
+				Launcher.LOGGER.trace(e.getMessage(), e);
 			}
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		return false;
 	}
-	
+
 	public static void validateDownloadRetry(final String url, final String name, final String sha1) {
 		validateDownloadRetry(url, name, sha1, null);
 	}
 
 	// This attempts to download a file if it isn't valid
-	public static void validateDownloadRetry(final String url, final String name, final String sha1, final Consumer<Long> update) {
+	public static void validateDownloadRetry(final String url, final String name, final String sha1,
+			final Consumer<Long> update) {
 		byte times = 0;
 		if (url.isEmpty()) {
 			if (!ConnectionUtil.validate(name, sha1))

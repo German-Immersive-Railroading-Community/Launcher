@@ -19,8 +19,16 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.swing.JFrame;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.node.Button;
@@ -45,10 +53,30 @@ public class Launcher extends Canvas implements MouseListener, MouseMotionListen
 	public static JFrame INSTANCE;
 	public static Launcher INSTANCEL;
 
+	public static final Logger LOGGER = LogManager.getLogger(Launcher.class);
+	
+	public static boolean UPDATE = true;
+	
+	private static Map<String, Predicate<Iterator<String>>> ARGUMENTS = initArguments();
+	private static Map<String, Predicate<Iterator<String>>> initArguments() {
+		Map<String, Predicate<Iterator<String>>> map = new HashMap<>();
+		map.put("--no-update", it -> !(UPDATE = false));
+		return map;
+	}
+	
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		Iterator<String> strs = Arrays.stream(args).iterator();
+		while (strs.hasNext()) {
+			String string = (String) strs.next();
+			if(ARGUMENTS.containsKey(string))
+				if(ARGUMENTS.get(string).test(strs))
+					break;
+		}
+		
+		LOGGER.info("Starting Launcher!");
 		INSTANCEL = new Launcher();
 		INSTANCE = new JFrame();
 		INSTANCEL.setPart(new HomePage());

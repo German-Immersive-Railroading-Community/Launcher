@@ -58,76 +58,77 @@ public class StartupUtil {
 		}
 		return "unknown";
 	}
-	
+
 	private static boolean isJavaAnd8(Path pathToDictionary) {
 		Path pathtoJava = pathToDictionary.resolve("java.exe");
-		if(Files.notExists(pathtoJava))
+		if (Files.notExists(pathtoJava))
 			return false;
 		try {
 			ProcessBuilder builder = new ProcessBuilder(pathtoJava.toString(), "-version");
 			builder.redirectErrorStream(true);
 			Process process = builder.start();
 			Scanner scanner = new Scanner(process.getInputStream());
-			if(!scanner.hasNextLine())
+			if (!scanner.hasNextLine())
 				return false;
 			String version = scanner.nextLine();
 			scanner.close();
-			if(version.split("\"")[1].startsWith("1.8.0"))
+			if (version.split("\"")[1].startsWith("1.8.0"))
 				return true;
 		} catch (Exception e) {
-			e.printStackTrace();
+			Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		return false;
 	}
-	
-	
+
 	public static Optional<String> findJavaVersion() {
 		Optional<String> opt1 = Arrays.stream(System.getenv("path").split(";")).filter(str -> {
 			Path pathto = Paths.get(str);
-			if(Files.notExists(pathto))
+			if (Files.notExists(pathto))
 				return false;
 			return isJavaAnd8(pathto);
 		}).findFirst();
-		if(opt1.isPresent())
+		if (opt1.isPresent())
 			return opt1;
 		String home = System.getenv("JAVA_HOME");
-		if(home != null) {
+		if (home != null) {
 			Path pathToHome = Paths.get(home).resolve("bin");
-			if(isJavaAnd8(pathToHome))
+			if (isJavaAnd8(pathToHome))
 				return Optional.of(pathToHome.toString());
 		}
 		// This is just fallback
 		Path commonStartup = Paths.get("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\");
 		Path userStartup = Paths.get("%appdata%\\Microsoft\\Windows\\Start Menu\\Programs\\");
 		try {
-			Predicate<Path> pathPred = pth -> { 
+			Predicate<Path> pathPred = pth -> {
 				try {
-					if(!Files.isRegularFile(pth) || !pth.toString().endsWith(".lnk"))
+					if (!Files.isRegularFile(pth) || !pth.toString().endsWith(".lnk"))
 						return false;
 					Path path = Paths.get(new ShellLink(pth).resolveTarget()).getParent();
-					System.out.println(path);
+					Launcher.LOGGER.info(path.toString());
 					return isJavaAnd8(path);
 				} catch (IOException e) {
-					e.printStackTrace();
+					Launcher.LOGGER.trace(e.getMessage(), e);
 				} catch (ShellLinkException e) {
-					e.printStackTrace();
+					Launcher.LOGGER.trace(e.getMessage(), e);
 				}
 				return false;
 			};
 			Optional<Path> opt2 = Files.walk(commonStartup).filter(pathPred).findFirst();
-			if(opt2.isPresent())
+			if (opt2.isPresent())
 				return Optional.of(opt2.get().getParent().toString());
-			
+
 			Optional<Path> opt3 = Files.walk(userStartup).filter(pathPred).findFirst();
-			if(opt3.isPresent())
+			if (opt3.isPresent())
 				return Optional.of(opt3.get().getParent().toString());
 		} catch (IOException e) {
-			e.printStackTrace();
+			Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		return Optional.empty();
 	}
 
 	public static void update() {
+		if(!Launcher.UPDATE)
+			return;
 		try {
 			String str = ConnectionUtil.getStringFromURL(RELEASE_API);
 			if (str == null)
@@ -140,12 +141,13 @@ public class StartupUtil {
 			long newsize = newversion.getNumber("size").longValue();
 			if (newsize == size || !location.isFile())
 				return;
-			System.out.println("Updating Launcher!");
+			Launcher.LOGGER.info("Updating Launcher!");
 			ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
 			Path pth = Paths.get(location.toURI());
 			Files.copy(pth, Paths.get(pth.toString() + ".tmp"), StandardCopyOption.REPLACE_EXISTING);
 			OutputStream stream = Files.newOutputStream(pth);
-			if(!ConnectionUtil.openConnection(downloadURL, stream, bytesize -> progress.setProgress(bytesize.intValue()))) {
+			if (!ConnectionUtil.openConnection(downloadURL, stream,
+					bytesize -> progress.setProgress(bytesize.intValue()))) {
 				stream.close();
 				Files.copy(Paths.get(pth.toString() + ".tmp"), pth, StandardCopyOption.REPLACE_EXISTING);
 				return;
@@ -154,7 +156,7 @@ public class StartupUtil {
 			new ProcessBuilder("java", "-jar", location.toString()).start().waitFor();
 			System.exit(0);
 		} catch (Throwable e) {
-			e.printStackTrace();
+			Launcher.LOGGER.trace(e.getMessage(), e);
 			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Update error!", "General error!"));
 		}
 	}
@@ -198,7 +200,7 @@ public class StartupUtil {
 		Files.createDirectories(ogMC.getParent());
 		JSONObject clientDL = object.getJSONObject("downloads").getJSONObject("client");
 		long sizeClient = clientDL.getLong("size");
-		ConnectionUtil.validateDownloadRetry(clientDL.getString("url"), ogMC.toString(), clientDL.getString("sha1"), 
+		ConnectionUtil.validateDownloadRetry(clientDL.getString("url"), ogMC.toString(), clientDL.getString("sha1"),
 				l -> Launcher.bar.update(l / sizeClient));
 		LIBPATHS = ogMC.toString() + ";";
 
@@ -211,7 +213,7 @@ public class StartupUtil {
 		JSONTokener tokener = new JSONTokener(Files.newInputStream(Paths.get(indexpath)));
 		JSONObject index = new JSONObject(tokener);
 		JSONObject objects = index.getJSONObject("objects");
-		
+
 		// This part is to download the libs
 		for (Object libentry : arr) {
 			JSONObject libobj = (JSONObject) libentry;
@@ -309,8 +311,9 @@ public class StartupUtil {
 
 	public static Process start(String[] parameter) throws Throwable {
 		Optional<String> javaVers = findJavaVersion();
-		if(!javaVers.isPresent()) {
-			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Couldn't find valid Java 8 installation!", "Check that you installed the correct java versions!"));
+		if (!javaVers.isPresent()) {
+			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(),
+					"Couldn't find valid Java 8 installation!", "Check that you installed the correct java versions!"));
 			return null;
 		}
 		String[] preparameter = new String[] { javaVers.get() + "/java", "-Xmx" + RAM + "M", "-Xms" + RAM + "M",
