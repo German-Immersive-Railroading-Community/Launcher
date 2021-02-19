@@ -5,12 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,9 +16,6 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.function.Consumer;
-
-import com.troblecodings.launcher.ErrorPart;
-import com.troblecodings.launcher.Launcher;
 
 public class ConnectionUtil {
 
@@ -51,9 +44,9 @@ public class ConnectionUtil {
 				addHeader(connection);
 			}
 			if(resp == HttpURLConnection.HTTP_FORBIDDEN) {
-				Launcher.INSTANCEL
-				.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Connection was rejected!",
-						"The operation was forbidden! Rate limit? Retry later."));
+//				Launcher.INSTANCEL
+//				.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Connection was rejected!",
+//						"The operation was forbidden! Rate limit? Retry later."));
 				return false;
 			}
 			InputStream stream = connection.getInputStream();
@@ -70,17 +63,17 @@ public class ConnectionUtil {
 			stream.close();
 			return true;
 		} catch (Exception e) {
-			if (e instanceof ConnectException || e instanceof SocketTimeoutException)
-				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Connection error!",
-						"No connection could be established!"));
-			else if (e instanceof MalformedURLException)
-				Launcher.INSTANCEL
-						.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "URL error!", "The URL was mallformed!"));
-			else if (e instanceof UnknownHostException)
-				Launcher.INSTANCEL
-						.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Couldn't resolve host " + e.getMessage(),
-								"Are you connected? No connection could be established!"));
-			Launcher.LOGGER.trace(e.getMessage(), e);
+//			if (e instanceof ConnectException || e instanceof SocketTimeoutException)
+//				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Connection error!",
+//						"No connection could be established!"));
+//			else if (e instanceof MalformedURLException)
+//				Launcher.INSTANCEL
+//						.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "URL error!", "The URL was mallformed!"));
+//			else if (e instanceof UnknownHostException)
+//				Launcher.INSTANCEL
+//						.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Couldn't resolve host " + e.getMessage(),
+//								"Are you connected? No connection could be established!"));
+//			Launcher.LOGGER.trace(e.getMessage(), e);
 			return false;
 		}
 	}
@@ -113,13 +106,13 @@ public class ConnectionUtil {
 			if (!openConnection(url, fos, update))
 				return false;
 		} catch (Exception e) {
-			Launcher.LOGGER.trace(e.getMessage(), e);
+			//Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		Path normalFile = Paths.get(name);
 		try {
 			Files.move(pathtofile, normalFile, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			Launcher.LOGGER.trace(e.getMessage(), e);
+			//Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		return true;
 	}
@@ -146,10 +139,10 @@ public class ConnectionUtil {
 				}
 				return sha1result.equalsIgnoreCase(sha1);
 			} catch (IOException e) {
-				Launcher.LOGGER.trace(e.getMessage(), e);
+				//Launcher.LOGGER.trace(e.getMessage(), e);
 			}
 		} catch (NoSuchAlgorithmException e) {
-			Launcher.LOGGER.trace(e.getMessage(), e);
+			//Launcher.LOGGER.trace(e.getMessage(), e);
 		}
 		return false;
 	}
@@ -169,9 +162,9 @@ public class ConnectionUtil {
 		}
 		while (!ConnectionUtil.validate(name, sha1)) {
 			if (times == 3) {
-				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(),
-						"Error verifying " + Paths.get(name).getFileName().toString(),
-						"The file failed to download correctly after 3 tries!"));
+//				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(),
+//						"Error verifying " + Paths.get(name).getFileName().toString(),
+//						"The file failed to download correctly after 3 tries!"));
 				break;
 			}
 			ConnectionUtil.download(url, name, update);

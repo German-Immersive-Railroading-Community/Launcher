@@ -7,13 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Key;
 import java.util.List;
-
 import javax.crypto.Cipher;
-
-import com.troblecodings.launcher.ErrorDialog;
-import com.troblecodings.launcher.HomePage;
-import com.troblecodings.launcher.Launcher;
-import com.troblecodings.launcher.SettingsPage;
 
 import net.cydhra.nidhogg.data.Session;
 
@@ -54,10 +48,10 @@ public class FileUtil {
 				BASE_DIR = System.getenv("APPDATA") + "/gir";
 			}
 		} catch (IOException e) {
-			ErrorDialog.createDialog(e);
+			//ErrorDialog.createDialog(e);
 		}
 
-		SettingsPage.NEWBASEDIR = BASE_DIR = setCreateIfNotExists(BASE_DIR.replace("\\", "/"));
+		//SettingsPage.NEWBASEDIR = BASE_DIR = setCreateIfNotExists(BASE_DIR.replace("\\", "/"));
 		ASSET_DIR = setCreateIfNotExists(BASE_DIR + "/assets");
 		LIB_DIR = setCreateIfNotExists(BASE_DIR + "/libraries");
 
@@ -76,7 +70,7 @@ public class FileUtil {
 					if (session.length == 4)
 						DEFAULT = new Session(session[0], session[1], session[2], session[3]);
 				} catch (Exception e) {
-					Launcher.LOGGER.trace(e.getMessage(), e);
+					//Launcher.LOGGER.trace(e.getMessage(), e);
 				}
 			}
 		}
@@ -109,9 +103,9 @@ public class FileUtil {
 		try {
 			FileUtil.init();
 		} catch (Throwable e) {
-			Launcher.LOGGER.trace(e.getMessage(), e);
+			//Launcher.LOGGER.trace(e.getMessage(), e);
 		}
-		Launcher.INSTANCEL.setPart(new HomePage());
+		//Launcher.INSTANCEL.setPart(new HomePage());
 	}
 
 	private static void deleteDirectory(File directory) {
