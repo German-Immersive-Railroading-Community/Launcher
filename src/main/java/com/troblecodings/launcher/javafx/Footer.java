@@ -1,5 +1,7 @@
 package com.troblecodings.launcher.javafx;
 
+import com.troblecodings.launcher.Launcher;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
@@ -17,7 +19,7 @@ public class Footer extends StackPane {
 	}
 	
 	private void onButtonClicked() {
-		//TODO Display credits
+		Launcher.setScene(Launcher.CREDITSSCENE);
 	}
 
 }

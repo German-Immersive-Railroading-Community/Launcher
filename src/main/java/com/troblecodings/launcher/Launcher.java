@@ -1,6 +1,7 @@
 package com.troblecodings.launcher;
 
 import com.troblecodings.launcher.assets.Assets;
+import com.troblecodings.launcher.javafx.CreditsScene;
 import com.troblecodings.launcher.javafx.Footer;
 import com.troblecodings.launcher.javafx.Header;
 import com.troblecodings.launcher.javafx.HomeScene;
@@ -14,6 +15,9 @@ import javafx.stage.StageStyle;
 public class Launcher extends Application {
 	
 	private static Stage stage;
+	
+	public static HomeScene HOMESCENE = new HomeScene();
+	public static CreditsScene CREDITSSCENE = new CreditsScene();
 
 	public static void main(String[] args) {
 		launch(args);
@@ -22,15 +26,15 @@ public class Launcher extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		Launcher.stage = stage;
-		stage.setScene(new HomeScene());
+		stage.setScene(HOMESCENE);
 		stage.setWidth(1280);
 		stage.setHeight(720);
 		stage.initStyle(StageStyle.TRANSPARENT);
 		stage.show();
 	}
 	
-	public static void setupScene(Scene scene, StackPane stackpane) {
-		stackpane.getChildren().add(new Header());
+	public static void setupScene(Scene scene, StackPane stackpane, boolean home) {
+		stackpane.getChildren().add(new Header(home));
 		stackpane.getChildren().add(new Footer());
 		scene.setFill(Color.TRANSPARENT);
 		scene.getStylesheets().add(Assets.getStyleSheet("style.css"));

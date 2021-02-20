@@ -6,11 +6,26 @@
 	-fx-border-radius: 30px;
 }
 
+VBox{
+	-fx-background-color: #1b1b1b;
+	-fx-background-radius: 10px;
+	-fx-padding: 40px;
+}
+
+Label{
+	-fx-font-size: 25px;
+	-fx-font-weight: bold;
+	-fx-text-fill: white;
+	-fx-padding: 20px 0px 10px 0px;
+}
+
 Button{
 	-fx-background-color: transparent;
 	-fx-font-size: 18px;
 	-fx-font-weight: bold;
 	-fx-text-fill: #808080;
+	-fx-padding: 0px;
+	-fx-padding: 0px 0px 10px 0px;
 }
 
 .launchbutton{
@@ -20,10 +35,17 @@ Button{
 }
 
 .optionsbutton{
-	-fx-background-image: url(settingbuttonoff.png);
+	-fx-background-image: url(optionsbutton.png);
 	-fx-background-repeat: stretch;
 	-fx-pref-height: 22px;
 	-fx-pref-width: 167px;
+}
+
+.backbutton{
+	-fx-background-image: url(backbutton.png);
+	-fx-background-repeat: stretch;
+	-fx-pref-height: 22px;
+	-fx-pref-width: 120px;
 }
 
 .closebutton {

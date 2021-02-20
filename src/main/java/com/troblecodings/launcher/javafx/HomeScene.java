@@ -13,7 +13,7 @@ public class HomeScene extends Scene {
 
 	public HomeScene() {
 		super(stackpane);
-		Launcher.setupScene(this, stackpane);
+		Launcher.setupScene(this, stackpane, true);
 		
 		ImageView imagelogo = new ImageView(Assets.getImage("logo.png"));
 		

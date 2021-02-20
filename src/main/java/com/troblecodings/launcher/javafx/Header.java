@@ -1,7 +1,6 @@
 package com.troblecodings.launcher.javafx;
 
 import com.troblecodings.launcher.Launcher;
-
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -13,10 +12,15 @@ public class Header extends StackPane {
 	 private static double xOffset = 0;
 	 private static double yOffset = 0;
 	
-	public Header() {
+	public Header(boolean home) {
 		Button optionsbutton = new Button();
-		optionsbutton.getStyleClass().add("optionsbutton");
-		optionsbutton.setOnAction(event -> onButtonClicked());
+		if(home) {
+			optionsbutton.getStyleClass().add("optionsbutton");
+			optionsbutton.setOnAction(event -> onButtonClicked());
+		} else {
+			optionsbutton.getStyleClass().add("backbutton");
+			optionsbutton.setOnAction(event -> Launcher.setScene(Launcher.HOMESCENE));
+		}
 		
 		Button closebutton = new Button();
 		closebutton.getStyleClass().add("closebutton");
@@ -49,7 +53,7 @@ public class Header extends StackPane {
 	}
 	
 	private void onButtonClicked() {
-		//TODO Display credits
+		//TODO Display options
 	}
 
 }
