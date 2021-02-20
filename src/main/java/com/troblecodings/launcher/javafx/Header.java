@@ -1,10 +1,17 @@
 package com.troblecodings.launcher.javafx;
 
+import com.troblecodings.launcher.Launcher;
+
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 
 public class Header extends StackPane {
+	
+	 private static double xOffset = 0;
+	 private static double yOffset = 0;
 	
 	public Header() {
 		Button optionsbutton = new Button();
@@ -21,6 +28,24 @@ public class Header extends StackPane {
 		this.getChildren().addAll(optionsbutton, closebutton);
 		this.setMaxHeight(85);
 		StackPane.setAlignment(this, Pos.TOP_CENTER);
+		initializeEvents();
+	}
+	
+	private void initializeEvents() {
+		this.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                xOffset = event.getSceneX();
+                yOffset = event.getSceneY();
+            }
+        });
+        this.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Launcher.getStage().setX(event.getScreenX() - xOffset);
+                Launcher.getStage().setY(event.getScreenY() - yOffset);
+            }
+        });
 	}
 	
 	private void onButtonClicked() {
