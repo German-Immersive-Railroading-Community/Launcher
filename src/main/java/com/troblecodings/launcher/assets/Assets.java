@@ -1,7 +1,5 @@
 package com.troblecodings.launcher.assets;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import javafx.scene.image.Image;
 
@@ -16,13 +14,7 @@ public class Assets {
 	}
 
 	public static Image getImage(String name) {
-		try {
-			return new Image(new FileInputStream(name));
-		} catch (FileNotFoundException e) {
-//			Launcher.LOGGER.trace(e.getMessage(), e);
-//			ErrorDialog.createDialog(e);
-			return null;
-		}
+		return new Image(getResourceAsStream(name));
 	}
 
 }

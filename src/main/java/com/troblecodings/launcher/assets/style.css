@@ -5,3 +5,39 @@
 	-fx-background-radius: 30px;
 	-fx-border-radius: 30px;
 }
+
+Button{
+	-fx-background-color: transparent;
+	-fx-font-size: 18px;
+	-fx-font-weight: bold;
+	-fx-text-fill: #808080;
+}
+
+.launchbutton{
+	-fx-background-image: url(launchbutton.png);
+	-fx-pref-height: 100px;
+	-fx-pref-width: 350px;
+}
+
+.optionsbutton{
+	-fx-background-image: url(settingbuttonoff.png);
+	-fx-background-repeat: stretch;
+	-fx-pref-height: 22px;
+	-fx-pref-width: 167px;
+}
+
+.closebutton {
+	-fx-background-image: url(closebutton.png);
+	-fx-pref-height: 67px;
+	-fx-pref-width: 52px;
+}
+
+.launchbutton:hover {
+	-fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.closebutton:hover{
+	-fx-scale-x: 1.15;
+    -fx-scale-y: 1.15;
+}

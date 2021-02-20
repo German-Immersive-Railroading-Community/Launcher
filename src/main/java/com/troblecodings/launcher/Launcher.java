@@ -1,6 +1,8 @@
 package com.troblecodings.launcher;
 
 import com.troblecodings.launcher.assets.Assets;
+import com.troblecodings.launcher.javafx.Footer;
+import com.troblecodings.launcher.javafx.Header;
 import com.troblecodings.launcher.javafx.HomeScene;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -28,8 +30,8 @@ public class Launcher extends Application {
 	}
 	
 	public static void setupScene(Scene scene, StackPane stackpane) {
-		//TODO setHeader
-		//TODO setFooter
+		stackpane.getChildren().add(new Header());
+		stackpane.getChildren().add(new Footer());
 		scene.setFill(Color.TRANSPARENT);
 		scene.getStylesheets().add(Assets.getStyleSheet("style.css"));
 	}
