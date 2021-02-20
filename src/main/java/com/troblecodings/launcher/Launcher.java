@@ -5,6 +5,8 @@ import com.troblecodings.launcher.javafx.CreditsScene;
 import com.troblecodings.launcher.javafx.Footer;
 import com.troblecodings.launcher.javafx.Header;
 import com.troblecodings.launcher.javafx.HomeScene;
+import com.troblecodings.launcher.javafx.OptionsScene;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
@@ -17,8 +19,9 @@ public class Launcher extends Application {
 	private static Stage stage;
 	
 	public static HomeScene HOMESCENE = new HomeScene();
+	public static OptionsScene OPTIONSSCENE = new OptionsScene();
 	public static CreditsScene CREDITSSCENE = new CreditsScene();
-
+	
 	public static void main(String[] args) {
 		launch(args);
 	}

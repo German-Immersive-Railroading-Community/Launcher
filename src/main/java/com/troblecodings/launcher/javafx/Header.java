@@ -16,7 +16,7 @@ public class Header extends StackPane {
 		Button optionsbutton = new Button();
 		if(home) {
 			optionsbutton.getStyleClass().add("optionsbutton");
-			optionsbutton.setOnAction(event -> onButtonClicked());
+			optionsbutton.setOnAction(event -> Launcher.setScene(Launcher.OPTIONSSCENE));
 		} else {
 			optionsbutton.getStyleClass().add("backbutton");
 			optionsbutton.setOnAction(event -> Launcher.setScene(Launcher.HOMESCENE));
@@ -50,10 +50,6 @@ public class Header extends StackPane {
                 Launcher.getStage().setY(event.getScreenY() - yOffset);
             }
         });
-	}
-	
-	private void onButtonClicked() {
-		//TODO Display options
 	}
 
 }
