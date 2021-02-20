@@ -5,6 +5,7 @@ import com.troblecodings.launcher.javafx.CreditsScene;
 import com.troblecodings.launcher.javafx.Footer;
 import com.troblecodings.launcher.javafx.Header;
 import com.troblecodings.launcher.javafx.HomeScene;
+import com.troblecodings.launcher.javafx.LoginScene;
 import com.troblecodings.launcher.javafx.OptionsScene;
 
 import javafx.application.Application;
@@ -18,9 +19,10 @@ public class Launcher extends Application {
 	
 	private static Stage stage;
 	
-	public static HomeScene HOMESCENE = new HomeScene();
-	public static OptionsScene OPTIONSSCENE = new OptionsScene();
-	public static CreditsScene CREDITSSCENE = new CreditsScene();
+	public static final HomeScene HOMESCENE = new HomeScene();
+	public static final OptionsScene OPTIONSSCENE = new OptionsScene();
+	public static final LoginScene LOGINSCENE = new LoginScene();
+	public static final CreditsScene CREDITSSCENE = new CreditsScene();
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -36,8 +38,8 @@ public class Launcher extends Application {
 		stage.show();
 	}
 	
-	public static void setupScene(Scene scene, StackPane stackpane, boolean home) {
-		stackpane.getChildren().add(new Header(home));
+	public static void setupScene(Scene scene, StackPane stackpane) {
+		stackpane.getChildren().add(new Header(scene));
 		stackpane.getChildren().add(new Footer());
 		scene.setFill(Color.TRANSPARENT);
 		scene.getStylesheets().add(Assets.getStyleSheet("style.css"));

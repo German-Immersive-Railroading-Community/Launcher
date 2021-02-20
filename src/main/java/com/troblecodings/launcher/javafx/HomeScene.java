@@ -13,7 +13,7 @@ public class HomeScene extends Scene {
 
 	public HomeScene() {
 		super(stackpane);
-		Launcher.setupScene(this, stackpane, true);
+		Launcher.setupScene(this, stackpane);
 		
 		ImageView imagelogo = new ImageView(Assets.getImage("logo.png"));
 		
@@ -27,6 +27,7 @@ public class HomeScene extends Scene {
 	
 	private void onButtonClicked() {
 		//TODO Launch
+		Launcher.setScene(Launcher.LOGINSCENE);
 	}
 
 }

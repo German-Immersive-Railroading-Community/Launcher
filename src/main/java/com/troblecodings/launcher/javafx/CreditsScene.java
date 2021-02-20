@@ -17,7 +17,7 @@ public class CreditsScene extends Scene {
 
 	public CreditsScene() {
 		super(stackpane);
-		Launcher.setupScene(this, stackpane, false);
+		Launcher.setupScene(this, stackpane);
 		
 		VBox vbox = new VBox();
 		vbox.setMaxHeight(400);

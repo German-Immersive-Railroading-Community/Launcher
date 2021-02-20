@@ -11,7 +11,7 @@ public class OptionsScene extends Scene {
 
 	public OptionsScene() {
 		super(stackpane);
-		Launcher.setupScene(this, stackpane, false);
+		Launcher.setupScene(this, stackpane);
 		
 		VBox vbox = new VBox();
 		vbox.setMaxHeight(400);

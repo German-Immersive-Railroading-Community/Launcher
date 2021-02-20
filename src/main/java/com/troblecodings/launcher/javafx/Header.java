@@ -3,6 +3,7 @@ package com.troblecodings.launcher.javafx;
 import com.troblecodings.launcher.Launcher;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
@@ -12,13 +13,13 @@ public class Header extends StackPane {
 	 private static double xOffset = 0;
 	 private static double yOffset = 0;
 	
-	public Header(boolean home) {
+	public Header(Scene scene) {
 		Button optionsbutton = new Button();
-		if(home) {
+		if(scene instanceof HomeScene) {
 			optionsbutton.getStyleClass().add("optionsbutton");
 			optionsbutton.setOnAction(event -> Launcher.setScene(Launcher.OPTIONSSCENE));
 		} else {
-			optionsbutton.getStyleClass().add("backbutton");
+ 			optionsbutton.getStyleClass().add("backbutton");
 			optionsbutton.setOnAction(event -> Launcher.setScene(Launcher.HOMESCENE));
 		}
 		
