@@ -57,7 +57,7 @@ public class AuthUtil {
 	private static final String getOrDefault(final JSONObject json, final String id, final String def) {
 		if (json.has(id))
 			return json.getString(id);
-		Launcher.getLogger().warn("Couldn't find %s in %s! Using default!");
+		Launcher.getLogger().warn("Couldn't find %s in %s! Using default!", id, json.toString());
 		return def;
 	}
 

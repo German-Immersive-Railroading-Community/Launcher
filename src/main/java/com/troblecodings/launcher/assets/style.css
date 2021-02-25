@@ -45,6 +45,28 @@ PasswordField{
 	-fx-background-radius: 5px;
 }
 
+ProgressBar {
+    -fx-border-style: none;
+	-fx-progress-color: none;
+	-fx-accent: green;
+	-fx-control-inner-background: transparent;
+}
+
+ProgressBar > .track {
+  	-fx-control-inner-background: transparent;
+  	-fx-background-color: transparent;
+}
+
+ProgressBar > {
+  	-fx-control-inner-background: transparent;
+  	-fx-background-color: transparent;
+}
+
+ProgressBar > .track > {
+  	-fx-control-inner-background: transparent;
+  	-fx-background-color: transparent;
+}
+
 ComboBox{
 	-fx-background-color: #5e5e5e;
 	-fx-font-size: 18px;
