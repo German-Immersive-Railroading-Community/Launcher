@@ -6,14 +6,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Key;
-import java.util.List;
+
 import javax.crypto.Cipher;
+
+import com.google.gson.Gson;
+import com.troblecodings.launcher.Launcher;
 
 import net.cydhra.nidhogg.data.Session;
 
 public class FileUtil {
 
-	public static String BASE_DIR = null;
+	public static SettingsData SETTINGS = null;
 	public static String ASSET_DIR = null;
 	public static String LIB_DIR = null;
 
@@ -22,59 +25,75 @@ public class FileUtil {
 	public static String TRANSFORM = "AES";
 	public static Path REMEMBERFILE;
 
-	public static final Path SETTINGSPATH = Paths.get(System.getProperty("user.home") + "/.launcher/Settings.txt");
+	public static final Path SETTINGSPATH = Paths.get(System.getProperty("user.home") + "/.launcher/settings.json");
 
-	private static String setCreateIfNotExists(String pathstr) throws Throwable {
+	private static String setCreateIfNotExists(String pathstr) {
 		Path path = Paths.get(pathstr);
 		if (!Files.exists(path)) {
-			Files.createDirectories(path);
+			try {
+				Files.createDirectories(path);
+			} catch (IOException e) {
+				// TODO LOG AND PRINT
+				e.printStackTrace();
+			}
 		}
 		return pathstr;
 	}
 
-	// Initiates all folders and reads the remember file
-	public static void init() throws Throwable {
+	public static class SettingsData {
+
+		public String baseDir = System.getenv("APPDATA") + "/gir";
+		public int width = 1280;
+		public int height = 720;
+		public int ram = 2048;
+
+	}
+
+	public static final Gson GSON = new Gson();
+
+	public static void readSettings() {
 		try {
 			if (Files.exists(SETTINGSPATH)) {
-				List<String> settings = Files.readAllLines(SETTINGSPATH);
-				StartupUtil.LWIDTH = settings.size() < 1 ? "1280" : settings.get(0);
-				StartupUtil.LHEIGHT = settings.size() < 2 ? "720" : settings.get(1);
-				if (settings.size() >= 3)
-					StartupUtil.RAM = Integer.valueOf(settings.get(2));
-				BASE_DIR = settings.size() < 4 ? (System.getenv("APPDATA") + "/gir") : settings.get(3);
+				SETTINGS = GSON.fromJson(Files.newBufferedReader(SETTINGSPATH), SettingsData.class);
 			} else {
 				Files.createDirectories(SETTINGSPATH.getParent());
 				Files.createFile(SETTINGSPATH);
-				BASE_DIR = System.getenv("APPDATA") + "/gir";
 			}
 		} catch (IOException e) {
-			//ErrorDialog.createDialog(e);
+			try {
+				Files.delete(SETTINGSPATH);
+			} catch (IOException e1) {
+				e1.printStackTrace();// Do not log
+			}
+		} finally {
+			if (SETTINGS == null)
+				SETTINGS = new SettingsData();
 		}
+	}
 
-		//SettingsPage.NEWBASEDIR = BASE_DIR = setCreateIfNotExists(BASE_DIR.replace("\\", "/"));
-		ASSET_DIR = setCreateIfNotExists(BASE_DIR + "/assets");
-		LIB_DIR = setCreateIfNotExists(BASE_DIR + "/libraries");
+	public static void init() {
+		ASSET_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/assets");
+		LIB_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/libraries");
 
-		REMEMBERFILE = Paths.get(BASE_DIR + "/ac.ce");
-		if (Files.exists(REMEMBERFILE)) {
-			byte[] content = Files.readAllBytes(REMEMBERFILE);
-			if (content != null && content.length > 0) {
-				Key key = CryptoUtil.getKey(TRANSFORM);
+		REMEMBERFILE = Paths.get(SETTINGS.baseDir + "/ac.ce");
+		try {
+			if (Files.exists(REMEMBERFILE)) {
+				byte[] content = Files.readAllBytes(REMEMBERFILE);
+				if (content != null && content.length > 0) {
+					Key key = CryptoUtil.getKey(TRANSFORM);
 
-				Cipher cipher = Cipher.getInstance(TRANSFORM);
-				cipher.init(Cipher.DECRYPT_MODE, key);
+					Cipher cipher = Cipher.getInstance(TRANSFORM);
+					cipher.init(Cipher.DECRYPT_MODE, key);
 
-				try {
 					byte[] encrypted = cipher.doFinal(content);
 					String[] session = new String(encrypted).split(System.lineSeparator());
 					if (session.length == 4)
 						DEFAULT = new Session(session[0], session[1], session[2], session[3]);
-				} catch (Exception e) {
-					//Launcher.LOGGER.trace(e.getMessage(), e);
 				}
 			}
+		} catch (Throwable e) {
+			Launcher.onError(e);
 		}
-
 	}
 
 	// Encrypts and saves a session
@@ -93,19 +112,19 @@ public class FileUtil {
 
 	// Delete option files and mod, assets and libraries folder
 	public static void resetFiles() {
-		deleteFile(Paths.get(FileUtil.BASE_DIR + "/options.txt").toFile());
-		deleteFile(Paths.get(FileUtil.BASE_DIR + "/optionsof.txt").toFile());
-		deleteFile(Paths.get(FileUtil.BASE_DIR + "/GIR.json").toFile());
-		deleteDirectory(Paths.get(FileUtil.BASE_DIR + "/mods").toFile());
-		deleteDirectory(Paths.get(FileUtil.BASE_DIR + "/assets").toFile());
-		deleteDirectory(Paths.get(FileUtil.BASE_DIR + "/libraries").toFile());
-		deleteDirectory(Paths.get(FileUtil.BASE_DIR + "/config").toFile());
+		deleteFile(Paths.get(SETTINGS.baseDir + "/options.txt").toFile());
+		deleteFile(Paths.get(SETTINGS.baseDir + "/optionsof.txt").toFile());
+		deleteFile(Paths.get(SETTINGS.baseDir + "/GIR.json").toFile());
+		deleteDirectory(Paths.get(SETTINGS.baseDir + "/mods").toFile());
+		deleteDirectory(Paths.get(SETTINGS.baseDir + "/assets").toFile());
+		deleteDirectory(Paths.get(SETTINGS.baseDir + "/libraries").toFile());
+		deleteDirectory(Paths.get(SETTINGS.baseDir + "/config").toFile());
 		try {
 			FileUtil.init();
 		} catch (Throwable e) {
-			//Launcher.LOGGER.trace(e.getMessage(), e);
+			// Launcher.LOGGER.trace(e.getMessage(), e);
 		}
-		//Launcher.INSTANCEL.setPart(new HomePage());
+		// Launcher.INSTANCEL.setPart(new HomePage());
 	}
 
 	private static void deleteDirectory(File directory) {

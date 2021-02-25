@@ -1,5 +1,8 @@
 package com.troblecodings.launcher;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.CreditsScene;
 import com.troblecodings.launcher.javafx.Footer;
@@ -7,6 +10,7 @@ import com.troblecodings.launcher.javafx.Header;
 import com.troblecodings.launcher.javafx.HomeScene;
 import com.troblecodings.launcher.javafx.LoginScene;
 import com.troblecodings.launcher.javafx.OptionsScene;
+import com.troblecodings.launcher.util.FileUtil;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -24,7 +28,18 @@ public class Launcher extends Application {
 	public static final LoginScene LOGINSCENE = new LoginScene();
 	public static final CreditsScene CREDITSSCENE = new CreditsScene();
 	
+	private static Logger LOGGER;
+	
+	public static final Logger getLogger() {
+		return LOGGER;
+	}
+	
 	public static void main(String[] args) {
+		FileUtil.readSettings();
+		System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
+		LOGGER = LogManager.getLogger("GIRC");
+		LOGGER.info("Starting Launcher!");
+		FileUtil.init();
 		launch(args);
 	}
 	
@@ -55,6 +70,11 @@ public class Launcher extends Application {
 	
 	public static Stage getStage() {
 		return stage;
+	}
+	
+	public static void onError(Throwable e) {
+		// Decide what to do on error for now log
+		LOGGER.trace(e.getMessage(), e);
 	}
 	
 }
