@@ -22,8 +22,20 @@ public class HomeScene extends Scene {
 		Button launchbutton = new Button();
 		launchbutton.getStyleClass().add("launchbutton");
 		launchbutton.setOnAction(event -> {
-			if(StartupUtil.start() != null)
-				return; // TODO
+			launchbutton.setDisable(true);
+			new Thread(() -> {
+				Process process;
+				if((process = StartupUtil.start()) == null) {
+					// TODO
+					return;
+				}
+				try {
+					process.waitFor();
+				} catch (InterruptedException e) {
+					Launcher.onError(e);
+				}
+				launchbutton.setDisable(false);
+			}).start();
 		});
 		launchbutton.setTranslateY(270);
 		

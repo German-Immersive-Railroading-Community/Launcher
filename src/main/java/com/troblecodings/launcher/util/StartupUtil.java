@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -28,6 +29,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.troblecodings.launcher.Launcher;
+import com.troblecodings.launcher.javafx.Footer;
 
 import mslinks.ShellLink;
 import mslinks.ShellLinkException;
@@ -201,6 +203,9 @@ public class StartupUtil {
 			JSONObject index = new JSONObject(tokener);
 			JSONObject objects = index.getJSONObject("objects");
 
+			final int maxItems = objects.keySet().size() + arr.length();
+			AtomicInteger counter = new AtomicInteger();
+			
 			// This part is to download the libs
 			for (Object libentry : arr) {
 				JSONObject libobj = (JSONObject) libentry;
@@ -229,6 +234,7 @@ public class StartupUtil {
 						unzip(name, FileUtil.LIB_DIR);
 					}
 				}
+				Footer.setProgress(counter.addAndGet(1) / maxItems);
 			}
 
 			// Asset lockup and download
@@ -247,6 +253,7 @@ public class StartupUtil {
 				} catch (Throwable e) {
 					Launcher.onError(e);
 				}
+				Footer.setProgress(counter.addAndGet(1) / maxItems);
 			});
 
 			additional.keySet().forEach(key -> {

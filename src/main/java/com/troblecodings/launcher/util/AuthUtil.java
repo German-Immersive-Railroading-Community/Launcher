@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import com.troblecodings.launcher.Launcher;
 
+import javafx.application.Platform;
 import net.cydhra.nidhogg.MojangClient;
 import net.cydhra.nidhogg.YggdrasilAgent;
 import net.cydhra.nidhogg.YggdrasilClient;
@@ -23,30 +24,43 @@ public class AuthUtil {
 
 	public static Session auth(final String username, final String passw) {
 		Session session = FileUtil.DEFAULT;
-		if (session != null) {
-			client.refresh(session);
-		} else {
+
+		if (session == null) {
 			if (username == null || passw == null)
 				return null;
 			session = client.login(new AccountCredentials(username, passw), YggdrasilAgent.MINECRAFT);
+			CryptoUtil.saveEncrypted(FileUtil.REMEMBERFILE, session);
 		}
-		CryptoUtil.saveEncrypted(FileUtil.REMEMBERFILE, session);
 
-		if (!client.validate(session))
-			return null;
-
+		try {
+			if (client.validate(session))
+				return session;
+		} catch (Throwable e) {
+			try {
+				client.refresh(session);
+				CryptoUtil.saveEncrypted(FileUtil.REMEMBERFILE, session);
+				return session;
+			} catch (Throwable ex) {
+				Platform.runLater(() -> {
+					FileUtil.DEFAULT = null;
+					Launcher.setScene(Launcher.LOGINSCENE);
+				});
+				Launcher.onError(ex);
+			}
+			Launcher.onError(e);
+		}
 		return session;
 	}
 
 	private static final String DEFAULT_ARGS = "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userType ${user_type} --tweakClass net.minecraftforge.fml.common.launcher.FMLTweaker --versionType Forge";
 
 	private static final String getOrDefault(final JSONObject json, final String id, final String def) {
-		if(json.has(id))
+		if (json.has(id))
 			return json.getString(id);
 		Launcher.getLogger().warn("Couldn't find %s in %s! Using default!");
 		return def;
 	}
-	
+
 	public static String[] make(final Session session, final JSONObject json) {
 		Profile profile = mclient.getProfileByUUID(session.getUuid());
 		Map<String, String> list = new HashMap<>();
@@ -63,7 +77,7 @@ public class AuthUtil {
 		String[] arguments = getOrDefault(json, "minecraftArguments", DEFAULT_ARGS).split(" ");
 		for (int i = 0; i < arguments.length; i++) {
 			String newArg = list.get(arguments[i]);
-			if(newArg != null)
+			if (newArg != null)
 				arguments[i] = newArg;
 		}
 		return arguments;

@@ -84,12 +84,7 @@ public class FileUtil {
 		deleteDirectory(Paths.get(SETTINGS.baseDir + "/assets").toFile());
 		deleteDirectory(Paths.get(SETTINGS.baseDir + "/libraries").toFile());
 		deleteDirectory(Paths.get(SETTINGS.baseDir + "/config").toFile());
-		try {
-			FileUtil.init();
-		} catch (Throwable e) {
-			// Launcher.LOGGER.trace(e.getMessage(), e);
-		}
-		// Launcher.INSTANCEL.setPart(new HomePage());
+		FileUtil.init();
 	}
 
 	private static void deleteDirectory(File directory) {

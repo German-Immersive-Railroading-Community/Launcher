@@ -11,10 +11,12 @@ public class Footer extends StackPane {
 	
 	private static ProgressBar progressBar = null;
 	
-	
 	public Footer() {
-		if(progressBar == null)
+		if(progressBar == null) {
 			progressBar = new ProgressBar();
+			progressBar.setTranslateY(20);
+			StackPane.setAlignment(progressBar, Pos.BOTTOM_LEFT);
+		}
 		
 		Button button = new Button("Lizensen und Kredits");
 		button.setOnAction(event -> onButtonClicked());
@@ -27,6 +29,10 @@ public class Footer extends StackPane {
 	
 	private void onButtonClicked() {
 		Launcher.setScene(Launcher.CREDITSSCENE);
+	}
+	
+	public static void setProgress(double progress) {
+		progressBar.setProgress(progress);
 	}
 
 }
