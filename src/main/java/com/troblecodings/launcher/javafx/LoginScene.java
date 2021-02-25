@@ -1,6 +1,9 @@
 package com.troblecodings.launcher.javafx;
 
 import com.troblecodings.launcher.Launcher;
+import com.troblecodings.launcher.util.AuthUtil;
+import com.troblecodings.launcher.util.FileUtil;
+
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -29,13 +32,12 @@ public class LoginScene extends Scene {
 		PasswordField passwordfield = new PasswordField();
 		Button loginbutton = new Button();
 		loginbutton.getStyleClass().add("loginbutton");
-		loginbutton.setOnAction(event -> onButtonClicked());
+		loginbutton.setOnAction(event -> {
+			if((FileUtil.DEFAULT = AuthUtil.auth(textfield.getText(), passwordfield.getText())) != null)
+				Launcher.setScene(Launcher.HOMESCENE);
+		});
 		loginbutton.setTranslateY(40);
 		vbox.getChildren().addAll(usernamelabel, textfield, passwordlabel, passwordfield, loginbutton);
-	}
-	
-	private void onButtonClicked() {
-		//TODO login
 	}
 
 }

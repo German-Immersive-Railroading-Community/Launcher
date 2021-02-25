@@ -21,7 +21,7 @@ public class AuthUtil {
 
 	public static String[] START_PARAMS = null;
 
-	public static Session auth(final String username, final String passw) throws Throwable {
+	public static Session auth(final String username, final String passw) {
 		Session session = FileUtil.DEFAULT;
 		if (session != null) {
 			client.refresh(session);
@@ -30,7 +30,7 @@ public class AuthUtil {
 				return null;
 			session = client.login(new AccountCredentials(username, passw), YggdrasilAgent.MINECRAFT);
 		}
-		FileUtil.saveSession(session);
+		CryptoUtil.saveEncrypted(FileUtil.REMEMBERFILE, session);
 
 		if (!client.validate(session))
 			return null;

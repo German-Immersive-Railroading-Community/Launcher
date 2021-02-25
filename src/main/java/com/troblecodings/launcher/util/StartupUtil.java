@@ -24,7 +24,6 @@ import javax.swing.JButton;
 import javax.swing.ProgressMonitor;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -156,114 +155,114 @@ public class StartupUtil {
 		}
 	}
 
-	private static String[] prestart() throws Throwable {
-		String clientJson = FileUtil.SETTINGS.baseDir + "/GIR.json";
-		ConnectionUtil.download("https://girc.eu/Launcher/GIR.json", clientJson);
-		if (Files.notExists(Paths.get(clientJson))) {
+	private static String[] prestart() {
+		try {
+			String clientJson = FileUtil.SETTINGS.baseDir + "/GIR.json";
+			ConnectionUtil.download("https://girc.eu/Launcher/GIR.json", clientJson);
+			if (Files.notExists(Paths.get(clientJson))) {
 //			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Missing version information!",
 //					"The GIR version json could not be found."));
-			return null;
-		}
+				return null;
+			}
 
-		String content = new String(Files.readAllBytes(Paths.get(clientJson)));
-		JSONObject object;
-		try {
+			String content = new String(Files.readAllBytes(Paths.get(clientJson)));
+			JSONObject object;
 			object = new JSONObject(content);
-		} catch (JSONException e) {
+
+			MAINCLASS = object.getString("mainClass");
+
+			// This part downloads the texture index and so on
+			JSONObject assetIndex = object.getJSONObject("assetIndex");
+
+			Path indexes = Paths.get(FileUtil.ASSET_DIR + "/indexes");
+			if (!Files.exists(indexes))
+				Files.createDirectories(indexes);
+
+			String indexpath = indexes.toString() + "/" + assetIndex.getString("id") + ".json";
+			String indexurl = assetIndex.getString("url");
+			String indexsha1 = assetIndex.getString("sha1");
+			ConnectionUtil.validateDownloadRetry(indexurl, indexpath, indexsha1);
+
+			Path ogMC = Paths.get(FileUtil.SETTINGS.baseDir + "/versions/" + object.getString("inheritsFrom") + "/"
+					+ object.getString("inheritsFrom") + ".jar");
+			Files.createDirectories(ogMC.getParent());
+			JSONObject clientDL = object.getJSONObject("downloads").getJSONObject("client");
+			ConnectionUtil.validateDownloadRetry(clientDL.getString("url"), ogMC.toString(),
+					clientDL.getString("sha1"));
+			LIBPATHS = ogMC.toString() + ";";
+
+			JSONObject additional = object.getJSONObject("additional");
+			JSONArray arr = object.getJSONArray("libraries");
+			Path ojectspath = Paths.get(FileUtil.ASSET_DIR + "/objects");
+			if (!Files.exists(ojectspath))
+				Files.createDirectories(ojectspath);
+
+			JSONTokener tokener = new JSONTokener(Files.newInputStream(Paths.get(indexpath)));
+			JSONObject index = new JSONObject(tokener);
+			JSONObject objects = index.getJSONObject("objects");
+
+			// This part is to download the libs
+			for (Object libentry : arr) {
+				JSONObject libobj = (JSONObject) libentry;
+				JSONObject downloadobj = libobj.getJSONObject("downloads");
+				if (downloadobj.has("artifact")) {
+					JSONObject artifact = downloadobj.getJSONObject("artifact");
+					String url = artifact.getString("url");
+					String name = FileUtil.LIB_DIR + "/" + artifact.getString("path");
+					String sha1 = artifact.getString("sha1");
+
+					LIBPATHS += name + ";";
+					ConnectionUtil.validateDownloadRetry(url, name, sha1);
+				} else {
+					JSONObject natives = libobj.getJSONObject("natives");
+					if (natives.has(OSSHORTNAME)) {
+						String nativekey = natives.getString(OSSHORTNAME).replace("${arch}",
+								System.getProperty("sun.arch.data.model"));
+						JSONObject classifier = downloadobj.getJSONObject("classifiers");
+						JSONObject artifact = classifier.getJSONObject(nativekey);
+						String url = artifact.getString("url");
+						String name = FileUtil.LIB_DIR + "/" + artifact.getString("path");
+						String sha1 = artifact.getString("sha1");
+						ConnectionUtil.validateDownloadRetry(url, name, sha1);
+
+						// Extract the natives
+						unzip(name, FileUtil.LIB_DIR);
+					}
+				}
+			}
+
+			// Asset lockup and download
+			String baseurl = "http://resources.download.minecraft.net/";
+			objects.keySet().forEach((key) -> {
+				try {
+					JSONObject asset = objects.getJSONObject(key);
+					String hash = asset.getString("hash");
+					String folder = hash.substring(0, 2);
+					Path folderpath = Paths.get(ojectspath.toString() + "/" + folder);
+					if (!Files.exists(folderpath)) {
+						Files.createDirectories(folderpath);
+					}
+					ConnectionUtil.validateDownloadRetry(baseurl + folder + "/" + hash,
+							folderpath.toString() + "/" + hash, hash);
+				} catch (Throwable e) {
+					Launcher.onError(e);
+				}
+			});
+
+			additional.keySet().forEach(key -> {
+				additional.getJSONArray(key).forEach(fileobj -> {
+					JSONObject jfileobj = (JSONObject) fileobj;
+					Path path = Paths.get(FileUtil.SETTINGS.baseDir, key, jfileobj.getString("name"));
+					ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
+							jfileobj.getString("sha1"));
+				});
+			});
+			return AuthUtil.make(AuthUtil.auth(null, null), object);
+		} catch (Throwable e) {
 //			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Corrupted version information!",
 //					"The GIR version json could not be read."));
 			return null;
 		}
-
-		MAINCLASS = object.getString("mainClass");
-
-		// This part downloads the texture index and so on
-		JSONObject assetIndex = object.getJSONObject("assetIndex");
-
-		Path indexes = Paths.get(FileUtil.ASSET_DIR + "/indexes");
-		if (!Files.exists(indexes))
-			Files.createDirectories(indexes);
-
-		String indexpath = indexes.toString() + "/" + assetIndex.getString("id") + ".json";
-		String indexurl = assetIndex.getString("url");
-		String indexsha1 = assetIndex.getString("sha1");
-		ConnectionUtil.validateDownloadRetry(indexurl, indexpath, indexsha1);
-
-		Path ogMC = Paths.get(FileUtil.SETTINGS.baseDir + "/versions/" + object.getString("inheritsFrom") + "/"
-				+ object.getString("inheritsFrom") + ".jar");
-		Files.createDirectories(ogMC.getParent());
-		JSONObject clientDL = object.getJSONObject("downloads").getJSONObject("client");
-		ConnectionUtil.validateDownloadRetry(clientDL.getString("url"), ogMC.toString(), clientDL.getString("sha1"));
-		LIBPATHS = ogMC.toString() + ";";
-
-		JSONObject additional = object.getJSONObject("additional");
-		JSONArray arr = object.getJSONArray("libraries");
-		Path ojectspath = Paths.get(FileUtil.ASSET_DIR + "/objects");
-		if (!Files.exists(ojectspath))
-			Files.createDirectories(ojectspath);
-
-		JSONTokener tokener = new JSONTokener(Files.newInputStream(Paths.get(indexpath)));
-		JSONObject index = new JSONObject(tokener);
-		JSONObject objects = index.getJSONObject("objects");
-
-		// This part is to download the libs
-		for (Object libentry : arr) {
-			JSONObject libobj = (JSONObject) libentry;
-			JSONObject downloadobj = libobj.getJSONObject("downloads");
-			if (downloadobj.has("artifact")) {
-				JSONObject artifact = downloadobj.getJSONObject("artifact");
-				String url = artifact.getString("url");
-				String name = FileUtil.LIB_DIR + "/" + artifact.getString("path");
-				String sha1 = artifact.getString("sha1");
-
-				LIBPATHS += name + ";";
-				ConnectionUtil.validateDownloadRetry(url, name, sha1);
-			} else {
-				JSONObject natives = libobj.getJSONObject("natives");
-				if (natives.has(OSSHORTNAME)) {
-					String nativekey = natives.getString(OSSHORTNAME).replace("${arch}",
-							System.getProperty("sun.arch.data.model"));
-					JSONObject classifier = downloadobj.getJSONObject("classifiers");
-					JSONObject artifact = classifier.getJSONObject(nativekey);
-					String url = artifact.getString("url");
-					String name = FileUtil.LIB_DIR + "/" + artifact.getString("path");
-					String sha1 = artifact.getString("sha1");
-					ConnectionUtil.validateDownloadRetry(url, name, sha1);
-
-					// Extract the natives
-					unzip(name, FileUtil.LIB_DIR);
-				}
-			}
-		}
-
-		// Asset lockup and download
-		String baseurl = "http://resources.download.minecraft.net/";
-		objects.keySet().forEach((key) -> {
-			try {
-				JSONObject asset = objects.getJSONObject(key);
-				String hash = asset.getString("hash");
-				String folder = hash.substring(0, 2);
-				Path folderpath = Paths.get(ojectspath.toString() + "/" + folder);
-				if (!Files.exists(folderpath)) {
-					Files.createDirectories(folderpath);
-				}
-				ConnectionUtil.validateDownloadRetry(baseurl + folder + "/" + hash, folderpath.toString() + "/" + hash,
-						hash);
-			} catch (Throwable e) {
-				Launcher.onError(e);
-			}
-		});
-
-		additional.keySet().forEach(key -> {
-			additional.getJSONArray(key).forEach(fileobj -> {
-				JSONObject jfileobj = (JSONObject) fileobj;
-				Path path = Paths.get(FileUtil.SETTINGS.baseDir, key, jfileobj.getString("name"));
-				ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
-						jfileobj.getString("sha1"));
-			});
-		});
-		// Launcher.bar.update(0);
-		return AuthUtil.make(AuthUtil.auth(null, null), object);
 	}
 
 	private static void unzip(String name, String base) throws Throwable {
@@ -289,7 +288,7 @@ public class StartupUtil {
 		file.close();
 	}
 
-	public static Process start() throws Throwable {
+	public static Process start() {
 		Optional<String> javaVers = findJavaVersion();
 		if (!javaVers.isPresent()) {
 //			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(),
@@ -313,7 +312,11 @@ public class StartupUtil {
 		builder.directory(new File(FileUtil.SETTINGS.baseDir));
 		builder.redirectError(Redirect.INHERIT);
 		builder.redirectOutput(Redirect.INHERIT);
-		Process process = builder.start();
-		return process;
+		try {
+			return builder.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

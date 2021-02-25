@@ -1,5 +1,7 @@
 package com.troblecodings.launcher;
 
+import java.io.FileNotFoundException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -10,6 +12,7 @@ import com.troblecodings.launcher.javafx.Header;
 import com.troblecodings.launcher.javafx.HomeScene;
 import com.troblecodings.launcher.javafx.LoginScene;
 import com.troblecodings.launcher.javafx.OptionsScene;
+import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 
 import javafx.application.Application;
@@ -46,7 +49,7 @@ public class Launcher extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		Launcher.stage = stage;
-		stage.setScene(HOMESCENE);
+		stage.setScene(AuthUtil.auth(null, null) == null ? LOGINSCENE:HOMESCENE);
 		stage.setWidth(1280);
 		stage.setHeight(720);
 		stage.initStyle(StageStyle.TRANSPARENT);

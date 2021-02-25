@@ -2,6 +2,8 @@ package com.troblecodings.launcher.javafx;
 
 import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
+import com.troblecodings.launcher.util.StartupUtil;
+
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -19,15 +21,13 @@ public class HomeScene extends Scene {
 		
 		Button launchbutton = new Button();
 		launchbutton.getStyleClass().add("launchbutton");
-		launchbutton.setOnAction(event -> onButtonClicked());
+		launchbutton.setOnAction(event -> {
+			if(StartupUtil.start() != null)
+				return; // TODO
+		});
 		launchbutton.setTranslateY(270);
 		
 		stackpane.getChildren().addAll(imagelogo, launchbutton);
 	}
 	
-	private void onButtonClicked() {
-		//TODO Launch
-		Launcher.setScene(Launcher.LOGINSCENE);
-	}
-
 }

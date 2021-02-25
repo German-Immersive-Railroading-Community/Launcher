@@ -5,12 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Key;
-
-import javax.crypto.Cipher;
 
 import com.google.gson.Gson;
-import com.troblecodings.launcher.Launcher;
 
 import net.cydhra.nidhogg.data.Session;
 
@@ -22,7 +18,6 @@ public class FileUtil {
 
 	public static Session DEFAULT = null;
 
-	public static String TRANSFORM = "AES";
 	public static Path REMEMBERFILE;
 
 	public static final Path SETTINGSPATH = Paths.get(System.getProperty("user.home") + "/.launcher/settings.json");
@@ -76,39 +71,9 @@ public class FileUtil {
 		LIB_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/libraries");
 
 		REMEMBERFILE = Paths.get(SETTINGS.baseDir + "/ac.ce");
-		try {
-			if (Files.exists(REMEMBERFILE)) {
-				byte[] content = Files.readAllBytes(REMEMBERFILE);
-				if (content != null && content.length > 0) {
-					Key key = CryptoUtil.getKey(TRANSFORM);
-
-					Cipher cipher = Cipher.getInstance(TRANSFORM);
-					cipher.init(Cipher.DECRYPT_MODE, key);
-
-					byte[] encrypted = cipher.doFinal(content);
-					String[] session = new String(encrypted).split(System.lineSeparator());
-					if (session.length == 4)
-						DEFAULT = new Session(session[0], session[1], session[2], session[3]);
-				}
-			}
-		} catch (Throwable e) {
-			Launcher.onError(e);
-		}
+		DEFAULT = CryptoUtil.readEncrypted(REMEMBERFILE, Session.class);
 	}
 
-	// Encrypts and saves a session
-	public static void saveSession(Session session) throws Throwable {
-		Key key = CryptoUtil.getKey(TRANSFORM);
-
-		String sessionstring = session.getId() + System.lineSeparator() + session.getAlias() + System.lineSeparator()
-				+ session.getAccessToken() + System.lineSeparator() + session.getClientToken();
-
-		Cipher cipher = Cipher.getInstance(TRANSFORM);
-		cipher.init(Cipher.ENCRYPT_MODE, key);
-
-		byte[] encrypted = cipher.doFinal(sessionstring.getBytes());
-		Files.write(REMEMBERFILE, encrypted);
-	}
 
 	// Delete option files and mod, assets and libraries folder
 	public static void resetFiles() {
