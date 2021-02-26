@@ -2,6 +2,7 @@ package com.troblecodings.launcher.javafx;
 
 import com.troblecodings.launcher.Launcher;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -34,7 +35,7 @@ public class Footer extends StackPane {
 	}
 	
 	public static void setProgress(double progress) {
-		bar.set(progress);
+		Platform.runLater(() -> bar.set(progress));
 	}
 
 }

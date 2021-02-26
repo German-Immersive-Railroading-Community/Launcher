@@ -25,7 +25,7 @@ public class Launcher extends Application {
 	private static Stage stage;
 	
 	public static final HomeScene HOMESCENE = new HomeScene();
-	public static final OptionsScene OPTIONSSCENE = new OptionsScene();
+	public static OptionsScene OPTIONSSCENE;
 	public static final LoginScene LOGINSCENE = new LoginScene();
 	public static final CreditsScene CREDITSSCENE = new CreditsScene();
 	
@@ -36,11 +36,13 @@ public class Launcher extends Application {
 	}
 	
 	public static void main(String[] args) {
+		Runtime.getRuntime().addShutdownHook(new Thread(FileUtil::saveSettings));
 		FileUtil.readSettings();
 		System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
 		LOGGER = LogManager.getLogger("GIRC");
 		LOGGER.info("Starting Launcher!");
 		FileUtil.init();
+		OPTIONSSCENE = new OptionsScene();
 		launch(args);
 	}
 	

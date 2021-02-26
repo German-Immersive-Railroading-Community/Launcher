@@ -2,11 +2,14 @@ package com.troblecodings.launcher.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.google.gson.Gson;
+import com.troblecodings.launcher.Launcher;
 
 import net.cydhra.nidhogg.data.Session;
 
@@ -49,7 +52,9 @@ public class FileUtil {
 	public static void readSettings() {
 		try {
 			if (Files.exists(SETTINGSPATH)) {
-				SETTINGS = GSON.fromJson(Files.newBufferedReader(SETTINGSPATH), SettingsData.class);
+				Reader reader = Files.newBufferedReader(SETTINGSPATH);
+				SETTINGS = GSON.fromJson(reader, SettingsData.class);
+				reader.close();
 			} else {
 				Files.createDirectories(SETTINGSPATH.getParent());
 				Files.createFile(SETTINGSPATH);
@@ -65,7 +70,19 @@ public class FileUtil {
 				SETTINGS = new SettingsData();
 		}
 	}
-
+	
+	public static void saveSettings()
+	{
+		Launcher.getLogger().info("Save Settings!");
+		try {
+			Writer writer = Files.newBufferedWriter(SETTINGSPATH);
+			GSON.toJson(SETTINGS, writer);
+			writer.close();
+		} catch (Throwable e) {
+			Launcher.onError(e);
+		}
+	}
+	
 	public static void init() {
 		ASSET_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/assets");
 		LIB_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/libraries");
