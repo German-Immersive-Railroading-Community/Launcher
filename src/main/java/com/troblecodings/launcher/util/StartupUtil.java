@@ -203,7 +203,7 @@ public class StartupUtil {
 			JSONObject index = new JSONObject(tokener);
 			JSONObject objects = index.getJSONObject("objects");
 
-			final int maxItems = objects.keySet().size() + arr.length();
+			final double maxItems = objects.keySet().size() + arr.length();
 			AtomicInteger counter = new AtomicInteger();
 			
 			// This part is to download the libs
@@ -256,14 +256,18 @@ public class StartupUtil {
 				Footer.setProgress(counter.addAndGet(1) / maxItems);
 			});
 
+			counter.set(0);
+			final double max = object.getLong("wholeSize");
 			additional.keySet().forEach(key -> {
 				additional.getJSONArray(key).forEach(fileobj -> {
 					JSONObject jfileobj = (JSONObject) fileobj;
 					Path path = Paths.get(FileUtil.SETTINGS.baseDir, key, jfileobj.getString("name"));
 					ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
-							jfileobj.getString("sha1"));
+							jfileobj.getString("sha1"), in -> Footer.setProgress((counter.get() + in) / max));
+					counter.getAndAdd(jfileobj.getInt("size"));
 				});
 			});
+			Footer.setProgress(0.001);
 			return AuthUtil.make(AuthUtil.auth(null, null), object);
 		} catch (Throwable e) {
 //			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Corrupted version information!",

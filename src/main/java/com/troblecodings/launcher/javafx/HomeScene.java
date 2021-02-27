@@ -27,6 +27,7 @@ public class HomeScene extends Scene {
 				Process process;
 				if((process = StartupUtil.start()) == null) {
 					// TODO
+					launchbutton.setDisable(false);
 					return;
 				}
 				try {

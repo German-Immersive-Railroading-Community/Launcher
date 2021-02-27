@@ -35,7 +35,8 @@ public class Footer extends StackPane {
 	}
 	
 	public static void setProgress(double progress) {
-		Platform.runLater(() -> bar.set(progress));
+		System.out.println(progress);
+		Platform.runLater(() -> { System.out.println(progress); bar.set(progress);});
 	}
 
 }

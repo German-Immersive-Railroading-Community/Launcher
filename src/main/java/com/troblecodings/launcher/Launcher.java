@@ -43,6 +43,7 @@ public class Launcher extends Application {
 		LOGGER.info("Starting Launcher!");
 		FileUtil.init();
 		OPTIONSSCENE = new OptionsScene();
+		Footer.setProgress(0.001);
 		launch(args);
 	}
 	
