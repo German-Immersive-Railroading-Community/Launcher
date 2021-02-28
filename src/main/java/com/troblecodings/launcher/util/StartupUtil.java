@@ -13,6 +13,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -157,6 +159,7 @@ public class StartupUtil {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private static String[] prestart() {
 		try {
 			String clientJson = FileUtil.SETTINGS.baseDir + "/GIR.json";
@@ -205,7 +208,7 @@ public class StartupUtil {
 
 			final double maxItems = objects.keySet().size() + arr.length();
 			AtomicInteger counter = new AtomicInteger();
-			
+
 			// This part is to download the libs
 			for (Object libentry : arr) {
 				JSONObject libobj = (JSONObject) libentry;
@@ -267,6 +270,39 @@ public class StartupUtil {
 					counter.getAndAdd(jfileobj.getInt("size"));
 				});
 			});
+
+			additional.keySet().forEach(key -> {
+				try {
+					List<Object> array = additional.getJSONArray(key).toList();
+					Files.list(Paths.get(FileUtil.SETTINGS.baseDir, key)).filter(incom -> {
+						String filename = incom.getFileName().toString();
+						return Files.isRegularFile(incom) && array.stream().noneMatch(job -> {
+							return ((HashMap<String, Object>) job).get("name").equals(filename);
+						});
+					}).forEach(t -> {
+						Launcher.getLogger().debug("Deleted file " + t.toString());
+						try { // I hate this language
+							Files.deleteIfExists(t);
+						} catch (IOException e) {
+							Launcher.onError(e);
+						}
+					});
+				} catch (IOException e) {
+					Launcher.onError(e);
+				}
+			});
+
+			Path additionalMods = Paths.get(FileUtil.SETTINGS.baseDir, "additional-mods");
+			Files.createDirectories(additionalMods);
+			Files.list(additionalMods).filter(pth -> !pth.toString().endsWith(".dis"))
+					.forEach(pth -> {
+						try {
+							Files.copy(pth, Paths.get(pth.toString().replace("additional-mods", "mods")));
+						} catch (IOException e) {
+							Launcher.onError(e);
+						}
+					});
+
 			Footer.setProgress(0.001);
 			return AuthUtil.make(AuthUtil.auth(null, null), object);
 		} catch (Throwable e) {

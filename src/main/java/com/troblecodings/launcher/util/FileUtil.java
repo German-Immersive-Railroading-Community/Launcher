@@ -31,8 +31,7 @@ public class FileUtil {
 			try {
 				Files.createDirectories(path);
 			} catch (IOException e) {
-				// TODO LOG AND PRINT
-				e.printStackTrace();
+				Launcher.onError(e);
 			}
 		}
 		return pathstr;
