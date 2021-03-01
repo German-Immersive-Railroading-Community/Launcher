@@ -37,12 +37,12 @@ public class Launcher extends Application {
 	}
 	
 	public static void main(String[] args) {
-		StartupUtil.update();
 		Runtime.getRuntime().addShutdownHook(new Thread(FileUtil::saveSettings));
 		FileUtil.readSettings();
 		System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
 		LOGGER = LogManager.getLogger("GIRC");
 		LOGGER.info("Starting Launcher!");
+		StartupUtil.update();
 		FileUtil.init();
 		OPTIONSSCENE = new OptionsScene();
 		Footer.setProgress(0.001);
@@ -81,7 +81,12 @@ public class Launcher extends Application {
 	
 	public static void onError(Throwable e) {
 		// Decide what to do on error for now log
-		LOGGER.trace(e.getMessage(), e);
+		if(e == null)
+			LOGGER.error("Error found but was passed null!");
+		else if(e.getMessage() == null)
+			LOGGER.trace("", e);
+		else
+			LOGGER.trace(e.getMessage(), e);
 	}
 	
 }
