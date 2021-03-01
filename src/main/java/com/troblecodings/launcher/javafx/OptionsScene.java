@@ -84,7 +84,7 @@ public class OptionsScene extends Scene {
 		baseDir.setStyle("-fx-padding: 20px 0px 10px 0px;");
 		
 		final TextField baseDirField = new TextField(FileUtil.SETTINGS.baseDir);
-		baseDirField.setOnAction(evtl -> FileUtil.moveBaseDir(baseDirField.getText()));
+		baseDirField.textProperty().addListener((obs, old, ne) -> FileUtil.moveBaseDir(baseDirField.getText()));
 		
 		final Button baseDirFinder = new Button("Open Folder");
 		baseDirFinder.getStyleClass().add("optionButton");

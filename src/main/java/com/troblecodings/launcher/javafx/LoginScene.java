@@ -23,7 +23,7 @@ public class LoginScene extends Scene {
 		Launcher.setupScene(this, stackpane);
 
 		VBox vbox = new VBox();
-		vbox.setMaxHeight(340);
+		vbox.setMaxHeight(400);
 		vbox.setMaxWidth(500);
 		stackpane.getChildren().add(vbox);
 
@@ -37,8 +37,9 @@ public class LoginScene extends Scene {
 		loginbutton.getStyleClass().add("loginbutton");
 		
 		Label errorLabel = new Label("");
+		errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 20px");
 
-		EventHandler<ActionEvent> evthl = evt -> loginCheck(textfield.getText(), passwordfield.getText(), passwordlabel);
+		EventHandler<ActionEvent> evthl = evt -> loginCheck(textfield.getText(), passwordfield.getText(), errorLabel);
 		loginbutton.setOnAction(evthl);
 		passwordfield.setOnAction(evthl);
 		textfield.setOnAction(evthl);
@@ -47,12 +48,12 @@ public class LoginScene extends Scene {
 	}
 
 	private void loginCheck(final String mail, final String pw, final Label error) {
-		if (pw.isEmpty()) {
-			error.setText("Password is empty!");
-			return;
-		}
 		if (mail.isEmpty()) {
 			error.setText("Email is empty!");
+			return;
+		}
+		if (pw.isEmpty()) {
+			error.setText("Password is empty!");
 			return;
 		}
 
