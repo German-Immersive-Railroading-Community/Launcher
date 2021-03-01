@@ -127,16 +127,24 @@ public class StartupUtil {
 	public static void update() {
 		try {
 			String str = ConnectionUtil.getStringFromURL(RELEASE_API);
-			if (str == null)
+			if (str == null) {
+				Launcher.getLogger().info("Couldn't read updater information!");
 				return;
+			}
 			JSONArray obj = new JSONArray(str);
 			JSONObject newversion = obj.getJSONObject(0).getJSONArray("assets").getJSONObject(0);
 			String downloadURL = newversion.getString("browser_download_url");
 			File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+			if(!location.isFile()) {
+				Launcher.getLogger().debug("Dev version no update!");
+				return;
+			}
 			long size = Files.size(Paths.get(location.toURI()));
 			long newsize = newversion.getNumber("size").longValue();
-			if (newsize == size || !location.isFile())
+			if (newsize == size) {
+				Launcher.getLogger().info("The new verision (%i) is equal to the old (%i)", newsize, size);
 				return;
+			}
 			Launcher.getLogger().info("Updating Launcher!");
 			ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
 			Path pth = Paths.get(location.toURI());
@@ -330,7 +338,7 @@ public class StartupUtil {
 		Optional<String> javaVers = findJavaVersion();
 		if (!javaVers.isPresent()) {
 			Launcher.onError(new IllegalStateException("No valid Java version found!"));
-			return null;
+			// try to start normaly
 		}
 
 		String[] parameter = prestart();
@@ -340,7 +348,7 @@ public class StartupUtil {
 		String width = String.valueOf(FileUtil.SETTINGS.width);
 		String height = String.valueOf(FileUtil.SETTINGS.height);
 		String ram = String.valueOf(FileUtil.SETTINGS.ram);
-		String[] preparameter = new String[] { javaVers.get() + "/java", "-Xmx" + ram + "M", "-Xms" + ram + "M",
+		String[] preparameter = new String[] { javaVers.isPresent() ? javaVers.get() + "/java":"java", "-Xmx" + ram + "M", "-Xms" + ram + "M",
 				"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
 				"-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", width, "-height",
 				height };

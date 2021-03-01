@@ -50,8 +50,25 @@ public class FileUtil {
 		try { // Why? WHY? Let me disable Exceptions pls
 			Files.walk(old).forEach(pt -> {
 				try { // I really hate this language ... I mean ... really
-					Files.move(pt, Paths.get(pt.toString().replace(old.toString(), file)),
+					Path newpth = Paths.get(pt.toString().replace(old.toString(), file));
+					if(Files.isDirectory(pt)) {
+						Files.createDirectories(newpth);
+						return;
+					}
+					Files.move(pt, newpth,
 							StandardCopyOption.REPLACE_EXISTING);
+				} catch (IOException e) {
+					Launcher.onError(e);
+					// I fucking don't care if this fails
+				}
+			});
+			Files.walk(old).sorted((c1, c2) -> {
+				int c1l = c1.toString().length();
+				int c2l = c2.toString().length();
+				return c1l < c2l ? 1:(c1l == c2l ? 0:-1);
+			}).forEach(p -> {
+				try {
+					Files.deleteIfExists(p);
 				} catch (IOException e) {
 					Launcher.onError(e);
 					// I fucking don't care if this fails
