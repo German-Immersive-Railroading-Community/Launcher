@@ -1,3 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+.navbar {
+	-fx-font-family: 'VT323', monospace;
+	-fx-font-size: 45px;
+	-fx-text-fill: white;
+	-fx-font-smoothing-type: lcd;
+}
+.navbar:hover {
+	-fx-background-color: #1b1b1b1b;
+}
+
 .root{
 	-fx-background-image: url(background.png);
 	-fx-font-family: Arial;
