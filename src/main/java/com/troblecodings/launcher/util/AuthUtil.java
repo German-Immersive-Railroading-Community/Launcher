@@ -1,5 +1,7 @@
 package com.troblecodings.launcher.util;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +52,16 @@ public class AuthUtil {
 			Launcher.onError(e);
 		}
 		return session;
+	}
+	
+	public static void logout() {
+		client.invalidate(FileUtil.DEFAULT);
+		FileUtil.DEFAULT = null;
+		try {
+			Files.deleteIfExists(FileUtil.REMEMBERFILE);
+		} catch (IOException e) {
+			Launcher.onError(e);
+		}
 	}
 
 	private static final String DEFAULT_ARGS = "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userType ${user_type} --tweakClass net.minecraftforge.fml.common.launcher.FMLTweaker --versionType Forge";

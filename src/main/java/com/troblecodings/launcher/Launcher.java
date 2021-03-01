@@ -50,6 +50,7 @@ public class Launcher extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		Launcher.stage = stage;
+		stage.getIcons().add(Assets.getImage("icon.png"));
 		stage.setScene(AuthUtil.auth(null, null) == null ? LOGINSCENE:HOMESCENE);
 		stage.setWidth(1280);
 		stage.setHeight(720);
@@ -59,7 +60,7 @@ public class Launcher extends Application {
 	
 	public static void setupScene(Scene scene, StackPane stackpane) {
 		stackpane.getChildren().add(new Header(scene));
-		stackpane.getChildren().add(new Footer());
+		stackpane.getChildren().add(new Footer(scene));
 		scene.setFill(Color.TRANSPARENT);
 		scene.getStylesheets().add(Assets.getStyleSheet("style.css"));
 	}

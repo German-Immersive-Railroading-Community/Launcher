@@ -7,6 +7,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import com.google.gson.Gson;
 import com.troblecodings.launcher.Launcher;
@@ -35,6 +36,30 @@ public class FileUtil {
 			}
 		}
 		return pathstr;
+	}
+
+	public static boolean moveBaseDir(String file) {
+		Path ptof = Paths.get(file);
+		if (Files.notExists(ptof) || !Files.isDirectory(ptof))
+			return false;
+
+		Path old = Paths.get(SETTINGS.baseDir);
+		try { // Why? WHY? Let me disable Exceptions pls
+			Files.walk(old).forEach(pt -> {
+				try { // I really hate this language ... I mean ... really
+					Files.move(pt, Paths.get(pt.toString().replace(old.toString(), file)),
+							StandardCopyOption.REPLACE_EXISTING);
+				} catch (IOException e) {
+					// I fucking don't care if this fails
+				}
+			});
+		} catch (IOException e) {
+			Launcher.onError(e);
+			return false;
+		}
+		SETTINGS.baseDir = file;
+		init();
+		return true;
 	}
 
 	public static class SettingsData {
@@ -69,9 +94,8 @@ public class FileUtil {
 				SETTINGS = new SettingsData();
 		}
 	}
-	
-	public static void saveSettings()
-	{
+
+	public static void saveSettings() {
 		Launcher.getLogger().info("Save Settings!");
 		try {
 			Writer writer = Files.newBufferedWriter(SETTINGSPATH);
@@ -81,7 +105,7 @@ public class FileUtil {
 			Launcher.onError(e);
 		}
 	}
-	
+
 	public static void init() {
 		ASSET_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/assets");
 		LIB_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/libraries");
@@ -89,7 +113,6 @@ public class FileUtil {
 		REMEMBERFILE = Paths.get(SETTINGS.baseDir + "/ac.ce");
 		DEFAULT = CryptoUtil.readEncrypted(REMEMBERFILE, Session.class);
 	}
-
 
 	// Delete option files and mod, assets and libraries folder
 	public static void resetFiles() {

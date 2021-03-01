@@ -102,12 +102,12 @@ public class StartupUtil {
 					if (!Files.isRegularFile(pth) || !pth.toString().endsWith(".lnk"))
 						return false;
 					Path path = Paths.get(new ShellLink(pth).resolveTarget()).getParent();
-					// Launcher.LOGGER.info(path.toString());
+					Launcher.getLogger().info(path.toString());
 					return isJavaAnd8(path);
 				} catch (IOException e) {
-					// Launcher.LOGGER.trace(e.getMessage(), e);
+					Launcher.onError(e);
 				} catch (ShellLinkException e) {
-					// Launcher.LOGGER.trace(e.getMessage(), e);
+					Launcher.onError(e);
 				}
 				return false;
 			};
@@ -119,14 +119,12 @@ public class StartupUtil {
 			if (opt3.isPresent())
 				return Optional.of(opt3.get().getParent().toString());
 		} catch (IOException e) {
-			// Launcher.LOGGER.trace(e.getMessage(), e);
+			Launcher.onError(e);
 		}
 		return Optional.empty();
 	}
 
 	public static void update() {
-//		if(!Launcher.UPDATE)
-//			return;
 		try {
 			String str = ConnectionUtil.getStringFromURL(RELEASE_API);
 			if (str == null)
@@ -139,7 +137,7 @@ public class StartupUtil {
 			long newsize = newversion.getNumber("size").longValue();
 			if (newsize == size || !location.isFile())
 				return;
-//			Launcher.LOGGER.info("Updating Launcher!");
+			Launcher.getLogger().info("Updating Launcher!");
 			ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
 			Path pth = Paths.get(location.toURI());
 			Files.copy(pth, Paths.get(pth.toString() + ".tmp"), StandardCopyOption.REPLACE_EXISTING);
@@ -154,8 +152,7 @@ public class StartupUtil {
 			new ProcessBuilder("java", "-jar", location.toString()).start().waitFor();
 			System.exit(0);
 		} catch (Throwable e) {
-//			Launcher.LOGGER.trace(e.getMessage(), e);
-//			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Update error!", "General error!"));
+			Launcher.onError(e);
 		}
 	}
 
@@ -164,12 +161,7 @@ public class StartupUtil {
 		try {
 			String clientJson = FileUtil.SETTINGS.baseDir + "/GIR.json";
 			ConnectionUtil.download("https://girc.eu/Launcher/GIR.json", clientJson);
-			if (Files.notExists(Paths.get(clientJson))) {
-//			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Missing version information!",
-//					"The GIR version json could not be found."));
-				return null;
-			}
-
+			
 			String content = new String(Files.readAllBytes(Paths.get(clientJson)));
 			JSONObject object;
 			object = new JSONObject(content);
@@ -306,8 +298,7 @@ public class StartupUtil {
 			Footer.setProgress(0.001);
 			return AuthUtil.make(AuthUtil.auth(null, null), object);
 		} catch (Throwable e) {
-//			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Corrupted version information!",
-//					"The GIR version json could not be read."));
+			Launcher.onError(e);
 			return null;
 		}
 	}
@@ -338,8 +329,7 @@ public class StartupUtil {
 	public static Process start() {
 		Optional<String> javaVers = findJavaVersion();
 		if (!javaVers.isPresent()) {
-//			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(),
-//					"Couldn't find valid Java 8 installation!", "Check that you installed the correct java versions!"));
+			Launcher.onError(new IllegalStateException("No valid Java version found!"));
 			return null;
 		}
 
@@ -362,8 +352,8 @@ public class StartupUtil {
 		try {
 			return builder.start();
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			Launcher.onError(e);
+	    }
 		return null;
 	}
 }
