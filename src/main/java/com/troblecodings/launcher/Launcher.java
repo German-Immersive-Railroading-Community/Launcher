@@ -12,6 +12,7 @@ import com.troblecodings.launcher.javafx.LoginScene;
 import com.troblecodings.launcher.javafx.OptionsScene;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
+import com.troblecodings.launcher.util.StartupUtil;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -36,6 +37,7 @@ public class Launcher extends Application {
 	}
 	
 	public static void main(String[] args) {
+		StartupUtil.update();
 		Runtime.getRuntime().addShutdownHook(new Thread(FileUtil::saveSettings));
 		FileUtil.readSettings();
 		System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
