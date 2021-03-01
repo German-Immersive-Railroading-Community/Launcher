@@ -44,12 +44,16 @@ public class FileUtil {
 			return false;
 
 		Path old = Paths.get(SETTINGS.baseDir);
+		if(ptof.equals(old))
+			return false;
+		
 		try { // Why? WHY? Let me disable Exceptions pls
 			Files.walk(old).forEach(pt -> {
 				try { // I really hate this language ... I mean ... really
 					Files.move(pt, Paths.get(pt.toString().replace(old.toString(), file)),
 							StandardCopyOption.REPLACE_EXISTING);
 				} catch (IOException e) {
+					Launcher.onError(e);
 					// I fucking don't care if this fails
 				}
 			});

@@ -2,8 +2,10 @@ package com.troblecodings.launcher.javafx;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.File;
 
 import com.troblecodings.launcher.Launcher;
+import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 
 import javafx.collections.ObservableList;
@@ -17,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 
 public class OptionsScene extends Scene {
 
@@ -32,10 +35,10 @@ public class OptionsScene extends Scene {
 		stackpane.getChildren().add(sp);
 
 		final VBox vbox = new VBox();
-		vbox.setStyle("");
 		sp.setMaxHeight(400);
 		sp.setMaxWidth(500);
 		sp.setContent(vbox);
+		vbox.setPrefSize(sp.getMaxWidth(), sp.getMaxHeight());
 
 		final Label ramlabel = new Label("RAM");
 		ramlabel.setStyle("-fx-padding: 0px 0px 10px 0px;");
@@ -54,8 +57,8 @@ public class OptionsScene extends Scene {
 			}
 		});
 
-		final Label resolution = new Label("RESOLUTION");
-		resolution.setStyle("-fx-padding: 10px 0px 10px 0px;");
+		final Label resolution = new Label("Resolution");
+		resolution.setStyle("-fx-padding: 20px 0px 10px 0px;");
 
 		final ComboBox<String> resolutioncombobox = new ComboBox<String>();
 		resolutioncombobox.setEditable(true);
@@ -77,20 +80,43 @@ public class OptionsScene extends Scene {
 			}
 		});
 		
-		final Label baseDir = new Label("DIRECTORY");
-		baseDir.setStyle("-fx-padding: 10px 0px 10px 0px;");
+		final Label baseDir = new Label("Folder");
+		baseDir.setStyle("-fx-padding: 20px 0px 10px 0px;");
 		
 		final TextField baseDirField = new TextField(FileUtil.SETTINGS.baseDir);
-		baseDirField.setOnAction(evtl -> {
-			FileUtil.moveBaseDir(baseDirField.getText());
+		baseDirField.setOnAction(evtl -> FileUtil.moveBaseDir(baseDirField.getText()));
+		
+		final Button baseDirFinder = new Button("Open Folder");
+		baseDirFinder.getStyleClass().add("optionButton");
+		baseDirFinder.setOnAction(evt -> {
+			final DirectoryChooser chooser = new DirectoryChooser();
+			chooser.setInitialDirectory(new File(FileUtil.SETTINGS.baseDir));
+			final File fl = chooser.showDialog(Launcher.getStage());
+			if(fl.exists() && fl.isDirectory()) {
+				baseDirField.setText(fl.toString());
+			}
 		});
-		
-		final Button baseDirFinder = new Buten
-		
-		final HBox box = new HBox(20);
-		box.getChildren().addAll(baseDir);
 
-		vbox.getChildren().addAll(ramlabel, ramcombobox, resolution, resolutioncombobox, baseDir, baseDirField);
+		final HBox hbox = new HBox(10);
+		hbox.setPrefWidth(500);
+		hbox.getChildren().addAll(baseDirField, baseDirFinder);
+		
+		final Button logout = new Button("Logout");
+		logout.getStyleClass().add("optionButton");
+		logout.setOnAction(evt -> AuthUtil.logout());
+
+		final Button resetconfigs = new Button("Reset");
+		resetconfigs.getStyleClass().add("optionButton");
+		resetconfigs.setOnAction(evt -> FileUtil.resetFiles());
+		
+		final HBox logouthbox = new HBox(10);
+		logouthbox.setPrefWidth(hbox.getPrefWidth());
+		logouthbox.getChildren().addAll(logout, resetconfigs);
+		
+		final Label lar = new Label("Logout & Rest");
+		lar.setStyle("-fx-padding: 20px 0px 10px 0px;");
+		
+		vbox.getChildren().addAll(ramlabel, ramcombobox, resolution, resolutioncombobox, baseDir, hbox, lar, logouthbox);
 
 	}
 

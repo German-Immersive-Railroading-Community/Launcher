@@ -74,6 +74,8 @@ public class AuthUtil {
 	}
 
 	public static String[] make(final Session session, final JSONObject json) {
+		if(session == null)
+			return null;
 		Profile profile = mclient.getProfileByUUID(session.getUuid());
 		Map<String, String> list = new HashMap<>();
 		list.put("${auth_player_name}", profile.getName());
