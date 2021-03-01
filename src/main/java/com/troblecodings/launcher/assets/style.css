@@ -4,6 +4,7 @@
 	-fx-font-size: 45px;
 	-fx-text-fill: white;
 	-fx-font-smoothing-type: lcd;
+	-fx-background-insets: -10 -20 0 -20;
 }
 .navbar:hover {
 	-fx-background-color: #1b1b1b1b;

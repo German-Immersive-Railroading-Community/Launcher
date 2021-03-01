@@ -37,7 +37,7 @@ public class Header extends StackPane {
 			btn.setText(page.name().toUpperCase());
 			btn.setOnAction(evt -> Launcher.setScene(page.supplier.get()));
 			hbox.getChildren().add(btn);
-		    HBox.setMargin(btn, new Insets(0, 20, 0, 20));
+		    HBox.setMargin(btn, new Insets(20, 20, 20, 20));
 		}
 		hbox.setAlignment(Pos.CENTER);
 		
