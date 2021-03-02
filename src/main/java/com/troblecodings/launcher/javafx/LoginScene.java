@@ -4,6 +4,7 @@ import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -13,6 +14,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import net.cydhra.nidhogg.exception.InvalidCredentialsException;
 
 public class LoginScene extends Scene {
 
@@ -35,7 +37,7 @@ public class LoginScene extends Scene {
 		PasswordField passwordfield = new PasswordField();
 		Button loginbutton = new Button();
 		loginbutton.getStyleClass().add("loginbutton");
-		
+
 		Label errorLabel = new Label("");
 		errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 20px");
 
@@ -57,13 +59,23 @@ public class LoginScene extends Scene {
 			return;
 		}
 
-		if ((FileUtil.DEFAULT = AuthUtil.auth(mail, pw)) != null) {
-			Launcher.setScene(Launcher.HOMESCENE);
-			error.setText("");
-			return;
-		}
-		
-		error.setText("Wrong credentials!");
+		new Thread(() -> {
+			try {
+				if ((FileUtil.DEFAULT = AuthUtil.auth(mail, pw)) != null) {
+					Platform.runLater(() -> {
+						Launcher.setScene(Launcher.HOMESCENE);
+						error.setText("");
+					});
+					return;
+				}
+			} catch (InvalidCredentialsException e) {
+				Platform.runLater(() -> error.setText("Wrong credentials!"));
+				Launcher.onError(e);
+			} catch (Exception e) {
+				Platform.runLater(() -> error.setText("Unexpected Error, try later!"));
+				Launcher.onError(e);
+			}
+		}).start();
 	}
 
 }

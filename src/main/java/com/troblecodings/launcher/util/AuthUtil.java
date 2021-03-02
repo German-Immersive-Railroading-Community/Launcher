@@ -62,6 +62,7 @@ public class AuthUtil {
 		} catch (IOException e) {
 			Launcher.onError(e);
 		}
+		Launcher.setScene(Launcher.LOGINSCENE);
 	}
 
 	private static final String DEFAULT_ARGS = "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userType ${user_type} --tweakClass net.minecraftforge.fml.common.launcher.FMLTweaker --versionType Forge";
