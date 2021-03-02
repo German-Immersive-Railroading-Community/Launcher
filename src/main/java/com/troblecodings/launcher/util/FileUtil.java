@@ -2,116 +2,149 @@ package com.troblecodings.launcher.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Key;
-import java.util.List;
+import java.nio.file.StandardCopyOption;
 
-import javax.crypto.Cipher;
-
-import com.troblecodings.launcher.ErrorDialog;
-import com.troblecodings.launcher.HomePage;
+import com.google.gson.Gson;
 import com.troblecodings.launcher.Launcher;
-import com.troblecodings.launcher.SettingsPage;
 
 import net.cydhra.nidhogg.data.Session;
 
 public class FileUtil {
 
-	public static String BASE_DIR = null;
+	public static SettingsData SETTINGS = null;
 	public static String ASSET_DIR = null;
 	public static String LIB_DIR = null;
 
 	public static Session DEFAULT = null;
 
-	public static String TRANSFORM = "AES";
 	public static Path REMEMBERFILE;
 
-	public static final Path SETTINGSPATH = Paths.get(System.getProperty("user.home") + "/.launcher/Settings.txt");
+	public static final Path SETTINGSPATH = Paths.get(System.getProperty("user.home") + "/.launcher/settings.json");
 
-	private static String setCreateIfNotExists(String pathstr) throws Throwable {
+	private static String setCreateIfNotExists(String pathstr) {
 		Path path = Paths.get(pathstr);
 		if (!Files.exists(path)) {
-			Files.createDirectories(path);
+			try {
+				Files.createDirectories(path);
+			} catch (IOException e) {
+				Launcher.onError(e);
+			}
 		}
 		return pathstr;
 	}
 
-	// Initiates all folders and reads the remember file
-	public static void init() throws Throwable {
-		try {
-			if (Files.exists(SETTINGSPATH)) {
-				List<String> settings = Files.readAllLines(SETTINGSPATH);
-				StartupUtil.LWIDTH = settings.size() < 1 ? "1280" : settings.get(0);
-				StartupUtil.LHEIGHT = settings.size() < 2 ? "720" : settings.get(1);
-				if (settings.size() >= 3)
-					StartupUtil.RAM = Integer.valueOf(settings.get(2));
-				BASE_DIR = settings.size() < 4 ? (System.getenv("APPDATA") + "/gir") : settings.get(3);
-			} else {
-				Files.createDirectories(SETTINGSPATH.getParent());
-				Files.createFile(SETTINGSPATH);
-				BASE_DIR = System.getenv("APPDATA") + "/gir";
-			}
-		} catch (IOException e) {
-			ErrorDialog.createDialog(e);
-		}
+	public static boolean moveBaseDir(String file) {
+		Path ptof = Paths.get(file);
+		if (Files.notExists(ptof) || !Files.isDirectory(ptof))
+			return false;
 
-		SettingsPage.NEWBASEDIR = BASE_DIR = setCreateIfNotExists(BASE_DIR.replace("\\", "/"));
-		ASSET_DIR = setCreateIfNotExists(BASE_DIR + "/assets");
-		LIB_DIR = setCreateIfNotExists(BASE_DIR + "/libraries");
-
-		REMEMBERFILE = Paths.get(BASE_DIR + "/ac.ce");
-		if (Files.exists(REMEMBERFILE)) {
-			byte[] content = Files.readAllBytes(REMEMBERFILE);
-			if (content != null && content.length > 0) {
-				Key key = CryptoUtil.getKey(TRANSFORM);
-
-				Cipher cipher = Cipher.getInstance(TRANSFORM);
-				cipher.init(Cipher.DECRYPT_MODE, key);
-
-				try {
-					byte[] encrypted = cipher.doFinal(content);
-					String[] session = new String(encrypted).split(System.lineSeparator());
-					if (session.length == 4)
-						DEFAULT = new Session(session[0], session[1], session[2], session[3]);
-				} catch (Exception e) {
-					Launcher.LOGGER.trace(e.getMessage(), e);
+		Path old = Paths.get(SETTINGS.baseDir);
+		if(ptof.equals(old))
+			return false;
+		
+		try { // Why? WHY? Let me disable Exceptions pls
+			Files.walk(old).forEach(pt -> {
+				try { // I really hate this language ... I mean ... really
+					Path newpth = Paths.get(pt.toString().replace(old.toString(), file));
+					if(Files.isDirectory(pt)) {
+						Files.createDirectories(newpth);
+						return;
+					}
+					Files.move(pt, newpth,
+							StandardCopyOption.REPLACE_EXISTING);
+				} catch (IOException e) {
+					Launcher.onError(e);
+					// I fucking don't care if this fails
 				}
-			}
+			});
+			Files.walk(old).sorted((c1, c2) -> {
+				int c1l = c1.toString().length();
+				int c2l = c2.toString().length();
+				return c1l < c2l ? 1:(c1l == c2l ? 0:-1);
+			}).forEach(p -> {
+				try {
+					Files.deleteIfExists(p);
+				} catch (IOException e) {
+					Launcher.onError(e);
+					// I fucking don't care if this fails
+				}
+			});
+		} catch (IOException e) {
+			Launcher.onError(e);
+			return false;
 		}
+		SETTINGS.baseDir = file;
+		init();
+		return true;
+	}
+
+	public static class SettingsData {
+
+		public String baseDir = System.getenv("APPDATA") + "/gir";
+		public int width = 1280;
+		public int height = 720;
+		public int ram = 2048;
 
 	}
 
-	// Encrypts and saves a session
-	public static void saveSession(Session session) throws Throwable {
-		Key key = CryptoUtil.getKey(TRANSFORM);
+	public static final Gson GSON = new Gson();
 
-		String sessionstring = session.getId() + System.lineSeparator() + session.getAlias() + System.lineSeparator()
-				+ session.getAccessToken() + System.lineSeparator() + session.getClientToken();
+	public static void readSettings() {
+		try {
+			if (Files.exists(SETTINGSPATH)) {
+				Reader reader = Files.newBufferedReader(SETTINGSPATH);
+				SETTINGS = GSON.fromJson(reader, SettingsData.class);
+				reader.close();
+			} else {
+				Files.createDirectories(SETTINGSPATH.getParent());
+				Files.createFile(SETTINGSPATH);
+			}
+		} catch (IOException e) {
+			try {
+				Files.delete(SETTINGSPATH);
+			} catch (IOException e1) {
+				e1.printStackTrace();// Do not log
+			}
+		} finally {
+			if (SETTINGS == null)
+				SETTINGS = new SettingsData();
+		}
+	}
 
-		Cipher cipher = Cipher.getInstance(TRANSFORM);
-		cipher.init(Cipher.ENCRYPT_MODE, key);
+	public static void saveSettings() {
+		Launcher.getLogger().info("Save Settings!");
+		try {
+			Writer writer = Files.newBufferedWriter(SETTINGSPATH);
+			GSON.toJson(SETTINGS, writer);
+			writer.close();
+		} catch (Throwable e) {
+			Launcher.onError(e);
+		}
+	}
 
-		byte[] encrypted = cipher.doFinal(sessionstring.getBytes());
-		Files.write(REMEMBERFILE, encrypted);
+	public static void init() {
+		ASSET_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/assets");
+		LIB_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/libraries");
+
+		REMEMBERFILE = Paths.get(SETTINGS.baseDir + "/ac.ce");
+		DEFAULT = CryptoUtil.readEncrypted(REMEMBERFILE, Session.class);
 	}
 
 	// Delete option files and mod, assets and libraries folder
 	public static void resetFiles() {
-		deleteFile(Paths.get(FileUtil.BASE_DIR + "/options.txt").toFile());
-		deleteFile(Paths.get(FileUtil.BASE_DIR + "/optionsof.txt").toFile());
-		deleteFile(Paths.get(FileUtil.BASE_DIR + "/GIR.json").toFile());
-		deleteDirectory(Paths.get(FileUtil.BASE_DIR + "/mods").toFile());
-		deleteDirectory(Paths.get(FileUtil.BASE_DIR + "/assets").toFile());
-		deleteDirectory(Paths.get(FileUtil.BASE_DIR + "/libraries").toFile());
-		deleteDirectory(Paths.get(FileUtil.BASE_DIR + "/config").toFile());
-		try {
-			FileUtil.init();
-		} catch (Throwable e) {
-			Launcher.LOGGER.trace(e.getMessage(), e);
-		}
-		Launcher.INSTANCEL.setPart(new HomePage());
+		deleteFile(Paths.get(SETTINGS.baseDir + "/options.txt").toFile());
+		deleteFile(Paths.get(SETTINGS.baseDir + "/optionsof.txt").toFile());
+		deleteFile(Paths.get(SETTINGS.baseDir + "/GIR.json").toFile());
+		deleteDirectory(Paths.get(SETTINGS.baseDir + "/mods").toFile());
+		deleteDirectory(Paths.get(SETTINGS.baseDir + "/assets").toFile());
+		deleteDirectory(Paths.get(SETTINGS.baseDir + "/libraries").toFile());
+		deleteDirectory(Paths.get(SETTINGS.baseDir + "/config").toFile());
+		FileUtil.init();
 	}
 
 	private static void deleteDirectory(File directory) {

@@ -1,11 +1,55 @@
 package com.troblecodings.launcher.util;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.Key;
 import java.util.Random;
 
+import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.troblecodings.launcher.Launcher;
+
 public class CryptoUtil {
+	
+	public static String TRANSFORM = "AES";
+	
+	// Encrypts and saves a session
+	public static void saveEncrypted(Path file, Object session) {
+		Key key = CryptoUtil.getKey(TRANSFORM);
+		
+		String sessionstring = FileUtil.GSON.toJson(session);
+		try {
+			Cipher cipher = Cipher.getInstance(TRANSFORM);
+			cipher.init(Cipher.ENCRYPT_MODE, key);
+
+			byte[] encrypted = cipher.doFinal(sessionstring.getBytes());
+			Files.write(file, encrypted);
+		} catch (Throwable e) {
+			Launcher.onError(e);
+		}
+	}
+	
+	public static <T> T readEncrypted(Path file, Class<T> t) {
+		try {
+			if (Files.exists(file)) {
+				byte[] content = Files.readAllBytes(file);
+				if (content != null && content.length > 0) {
+					Key key = CryptoUtil.getKey(TRANSFORM);
+
+					Cipher cipher = Cipher.getInstance(TRANSFORM);
+					cipher.init(Cipher.DECRYPT_MODE, key);
+
+					byte[] encrypted = cipher.doFinal(content);
+					String session = new String(encrypted);
+					return FileUtil.GSON.fromJson(session, t);
+				}
+			}
+		} catch (Throwable e) {
+			Launcher.onError(e);
+		}
+		return null;
+	}
 	
 	// Generates a 256 bit AES key
 	public static Key getKey(String transform) {

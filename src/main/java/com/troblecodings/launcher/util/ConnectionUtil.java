@@ -5,12 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,7 +17,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.function.Consumer;
 
-import com.troblecodings.launcher.ErrorPart;
+import javax.xml.ws.http.HTTPException;
+
 import com.troblecodings.launcher.Launcher;
 
 public class ConnectionUtil {
@@ -51,9 +48,7 @@ public class ConnectionUtil {
 				addHeader(connection);
 			}
 			if(resp == HttpURLConnection.HTTP_FORBIDDEN) {
-				Launcher.INSTANCEL
-				.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Connection was rejected!",
-						"The operation was forbidden! Rate limit? Retry later."));
+				Launcher.onError(new HTTPException(resp));
 				return false;
 			}
 			InputStream stream = connection.getInputStream();
@@ -70,17 +65,7 @@ public class ConnectionUtil {
 			stream.close();
 			return true;
 		} catch (Exception e) {
-			if (e instanceof ConnectException || e instanceof SocketTimeoutException)
-				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Connection error!",
-						"No connection could be established!"));
-			else if (e instanceof MalformedURLException)
-				Launcher.INSTANCEL
-						.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "URL error!", "The URL was mallformed!"));
-			else if (e instanceof UnknownHostException)
-				Launcher.INSTANCEL
-						.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Couldn't resolve host " + e.getMessage(),
-								"Are you connected? No connection could be established!"));
-			Launcher.LOGGER.trace(e.getMessage(), e);
+			Launcher.onError(e);
 			return false;
 		}
 	}
@@ -104,8 +89,7 @@ public class ConnectionUtil {
 			try {
 				Files.createDirectories(parent);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				Launcher.onError(e1);
 			}
 		}
 
@@ -113,13 +97,13 @@ public class ConnectionUtil {
 			if (!openConnection(url, fos, update))
 				return false;
 		} catch (Exception e) {
-			Launcher.LOGGER.trace(e.getMessage(), e);
+			Launcher.onError(e);
 		}
 		Path normalFile = Paths.get(name);
 		try {
 			Files.move(pathtofile, normalFile, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
-			Launcher.LOGGER.trace(e.getMessage(), e);
+			Launcher.onError(e);
 		}
 		return true;
 	}
@@ -146,10 +130,10 @@ public class ConnectionUtil {
 				}
 				return sha1result.equalsIgnoreCase(sha1);
 			} catch (IOException e) {
-				Launcher.LOGGER.trace(e.getMessage(), e);
+				Launcher.onError(e);
 			}
 		} catch (NoSuchAlgorithmException e) {
-			Launcher.LOGGER.trace(e.getMessage(), e);
+			Launcher.onError(e);
 		}
 		return false;
 	}
@@ -169,9 +153,7 @@ public class ConnectionUtil {
 		}
 		while (!ConnectionUtil.validate(name, sha1)) {
 			if (times == 3) {
-				Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(),
-						"Error verifying " + Paths.get(name).getFileName().toString(),
-						"The file failed to download correctly after 3 tries!"));
+				Launcher.onError(new VerifyError("Couldn't verfiy file against sha1!"));
 				break;
 			}
 			ConnectionUtil.download(url, name, update);

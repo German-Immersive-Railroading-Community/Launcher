@@ -22,6 +22,12 @@
 			<resource>
 				<directory>src/main/java/</directory>
 				<includes>
+					<include>com/troblecodings/launcher/assets/*.css</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/java/</directory>
+				<includes>
 					<include>*.xml</include>
 				</includes>
 			</resource>

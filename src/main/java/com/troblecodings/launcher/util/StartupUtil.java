@@ -13,8 +13,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -24,13 +27,11 @@ import javax.swing.JButton;
 import javax.swing.ProgressMonitor;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import com.troblecodings.launcher.ErrorDialog;
-import com.troblecodings.launcher.ErrorPart;
 import com.troblecodings.launcher.Launcher;
+import com.troblecodings.launcher.javafx.Footer;
 
 import mslinks.ShellLink;
 import mslinks.ShellLinkException;
@@ -43,9 +44,6 @@ public class StartupUtil {
 	private static String MAINCLASS = null;
 
 	public static final String OSSHORTNAME = getOSShortName();
-
-	public static String LWIDTH = "1280", LHEIGHT = "720";
-	public static int RAM = 2048;
 
 	private static String getOSShortName() {
 		String longname = System.getProperty("os.name").toLowerCase();
@@ -75,7 +73,7 @@ public class StartupUtil {
 			if (version.split("\"")[1].startsWith("1.8.0"))
 				return true;
 		} catch (Exception e) {
-			Launcher.LOGGER.trace(e.getMessage(), e);
+			Launcher.onError(e);
 		}
 		return false;
 	}
@@ -104,12 +102,12 @@ public class StartupUtil {
 					if (!Files.isRegularFile(pth) || !pth.toString().endsWith(".lnk"))
 						return false;
 					Path path = Paths.get(new ShellLink(pth).resolveTarget()).getParent();
-					Launcher.LOGGER.info(path.toString());
+					Launcher.getLogger().info(path.toString());
 					return isJavaAnd8(path);
 				} catch (IOException e) {
-					Launcher.LOGGER.trace(e.getMessage(), e);
+					Launcher.onError(e);
 				} catch (ShellLinkException e) {
-					Launcher.LOGGER.trace(e.getMessage(), e);
+					Launcher.onError(e);
 				}
 				return false;
 			};
@@ -121,27 +119,33 @@ public class StartupUtil {
 			if (opt3.isPresent())
 				return Optional.of(opt3.get().getParent().toString());
 		} catch (IOException e) {
-			Launcher.LOGGER.trace(e.getMessage(), e);
+			Launcher.onError(e);
 		}
 		return Optional.empty();
 	}
 
 	public static void update() {
-		if(!Launcher.UPDATE)
-			return;
 		try {
 			String str = ConnectionUtil.getStringFromURL(RELEASE_API);
-			if (str == null)
+			if (str == null) {
+				Launcher.getLogger().info("Couldn't read updater information!");
 				return;
+			}
 			JSONArray obj = new JSONArray(str);
 			JSONObject newversion = obj.getJSONObject(0).getJSONArray("assets").getJSONObject(0);
 			String downloadURL = newversion.getString("browser_download_url");
 			File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+			if(!location.isFile()) {
+				Launcher.getLogger().debug("Dev version no update!");
+				return;
+			}
 			long size = Files.size(Paths.get(location.toURI()));
 			long newsize = newversion.getNumber("size").longValue();
-			if (newsize == size || !location.isFile())
+			if (newsize == size) {
+				Launcher.getLogger().info("The new verision (%i) is equal to the old (%i)", newsize, size);
 				return;
-			Launcher.LOGGER.info("Updating Launcher!");
+			}
+			Launcher.getLogger().info("Updating Launcher!");
 			ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
 			Path pth = Paths.get(location.toURI());
 			Files.copy(pth, Paths.get(pth.toString() + ".tmp"), StandardCopyOption.REPLACE_EXISTING);
@@ -156,134 +160,155 @@ public class StartupUtil {
 			new ProcessBuilder("java", "-jar", location.toString()).start().waitFor();
 			System.exit(0);
 		} catch (Throwable e) {
-			Launcher.LOGGER.trace(e.getMessage(), e);
-			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Update error!", "General error!"));
+			Launcher.onError(e);
 		}
 	}
 
-	public static boolean prestart() throws Throwable {
-		String clientJson = FileUtil.BASE_DIR + "/GIR.json";
-		ConnectionUtil.download("https://girc.eu/Launcher/GIR.json", clientJson);
-		if (Files.notExists(Paths.get(clientJson))) {
-			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Missing version information!",
-					"The GIR version json could not be found."));
-			return false;
-		}
-
-		String content = new String(Files.readAllBytes(Paths.get(clientJson)));
-		JSONObject object;
+	@SuppressWarnings("unchecked")
+	private static String[] prestart() {
 		try {
+			String clientJson = FileUtil.SETTINGS.baseDir + "/GIR.json";
+			ConnectionUtil.download("https://girc.eu/Launcher/GIR.json", clientJson);
+			
+			String content = new String(Files.readAllBytes(Paths.get(clientJson)));
+			JSONObject object;
 			object = new JSONObject(content);
-		} catch (JSONException e) {
-			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(), "Corrupted version information!",
-					"The GIR version json could not be read."));
-			return false;
-		}
 
-		MAINCLASS = object.getString("mainClass");
+			MAINCLASS = object.getString("mainClass");
 
-		// This part downloads the texture index and so on
-		JSONObject assetIndex = object.getJSONObject("assetIndex");
+			// This part downloads the texture index and so on
+			JSONObject assetIndex = object.getJSONObject("assetIndex");
 
-		Path indexes = Paths.get(FileUtil.ASSET_DIR + "/indexes");
-		if (!Files.exists(indexes))
-			Files.createDirectories(indexes);
+			Path indexes = Paths.get(FileUtil.ASSET_DIR + "/indexes");
+			if (!Files.exists(indexes))
+				Files.createDirectories(indexes);
 
-		String indexpath = indexes.toString() + "/" + assetIndex.getString("id") + ".json";
-		String indexurl = assetIndex.getString("url");
-		String indexsha1 = assetIndex.getString("sha1");
-		long sizeAsset = assetIndex.getLong("size");
-		ConnectionUtil.validateDownloadRetry(indexurl, indexpath, indexsha1, l -> Launcher.bar.update(l / sizeAsset));
+			String indexpath = indexes.toString() + "/" + assetIndex.getString("id") + ".json";
+			String indexurl = assetIndex.getString("url");
+			String indexsha1 = assetIndex.getString("sha1");
+			ConnectionUtil.validateDownloadRetry(indexurl, indexpath, indexsha1);
 
-		Path ogMC = Paths.get(FileUtil.BASE_DIR + "/versions/" + object.getString("inheritsFrom") + "/"
-				+ object.getString("inheritsFrom") + ".jar");
-		Files.createDirectories(ogMC.getParent());
-		JSONObject clientDL = object.getJSONObject("downloads").getJSONObject("client");
-		long sizeClient = clientDL.getLong("size");
-		ConnectionUtil.validateDownloadRetry(clientDL.getString("url"), ogMC.toString(), clientDL.getString("sha1"),
-				l -> Launcher.bar.update(l / sizeClient));
-		LIBPATHS = ogMC.toString() + ";";
+			Path ogMC = Paths.get(FileUtil.SETTINGS.baseDir + "/versions/" + object.getString("inheritsFrom") + "/"
+					+ object.getString("inheritsFrom") + ".jar");
+			Files.createDirectories(ogMC.getParent());
+			JSONObject clientDL = object.getJSONObject("downloads").getJSONObject("client");
+			ConnectionUtil.validateDownloadRetry(clientDL.getString("url"), ogMC.toString(),
+					clientDL.getString("sha1"));
+			LIBPATHS = ogMC.toString() + ";";
 
-		JSONObject additional = object.getJSONObject("additional");
-		JSONArray arr = object.getJSONArray("libraries");
-		Path ojectspath = Paths.get(FileUtil.ASSET_DIR + "/objects");
-		if (!Files.exists(ojectspath))
-			Files.createDirectories(ojectspath);
+			JSONObject additional = object.getJSONObject("additional");
+			JSONArray arr = object.getJSONArray("libraries");
+			Path ojectspath = Paths.get(FileUtil.ASSET_DIR + "/objects");
+			if (!Files.exists(ojectspath))
+				Files.createDirectories(ojectspath);
 
-		JSONTokener tokener = new JSONTokener(Files.newInputStream(Paths.get(indexpath)));
-		JSONObject index = new JSONObject(tokener);
-		JSONObject objects = index.getJSONObject("objects");
+			JSONTokener tokener = new JSONTokener(Files.newInputStream(Paths.get(indexpath)));
+			JSONObject index = new JSONObject(tokener);
+			JSONObject objects = index.getJSONObject("objects");
 
-		// This part is to download the libs
-		for (Object libentry : arr) {
-			JSONObject libobj = (JSONObject) libentry;
-			JSONObject downloadobj = libobj.getJSONObject("downloads");
-			if (downloadobj.has("artifact")) {
-				JSONObject artifact = downloadobj.getJSONObject("artifact");
-				String url = artifact.getString("url");
-				String name = FileUtil.LIB_DIR + "/" + artifact.getString("path");
-				String sha1 = artifact.getString("sha1");
+			final double maxItems = objects.keySet().size() + arr.length();
+			AtomicInteger counter = new AtomicInteger();
 
-				LIBPATHS += name + ";";
-				long size = artifact.getLong("size");
-				ConnectionUtil.validateDownloadRetry(url, name, sha1, l -> Launcher.bar.update(l / size));
-			} else {
-				JSONObject natives = libobj.getJSONObject("natives");
-				if (natives.has(OSSHORTNAME)) {
-					String nativekey = natives.getString(OSSHORTNAME).replace("${arch}",
-							System.getProperty("sun.arch.data.model"));
-					JSONObject classifier = downloadobj.getJSONObject("classifiers");
-					JSONObject artifact = classifier.getJSONObject(nativekey);
+			// This part is to download the libs
+			for (Object libentry : arr) {
+				JSONObject libobj = (JSONObject) libentry;
+				JSONObject downloadobj = libobj.getJSONObject("downloads");
+				if (downloadobj.has("artifact")) {
+					JSONObject artifact = downloadobj.getJSONObject("artifact");
 					String url = artifact.getString("url");
 					String name = FileUtil.LIB_DIR + "/" + artifact.getString("path");
 					String sha1 = artifact.getString("sha1");
-					long size = artifact.getLong("size");
-					ConnectionUtil.validateDownloadRetry(url, name, sha1, l -> Launcher.bar.update(l / size));
 
-					// Extract the natives
-					unzip(name, FileUtil.LIB_DIR);
+					LIBPATHS += name + ";";
+					ConnectionUtil.validateDownloadRetry(url, name, sha1);
+				} else {
+					JSONObject natives = libobj.getJSONObject("natives");
+					if (natives.has(OSSHORTNAME)) {
+						String nativekey = natives.getString(OSSHORTNAME).replace("${arch}",
+								System.getProperty("sun.arch.data.model"));
+						JSONObject classifier = downloadobj.getJSONObject("classifiers");
+						JSONObject artifact = classifier.getJSONObject(nativekey);
+						String url = artifact.getString("url");
+						String name = FileUtil.LIB_DIR + "/" + artifact.getString("path");
+						String sha1 = artifact.getString("sha1");
+						ConnectionUtil.validateDownloadRetry(url, name, sha1);
+
+						// Extract the natives
+						unzip(name, FileUtil.LIB_DIR);
+					}
 				}
+				Footer.setProgress(counter.addAndGet(1) / maxItems);
 			}
-		}
 
-		// Asset lockup and download
-		String baseurl = "http://resources.download.minecraft.net/";
-		objects.keySet().forEach((key) -> {
-			JSONObject asset = objects.getJSONObject(key);
-			String hash = asset.getString("hash");
-			String folder = hash.substring(0, 2);
-			Path folderpath = Paths.get(ojectspath.toString() + "/" + folder);
-			if (!Files.exists(folderpath)) {
+			// Asset lockup and download
+			String baseurl = "http://resources.download.minecraft.net/";
+			objects.keySet().forEach((key) -> {
 				try {
-					Files.createDirectories(folderpath);
-				} catch (IOException e) {
-					ErrorDialog.createDialog(e);
-				}
-			}
-			try {
-				long size = asset.getLong("size");
-				ConnectionUtil.validateDownloadRetry(baseurl + folder + "/" + hash, folderpath.toString() + "/" + hash,
-						hash, l -> Launcher.bar.update(l / size));
-			} catch (Throwable e) {
-				ErrorDialog.createDialog(e);
-			}
-		});
-
-		additional.keySet().forEach(key -> {
-			additional.getJSONArray(key).forEach(fileobj -> {
-				try {
-					JSONObject jfileobj = (JSONObject) fileobj;
-					long size = jfileobj.getLong("size");
-					Path path = Paths.get(FileUtil.BASE_DIR, key, jfileobj.getString("name"));
-					ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
-							jfileobj.getString("sha1"), l -> Launcher.bar.update(l / size));
+					JSONObject asset = objects.getJSONObject(key);
+					String hash = asset.getString("hash");
+					String folder = hash.substring(0, 2);
+					Path folderpath = Paths.get(ojectspath.toString() + "/" + folder);
+					if (!Files.exists(folderpath)) {
+						Files.createDirectories(folderpath);
+					}
+					ConnectionUtil.validateDownloadRetry(baseurl + folder + "/" + hash,
+							folderpath.toString() + "/" + hash, hash);
 				} catch (Throwable e) {
-					ErrorDialog.createDialog(e);
+					Launcher.onError(e);
+				}
+				Footer.setProgress(counter.addAndGet(1) / maxItems);
+			});
+
+			counter.set(0);
+			final double max = object.getLong("wholeSize");
+			additional.keySet().forEach(key -> {
+				additional.getJSONArray(key).forEach(fileobj -> {
+					JSONObject jfileobj = (JSONObject) fileobj;
+					Path path = Paths.get(FileUtil.SETTINGS.baseDir, key, jfileobj.getString("name"));
+					ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
+							jfileobj.getString("sha1"), in -> Footer.setProgress((counter.get() + in) / max));
+					counter.getAndAdd(jfileobj.getInt("size"));
+				});
+			});
+
+			additional.keySet().forEach(key -> {
+				try {
+					List<Object> array = additional.getJSONArray(key).toList();
+					Files.list(Paths.get(FileUtil.SETTINGS.baseDir, key)).filter(incom -> {
+						String filename = incom.getFileName().toString();
+						return Files.isRegularFile(incom) && array.stream().noneMatch(job -> {
+							return ((HashMap<String, Object>) job).get("name").equals(filename);
+						});
+					}).forEach(t -> {
+						Launcher.getLogger().debug("Deleted file " + t.toString());
+						try { // I hate this language
+							Files.deleteIfExists(t);
+						} catch (IOException e) {
+							Launcher.onError(e);
+						}
+					});
+				} catch (IOException e) {
+					Launcher.onError(e);
 				}
 			});
-		});
-		Launcher.bar.update(0);
-		return true;
+
+			Path additionalMods = Paths.get(FileUtil.SETTINGS.baseDir, "additional-mods");
+			Files.createDirectories(additionalMods);
+			Files.list(additionalMods).filter(pth -> !pth.toString().endsWith(".dis"))
+					.forEach(pth -> {
+						try {
+							Files.copy(pth, Paths.get(pth.toString().replace("additional-mods", "mods")));
+						} catch (IOException e) {
+							Launcher.onError(e);
+						}
+					});
+
+			Footer.setProgress(0.001);
+			return AuthUtil.make(AuthUtil.auth(null, null), object);
+		} catch (Throwable e) {
+			Launcher.onError(e);
+			return null;
+		}
 	}
 
 	private static void unzip(String name, String base) throws Throwable {
@@ -309,23 +334,34 @@ public class StartupUtil {
 		file.close();
 	}
 
-	public static Process start(String[] parameter) throws Throwable {
+	public static Process start() {
 		Optional<String> javaVers = findJavaVersion();
 		if (!javaVers.isPresent()) {
-			Launcher.INSTANCEL.setPart(new ErrorPart(Launcher.INSTANCEL.getPart(),
-					"Couldn't find valid Java 8 installation!", "Check that you installed the correct java versions!"));
-			return null;
+			Launcher.onError(new IllegalStateException("No valid Java version found!"));
+			// try to start normaly
 		}
-		String[] preparameter = new String[] { javaVers.get() + "/java", "-Xmx" + RAM + "M", "-Xms" + RAM + "M",
+
+		String[] parameter = prestart();
+		if (parameter == null)
+			return null;
+
+		String width = String.valueOf(FileUtil.SETTINGS.width);
+		String height = String.valueOf(FileUtil.SETTINGS.height);
+		String ram = String.valueOf(FileUtil.SETTINGS.ram);
+		String[] preparameter = new String[] { javaVers.isPresent() ? javaVers.get() + "/java":"java", "-Xmx" + ram + "M", "-Xms" + ram + "M",
 				"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
-				"-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", LWIDTH, "-height",
-				LHEIGHT };
+				"-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", width, "-height",
+				height };
 		ProcessBuilder builder = new ProcessBuilder(
 				Stream.concat(Arrays.stream(preparameter), Arrays.stream(parameter)).toArray(String[]::new));
-		builder.directory(new File(FileUtil.BASE_DIR));
+		builder.directory(new File(FileUtil.SETTINGS.baseDir));
 		builder.redirectError(Redirect.INHERIT);
 		builder.redirectOutput(Redirect.INHERIT);
-		Process process = builder.start();
-		return process;
+		try {
+			return builder.start();
+		} catch (IOException e) {
+			Launcher.onError(e);
+	    }
+		return null;
 	}
 }
