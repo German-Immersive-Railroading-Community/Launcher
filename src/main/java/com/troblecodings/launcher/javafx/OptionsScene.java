@@ -92,7 +92,7 @@ public class OptionsScene extends Scene {
 			final DirectoryChooser chooser = new DirectoryChooser();
 			chooser.setInitialDirectory(new File(FileUtil.SETTINGS.baseDir));
 			final File fl = chooser.showDialog(Launcher.getStage());
-			if(fl.exists() && fl.isDirectory()) {
+			if(fl != null && fl.exists() && fl.isDirectory()) {
 				baseDirField.setText(fl.toString());
 			}
 		});
