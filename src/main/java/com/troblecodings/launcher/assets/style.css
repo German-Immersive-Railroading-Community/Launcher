@@ -3,12 +3,16 @@
 	-fx-font-family: 'VT323', monospace;
 	-fx-font-size: 45px;
 	-fx-text-fill: white;
+	-fx-padding: 2px;
 	-fx-font-smoothing-type: lcd;
-	-fx-background-insets: -10 -20 0 -20;
 	-fx-background-radius: 10px;
+	-fx-border-style: hidden hidden hidden hidden;
+	-fx-border-color: white;
+	-fx-border-width: 2px;
 }
 .navbar:hover {
-	-fx-background-color: #1b1b1b1b;
+	-fx-border-style: hidden hidden solid hidden;
+	-fx-padding: 0px;
 }
 
 .optionButton {
