@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.troblecodings.launcher.Launcher;
+import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.Footer;
 
 import mslinks.ShellLink;
@@ -56,7 +58,7 @@ public class StartupUtil {
 		}
 		return "unknown";
 	}
-
+		
 	private static boolean isJavaAnd8(Path pathToDictionary) {
 		Path pathtoJava = pathToDictionary.resolve("java.exe");
 		if (Files.notExists(pathtoJava))
@@ -122,6 +124,34 @@ public class StartupUtil {
 			Launcher.onError(e);
 		}
 		return Optional.empty();
+	}
+	
+	private static void addServerToData() {
+		Path pth = Paths.get(FileUtil.SETTINGS.baseDir, "servers.dat");
+		if(Files.exists(pth)) {
+			try {
+				byte[] bytes = Files.readAllBytes(pth);
+				final byte[] girc = "girc.eu".getBytes();
+				m1: for (int i = 0; i < bytes.length - girc.length; i++) {
+					boolean found = true;
+					for (int j = 0; j < girc.length; j++) {
+						if(bytes[i + j] != girc[j]) {
+							found = false;
+						}
+					}
+					if(found)
+						break m1;
+				}
+			} catch (IOException e) {
+				Launcher.onError(e);
+			}
+		} else {
+			try {
+				Files.copy(Assets.getResourceAsStream("servers.dat"), pth);
+			} catch (IOException e) {
+				Launcher.onError(e);
+			}
+		}
 	}
 
 	public static void update() {
