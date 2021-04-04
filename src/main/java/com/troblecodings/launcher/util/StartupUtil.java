@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.troblecodings.launcher.Launcher;
+import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.Footer;
 
 import mslinks.ShellLink;
@@ -56,7 +57,7 @@ public class StartupUtil {
 		}
 		return "unknown";
 	}
-
+		
 	private static boolean isJavaAnd8(Path pathToDictionary) {
 		Path pathtoJava = pathToDictionary.resolve("java.exe");
 		if (Files.notExists(pathtoJava))
@@ -123,9 +124,21 @@ public class StartupUtil {
 		}
 		return Optional.empty();
 	}
+	
+	private static void addServerToData() {
+		Path pth = Paths.get(FileUtil.SETTINGS.baseDir, "servers.dat");
+		if(!Files.exists(pth)) {
+			try {
+				Files.copy(Assets.getResourceAsStream("servers.dat"), pth);
+			} catch (IOException e) {
+				Launcher.onError(e);
+			}
+		}
+	}
 
 	public static void update() {
 		try {
+			addServerToData();
 			String str = ConnectionUtil.getStringFromURL(RELEASE_API);
 			if (str == null) {
 				Launcher.getLogger().info("Couldn't read updater information!");
