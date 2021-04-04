@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -128,24 +127,7 @@ public class StartupUtil {
 	
 	private static void addServerToData() {
 		Path pth = Paths.get(FileUtil.SETTINGS.baseDir, "servers.dat");
-		if(Files.exists(pth)) {
-			try {
-				byte[] bytes = Files.readAllBytes(pth);
-				final byte[] girc = "girc.eu".getBytes();
-				m1: for (int i = 0; i < bytes.length - girc.length; i++) {
-					boolean found = true;
-					for (int j = 0; j < girc.length; j++) {
-						if(bytes[i + j] != girc[j]) {
-							found = false;
-						}
-					}
-					if(found)
-						break m1;
-				}
-			} catch (IOException e) {
-				Launcher.onError(e);
-			}
-		} else {
+		if(!Files.exists(pth)) {
 			try {
 				Files.copy(Assets.getResourceAsStream("servers.dat"), pth);
 			} catch (IOException e) {
@@ -156,6 +138,7 @@ public class StartupUtil {
 
 	public static void update() {
 		try {
+			addServerToData();
 			String str = ConnectionUtil.getStringFromURL(RELEASE_API);
 			if (str == null) {
 				Launcher.getLogger().info("Couldn't read updater information!");
