@@ -36,12 +36,18 @@ public class Launcher extends Application {
 		return LOGGER;
 	}
 	
-	public static void main(String[] args) {
-		Runtime.getRuntime().addShutdownHook(new Thread(FileUtil::saveSettings));
-		FileUtil.readSettings();
+	public static final void initializeLogger() {
 		System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
 		LOGGER = LogManager.getLogger("GIRC");
 		LOGGER.info("Starting Launcher!");
+	}
+	
+	public static final Thread SHUTDOWNHOOK = new Thread(FileUtil::saveSettings);
+	
+	public static void mainStartup(String[] args) {
+		Runtime.getRuntime().addShutdownHook(SHUTDOWNHOOK);
+		FileUtil.readSettings();
+		initializeLogger();
 		StartupUtil.update();
 		FileUtil.init();
 		OPTIONSSCENE = new OptionsScene();
