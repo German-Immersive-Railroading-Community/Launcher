@@ -16,7 +16,7 @@ import net.cydhra.nidhogg.data.Session;
 
 public class FileUtil {
 
-	public static SettingsData SETTINGS = null;
+	public static SettingsData SETTINGS = new SettingsData();
 	public static String ASSET_DIR = null;
 	public static String LIB_DIR = null;
 
