@@ -12,7 +12,6 @@ import com.troblecodings.launcher.javafx.LoginScene;
 import com.troblecodings.launcher.javafx.OptionsScene;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
-import com.troblecodings.launcher.util.StartupUtil;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -43,19 +42,11 @@ public class Launcher extends Application {
 	}
 	
 	public static final Thread SHUTDOWNHOOK = new Thread(FileUtil::saveSettings);
-	
-	public static void mainStartup(String[] args) {
-		Runtime.getRuntime().addShutdownHook(SHUTDOWNHOOK);
-		FileUtil.readSettings();
-		initializeLogger();
-		StartupUtil.update();
-		FileUtil.init();
-		launch(args);
-	}
-	
+		
 	@Override
 	public void start(Stage stage) throws Exception {
 		Footer.setProgress(0.001);
+
 		OPTIONSSCENE = new OptionsScene();
 		HOMESCENE = new HomeScene();
 		LOGINSCENE = new LoginScene();
