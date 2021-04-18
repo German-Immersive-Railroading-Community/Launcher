@@ -10,14 +10,16 @@ public class LaunchSystem {
 	public static String USERVERSION = "-useversion";
 
 	public static void main(String[] args) {
+		// currently pointless
 		if(Arrays.stream(args).anyMatch(USERVERSION::equals)) {
 			Launcher.mainStartup(args);
 			return;
 		}
 		Optional<String> str = StartupUtil.findJavaVersion();
 		if(str.isPresent()) {
-			
+			Launcher.mainStartup(args);
 		}
+		Launcher.mainStartup(args);
 
 	}
 

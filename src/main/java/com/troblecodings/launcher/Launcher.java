@@ -25,10 +25,10 @@ public class Launcher extends Application {
 	
 	private static Stage stage;
 	
-	public static final HomeScene HOMESCENE = new HomeScene();
+	public static HomeScene HOMESCENE;
 	public static OptionsScene OPTIONSSCENE;
-	public static final LoginScene LOGINSCENE = new LoginScene();
-	public static final CreditsScene CREDITSSCENE = new CreditsScene();
+	public static LoginScene LOGINSCENE;
+	public static CreditsScene CREDITSSCENE;
 	
 	private static Logger LOGGER;
 	
@@ -50,13 +50,17 @@ public class Launcher extends Application {
 		initializeLogger();
 		StartupUtil.update();
 		FileUtil.init();
-		OPTIONSSCENE = new OptionsScene();
-		Footer.setProgress(0.001);
 		launch(args);
 	}
 	
 	@Override
 	public void start(Stage stage) throws Exception {
+		Footer.setProgress(0.001);
+		OPTIONSSCENE = new OptionsScene();
+		HOMESCENE = new HomeScene();
+		LOGINSCENE = new LoginScene();
+		CREDITSSCENE = new CreditsScene();
+				 
 		Launcher.stage = stage;
 		stage.getIcons().add(Assets.getImage("icon.png"));
 		stage.setScene(AuthUtil.auth(null, null) == null ? LOGINSCENE:HOMESCENE);
