@@ -104,11 +104,9 @@ public class FileUtil {
 				Files.createDirectories(SETTINGSPATH.getParent());
 				Files.createFile(SETTINGSPATH);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Error dialog
-		} finally {
-			if (SETTINGS == null)
-				SETTINGS = new SettingsData();
+			e.printStackTrace();
 		}
 	}
 

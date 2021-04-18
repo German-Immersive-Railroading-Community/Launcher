@@ -5,7 +5,7 @@ import com.troblecodings.launcher.util.StartupUtil;
 
 public class LaunchSystem {
 
-	public static String USERVERSION = "-useversion";
+	public static final String USERVERSION = "-useversion";
 
 	public static void main(String[] args) {
 		Runtime.getRuntime().addShutdownHook(Launcher.SHUTDOWNHOOK);
