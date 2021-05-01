@@ -175,8 +175,7 @@ public class StartupUtil {
 			ProcessBuilder builder = new ProcessBuilder("java", "-jar", location.toString());
 			builder.redirectError(Redirect.INHERIT);
 			builder.redirectOutput(Redirect.INHERIT);
-			builder.start().waitFor();
-			System.exit(0);
+			System.exit(builder.start().waitFor());
 		} catch (Throwable e) {
 			Launcher.onError(e);
 		}
