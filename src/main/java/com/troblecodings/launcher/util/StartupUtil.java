@@ -173,8 +173,8 @@ public class StartupUtil {
 			stream.close();
 			LogManager.shutdown(false, true);
 			ProcessBuilder builder = new ProcessBuilder("java", "-jar", location.toString());
-			builder.redirectError(Redirect.PIPE);
-			builder.redirectOutput(Redirect.PIPE);
+			builder.redirectError(Redirect.INHERIT);
+			builder.redirectOutput(Redirect.INHERIT);
 			builder.start().waitFor();
 			System.exit(0);
 		} catch (Throwable e) {
