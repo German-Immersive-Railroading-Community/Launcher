@@ -9,10 +9,8 @@ public class LaunchSystem {
 
 	public static void main(String[] args) {
 		FileUtil.readSettings();
-		System.out.println("read settings");
 		Launcher.initializeLogger();
 		StartupUtil.update();
-		System.out.println("updatet check finished");
 		Runtime.getRuntime().addShutdownHook(Launcher.SHUTDOWNHOOK);
 		FileUtil.init();
 		Launcher.launch(Launcher.class, args);
