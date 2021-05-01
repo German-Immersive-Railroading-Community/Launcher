@@ -172,7 +172,10 @@ public class StartupUtil {
 			}
 			stream.close();
 			LogManager.shutdown(false, true);
-			new ProcessBuilder("java", "-jar", location.toString()).start().waitFor();
+			ProcessBuilder builder = new ProcessBuilder("java", "-jar", location.toString());
+			builder.redirectError(Redirect.PIPE);
+			builder.redirectOutput(Redirect.PIPE);
+			builder.start().waitFor();
 			System.exit(0);
 		} catch (Throwable e) {
 			Launcher.onError(e);
