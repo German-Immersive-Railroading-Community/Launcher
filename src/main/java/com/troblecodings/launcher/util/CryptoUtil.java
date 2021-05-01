@@ -53,10 +53,8 @@ public class CryptoUtil {
 	
 	// Generates a 256 bit AES key
 	public static Key getKey(String transform) {
-		Runtime run =  Runtime.getRuntime();
-		long seed = run.availableProcessors();
 		String user = System.getProperty("user.name");
-		seed *= user.length();
+		long seed = user.length();
 		for (char x : user.toCharArray()) {
 			seed += x;
 		}

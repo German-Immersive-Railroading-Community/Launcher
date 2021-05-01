@@ -172,7 +172,6 @@ public class StartupUtil {
 			}
 			stream.close();
 			LogManager.shutdown(false, true);
-			Runtime.getRuntime().removeShutdownHook(Launcher.SHUTDOWNHOOK);
 			new ProcessBuilder("java", "-jar", location.toString()).start().waitFor();
 			System.exit(0);
 		} catch (Throwable e) {
