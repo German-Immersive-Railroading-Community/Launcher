@@ -3,6 +3,7 @@ package com.troblecodings.launcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.sun.prism.Image;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.CreditsScene;
 import com.troblecodings.launcher.javafx.Footer;
@@ -13,6 +14,7 @@ import com.troblecodings.launcher.javafx.OptionsScene;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 import com.troblecodings.launcher.util.StartupUtil;
+import com.troblecodings.launcher.assets.LauncherClock;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -38,6 +40,8 @@ public class Launcher extends Application {
 	
 	public static void main(String[] args) {
 		Runtime.getRuntime().addShutdownHook(new Thread(FileUtil::saveSettings));
+		LauncherClock lClock = new LauncherClock();
+		lClock.start();
 		FileUtil.readSettings();
 		System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
 		LOGGER = LogManager.getLogger("GIRC");
