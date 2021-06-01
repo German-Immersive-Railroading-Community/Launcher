@@ -57,7 +57,7 @@ public class StartupUtil {
 		return "unknown";
 	}
 
-	private static boolean isJavaAnd8(Path pathToDictionary) {
+	public static boolean isJavaAnd8(Path pathToDictionary) {
 		Path pathtoJava = pathToDictionary.resolve("java.exe");
 		if (Files.notExists(pathtoJava))
 			return false;
