@@ -26,7 +26,10 @@
 }
 
 .root{
-	-fx-background-image: url(background.png);
+	-fx-background-image: 
+		url(background.png),
+		url(background_2.png),
+		url(background_3.png);
 	-fx-font-family: Arial;
 	-fx-border-width: 0px;
 	-fx-background-radius: 30px;
