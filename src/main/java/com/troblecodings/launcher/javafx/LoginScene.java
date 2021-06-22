@@ -1,6 +1,7 @@
 package com.troblecodings.launcher.javafx;
 
 import com.troblecodings.launcher.Launcher;
+import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 
@@ -12,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import net.cydhra.nidhogg.exception.InvalidCredentialsException;
@@ -26,7 +28,7 @@ public class LoginScene extends Scene {
 
 		VBox vbox = new VBox();
 		vbox.setMaxHeight(400);
-		vbox.setMaxWidth(500);
+		vbox.setMaxWidth(525);
 		stackpane.getChildren().add(vbox);
 
 		Label usernamelabel = new Label("Email");
@@ -47,6 +49,11 @@ public class LoginScene extends Scene {
 		textfield.setOnAction(evthl);
 		loginbutton.setTranslateY(40);
 		vbox.getChildren().addAll(usernamelabel, textfield, passwordlabel, passwordfield, errorLabel, loginbutton);
+
+		final ImageView trainImageView = new ImageView(Assets.getImage("train2.png"));
+		trainImageView.setTranslateX(800 - trainImageView.getImage().getWidth());
+		trainImageView.setTranslateY(325 - trainImageView.getImage().getHeight());
+		stackpane.getChildren().add(trainImageView);
 	}
 
 	private void loginCheck(final String mail, final String pw, final Label error) {

@@ -5,10 +5,12 @@ import java.awt.Toolkit;
 import java.io.File;
 
 import com.troblecodings.launcher.Launcher;
+import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -16,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -36,7 +39,7 @@ public class OptionsScene extends Scene {
 
 		final VBox vbox = new VBox();
 		sp.setMaxHeight(400);
-		sp.setMaxWidth(500);
+		sp.setMaxWidth(650);
 		sp.setContent(vbox);
 		vbox.setPrefSize(sp.getMaxWidth(), sp.getMaxHeight());
 
@@ -113,11 +116,16 @@ public class OptionsScene extends Scene {
 		logouthbox.setPrefWidth(hbox.getPrefWidth());
 		logouthbox.getChildren().addAll(logout, resetconfigs);
 		
-		final Label lar = new Label("Logout & Rest");
+		final Label lar = new Label("Logout & Reset");
 		lar.setStyle("-fx-padding: 20px 0px 10px 0px;");
 		
 		vbox.getChildren().addAll(ramlabel, ramcombobox, resolution, resolutioncombobox, baseDir, hbox, lar, logouthbox);
 
+		ImageView settingstrainview = new ImageView(Assets.getImage("train3.png"));
+		settingstrainview.setScaleX(-1);
+		settingstrainview.setTranslateX((-1280/1.75) + settingstrainview.getImage().getWidth());
+		settingstrainview.setTranslateY(360 - settingstrainview.getImage().getHeight());
+		stackpane.getChildren().add(settingstrainview);
 	}
 
 }
