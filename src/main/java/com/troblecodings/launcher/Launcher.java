@@ -20,6 +20,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.File;
+
 public class Launcher extends Application {
 	
 	private static Stage stage;
@@ -36,6 +38,9 @@ public class Launcher extends Application {
 	}
 	
 	public static final void initializeLogger() {
+		if(FileUtil.SETTINGS == null)
+			FileUtil.SETTINGS = new FileUtil.SettingsData();
+
 		System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
 		LOGGER = LogManager.getLogger("GIRC");
 		LOGGER.info("Starting Launcher!");
@@ -51,7 +56,7 @@ public class Launcher extends Application {
 		HOMESCENE = new HomeScene();
 		LOGINSCENE = new LoginScene();
 		CREDITSSCENE = new CreditsScene();
-				 
+
 		Launcher.stage = stage;
 		stage.getIcons().add(Assets.getImage("icon.png"));
 		stage.setScene(AuthUtil.auth(null, null) == null ? LOGINSCENE:HOMESCENE);
