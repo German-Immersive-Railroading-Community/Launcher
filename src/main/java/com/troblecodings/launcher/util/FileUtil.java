@@ -103,6 +103,10 @@ public class FileUtil {
 			} else {
 				Files.createDirectories(SETTINGSPATH.getParent());
 				Files.createFile(SETTINGSPATH);
+
+				Writer writer = Files.newBufferedWriter(SETTINGSPATH);
+				GSON.toJson(SETTINGS, writer);
+				writer.close();
 			}
 		} catch (Exception e) {
 			// TODO Error dialog
