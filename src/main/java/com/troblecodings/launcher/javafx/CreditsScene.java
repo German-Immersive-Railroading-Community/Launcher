@@ -21,7 +21,7 @@ public class CreditsScene extends Scene {
 		
 		VBox vbox = new VBox();
 		vbox.setMaxHeight(400);
-		vbox.setMaxWidth(500);
+		vbox.setMaxWidth(650);
 		stackpane.getChildren().add(vbox);
 		
 		Label graficslabel = new Label("Graphics");
