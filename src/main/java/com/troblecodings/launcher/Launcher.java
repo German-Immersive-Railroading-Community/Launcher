@@ -66,6 +66,7 @@ public class Launcher extends Application {
 		stage.setWidth(1280);
 		stage.setHeight(720);
 		stage.initStyle(StageStyle.TRANSPARENT);
+		stage.setTitle("GIR Launcher");
 		stage.show();
 	}
 	
