@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import javax.swing.JButton;
 import javax.swing.ProgressMonitor;
 
+import org.apache.logging.log4j.LogManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -155,7 +156,7 @@ public class StartupUtil {
 			long size = Files.size(Paths.get(location.toURI()));
 			long newsize = newversion.getNumber("size").longValue();
 			if (newsize == size) {
-				Launcher.getLogger().info("The new verision (%i) is equal to the old (%i)", newsize, size);
+				Launcher.getLogger().info("The new verision (%d) is equal to the old (%d)", newsize, size);
 				return;
 			}
 			Launcher.getLogger().info("Updating Launcher!");
@@ -170,8 +171,11 @@ public class StartupUtil {
 				return;
 			}
 			stream.close();
-			new ProcessBuilder("java", "-jar", location.toString()).start().waitFor();
-			System.exit(0);
+			LogManager.shutdown(false, true);
+			ProcessBuilder builder = new ProcessBuilder("java", "-jar", location.toString());
+			builder.redirectError(Redirect.INHERIT);
+			builder.redirectOutput(Redirect.INHERIT);
+			System.exit(builder.start().waitFor());
 		} catch (Throwable e) {
 			Launcher.onError(e);
 		}

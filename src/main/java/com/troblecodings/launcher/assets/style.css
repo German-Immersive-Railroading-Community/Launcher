@@ -119,7 +119,7 @@ ScrollPane {
 VBox{
 	-fx-background-color: #1b1b1b;
 	-fx-background-radius: 10px;
-	-fx-padding: 40px;
+	-fx-padding: 40px 140px;
 }
 
 Label{

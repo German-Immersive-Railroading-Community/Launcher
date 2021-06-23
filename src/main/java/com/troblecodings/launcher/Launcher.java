@@ -14,7 +14,6 @@ import com.troblecodings.launcher.javafx.LoginScene;
 import com.troblecodings.launcher.javafx.OptionsScene;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
-import com.troblecodings.launcher.util.StartupUtil;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -27,10 +26,10 @@ public class Launcher extends Application {
 	
 	private static Stage stage;
 	
-	public static final HomeScene HOMESCENE = new HomeScene();
+	public static HomeScene HOMESCENE;
 	public static OptionsScene OPTIONSSCENE;
-	public static final LoginScene LOGINSCENE = new LoginScene();
-	public static final CreditsScene CREDITSSCENE = new CreditsScene();
+	public static LoginScene LOGINSCENE;
+	public static CreditsScene CREDITSSCENE;
 	
 	public static final ImageController IMG_CONTROLLER = new ImageController();
 	
@@ -40,21 +39,26 @@ public class Launcher extends Application {
 		return LOGGER;
 	}
 	
-	public static void main(String[] args) {
-		Runtime.getRuntime().addShutdownHook(new Thread(FileUtil::saveSettings));
-		FileUtil.readSettings();
+	public static final void initializeLogger() {
+		if(FileUtil.SETTINGS == null)
+			FileUtil.SETTINGS = new FileUtil.SettingsData();
+
 		System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
 		LOGGER = LogManager.getLogger("GIRC");
 		LOGGER.info("Starting Launcher!");
-		StartupUtil.update();
-		FileUtil.init();
-		OPTIONSSCENE = new OptionsScene();
-		Footer.setProgress(0.001);
-		launch(args);
 	}
 	
+	public static final Thread SHUTDOWNHOOK = new Thread(FileUtil::saveSettings);
+		
 	@Override
 	public void start(Stage stage) throws Exception {
+		Footer.setProgress(0.001);
+
+		OPTIONSSCENE = new OptionsScene();
+		HOMESCENE = new HomeScene();
+		LOGINSCENE = new LoginScene();
+		CREDITSSCENE = new CreditsScene();
+
 		Launcher.stage = stage;
 		stage.getIcons().add(Assets.getImage("icon.png"));
 		stage.setScene(AuthUtil.auth(null, null) == null ? LOGINSCENE:HOMESCENE);

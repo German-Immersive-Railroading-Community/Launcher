@@ -16,7 +16,7 @@ import net.cydhra.nidhogg.data.Session;
 
 public class FileUtil {
 
-	public static SettingsData SETTINGS = null;
+	public static SettingsData SETTINGS = new SettingsData();
 	public static String ASSET_DIR = null;
 	public static String LIB_DIR = null;
 
@@ -103,16 +103,14 @@ public class FileUtil {
 			} else {
 				Files.createDirectories(SETTINGSPATH.getParent());
 				Files.createFile(SETTINGSPATH);
+
+				Writer writer = Files.newBufferedWriter(SETTINGSPATH);
+				GSON.toJson(SETTINGS, writer);
+				writer.close();
 			}
-		} catch (IOException e) {
-			try {
-				Files.delete(SETTINGSPATH);
-			} catch (IOException e1) {
-				e1.printStackTrace();// Do not log
-			}
-		} finally {
-			if (SETTINGS == null)
-				SETTINGS = new SettingsData();
+		} catch (Exception e) {
+			// TODO Error dialog
+			e.printStackTrace();
 		}
 	}
 
@@ -123,8 +121,14 @@ public class FileUtil {
 			GSON.toJson(SETTINGS, writer);
 			writer.close();
 		} catch (Throwable e) {
-			Launcher.onError(e);
+			Launcher.getLogger().trace(e.getMessage(), e);
+			e.printStackTrace();
 		}
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} // NOOP
 	}
 
 	public static void init() {
@@ -137,6 +141,7 @@ public class FileUtil {
 
 	// Delete option files and mod, assets and libraries folder
 	public static void resetFiles() {
+		Launcher.getLogger().info("Started launcher reset!");
 		deleteFile(Paths.get(SETTINGS.baseDir + "/options.txt").toFile());
 		deleteFile(Paths.get(SETTINGS.baseDir + "/optionsof.txt").toFile());
 		deleteFile(Paths.get(SETTINGS.baseDir + "/GIR.json").toFile());
@@ -145,6 +150,7 @@ public class FileUtil {
 		deleteDirectory(Paths.get(SETTINGS.baseDir + "/libraries").toFile());
 		deleteDirectory(Paths.get(SETTINGS.baseDir + "/config").toFile());
 		FileUtil.init();
+		Launcher.getLogger().info("Finished launcher reset!");
 	}
 
 	private static void deleteDirectory(File directory) {
