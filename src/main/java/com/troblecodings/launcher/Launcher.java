@@ -1,11 +1,12 @@
 package com.troblecodings.launcher;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.sun.prism.Image;
 import com.troblecodings.launcher.assets.Assets;
-import com.troblecodings.launcher.assets.ImageController;
 import com.troblecodings.launcher.javafx.CreditsScene;
 import com.troblecodings.launcher.javafx.Footer;
 import com.troblecodings.launcher.javafx.Header;
@@ -15,12 +16,16 @@ import com.troblecodings.launcher.javafx.OptionsScene;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 
+import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 public class Launcher extends Application {
 	
@@ -30,8 +35,6 @@ public class Launcher extends Application {
 	public static OptionsScene OPTIONSSCENE;
 	public static LoginScene LOGINSCENE;
 	public static CreditsScene CREDITSSCENE;
-	
-	public static final ImageController IMG_CONTROLLER = new ImageController();
 	
 	private static Logger LOGGER;
 	
@@ -69,6 +72,34 @@ public class Launcher extends Application {
 	}
 	
 	public static void setupScene(Scene scene, StackPane stackpane) {
+		
+		//pls don't kill me for this but it works somehow
+		ImageView backgroundImg = new ImageView();
+		List<Image> images = new ArrayList<>();
+		// load images into list
+		images.add(Assets.getImage("background.png"));
+		images.add(Assets.getImage("background_2.png"));
+		images.add(Assets.getImage("background_3.png"));
+		images.add(Assets.getImage("background_4.png"));
+		images.add(Assets.getImage("background_5.png"));
+
+		Transition animation = new Transition() {
+		    {
+		        setCycleDuration(Duration.seconds(10)); // total time for animation
+		        setRate(1.5);
+		        setCycleCount(INDEFINITE);
+		    }
+
+		    @Override
+		    protected void interpolate(double fraction) {
+		        int index = (int) (fraction*(images.size()-1));
+		        backgroundImg.setImage(images.get(index)); 
+		    }
+		};
+		
+		animation.play();
+        
+		stackpane.getChildren().add(backgroundImg);
 		stackpane.getChildren().add(new Header(scene));
 		stackpane.getChildren().add(new Footer(scene));
 		scene.setFill(Color.TRANSPARENT);
