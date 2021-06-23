@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.CreditsScene;
+import com.troblecodings.launcher.javafx.ErrorScene;
 import com.troblecodings.launcher.javafx.Footer;
 import com.troblecodings.launcher.javafx.Header;
 import com.troblecodings.launcher.javafx.HomeScene;
@@ -19,6 +20,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class Launcher extends Application {
 	
@@ -84,13 +89,35 @@ public class Launcher extends Application {
 	}
 	
 	public static void onError(Throwable e) {
-		// Decide what to do on error for now log
+		// Return here since we cannot show any error.
 		if(e == null)
+		{
 			LOGGER.error("Error found but was passed null!");
+			return;
+		}
 		else if(e.getMessage() == null)
 			LOGGER.trace("", e);
 		else
 			LOGGER.trace(e.getMessage(), e);
+
+		// See if this can be made better, seems overly clunky-like to me, but any other method doesn't generate a stack-trace.
+		// toString and getMessage only return the String representation of what the exception actually is.
+		if(stage.isShowing()) {
+			try {
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+
+				e.printStackTrace(pw);
+
+				ErrorScene errorScene = new ErrorScene(sw.toString(), stage.getScene());
+				Launcher.setScene(errorScene);
+
+				sw.close();
+				pw.close();
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
+		}
 	}
 	
 }

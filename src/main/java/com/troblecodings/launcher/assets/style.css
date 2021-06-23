@@ -33,6 +33,15 @@
 	-fx-border-radius: 30px;
 }
 
+TextArea {
+	-fx-background-color: transparent;
+	-fx-border: none;
+}
+
+.text-area .content {
+	-fx-background-color: transparent;
+}
+
 ScrollPane > .viewport{
 	-fx-background-color: transparent;
 	-fx-background-radius: 10px;
