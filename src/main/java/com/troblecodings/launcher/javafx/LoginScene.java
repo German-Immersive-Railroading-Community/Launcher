@@ -28,7 +28,7 @@ public class LoginScene extends Scene {
 
 		VBox vbox = new VBox();
 		vbox.setMaxHeight(400);
-		vbox.setMaxWidth(525);
+		vbox.setMaxWidth(625);
 		stackpane.getChildren().add(vbox);
 
 		Label usernamelabel = new Label("Email");
@@ -51,7 +51,7 @@ public class LoginScene extends Scene {
 		vbox.getChildren().addAll(usernamelabel, textfield, passwordlabel, passwordfield, errorLabel, loginbutton);
 
 		final ImageView trainImageView = new ImageView(Assets.getImage("train2.png"));
-		trainImageView.setTranslateX(800 - trainImageView.getImage().getWidth());
+		trainImageView.setTranslateX(760 - trainImageView.getImage().getWidth());
 		trainImageView.setTranslateY(325 - trainImageView.getImage().getHeight());
 		stackpane.getChildren().add(trainImageView);
 	}

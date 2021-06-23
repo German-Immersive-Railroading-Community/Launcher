@@ -20,8 +20,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.File;
-
 public class Launcher extends Application {
 	
 	private static Stage stage;
