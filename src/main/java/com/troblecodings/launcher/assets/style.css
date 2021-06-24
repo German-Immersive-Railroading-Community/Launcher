@@ -260,3 +260,9 @@ ComboBox{
 	-fx-scale-x: 1.15;
     -fx-scale-y: 1.15;
 }
+
+.backbutton {
+	-fx-background-image: url(backbutton.png);
+	-fx-pref-height: 50px;
+	-fx-pref-width: 175px;
+}

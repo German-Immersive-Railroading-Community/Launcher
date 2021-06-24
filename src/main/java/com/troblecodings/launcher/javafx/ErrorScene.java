@@ -43,7 +43,7 @@ public class ErrorScene extends Scene {
             _stackPane = new StackPane();
             Launcher.setScene(sourceScene);
         });
-        button.getStyleClass().add("loginbutton");
+        button.getStyleClass().add("backbutton");
 
         vbox.getChildren().addAll(errorHeader, errorReason, button);
 
