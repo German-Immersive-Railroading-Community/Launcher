@@ -28,34 +28,44 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 public class Launcher extends Application {
-	
+
 	private static Stage stage;
-	
+
 	public static HomeScene HOMESCENE;
 	public static OptionsScene OPTIONSSCENE;
 	public static LoginScene LOGINSCENE;
 	public static CreditsScene CREDITSSCENE;
-	
+
 	private static Logger LOGGER;
-	
+
+	private static final List<Image> images = new ArrayList<>();
+
 	public static final Logger getLogger() {
 		return LOGGER;
 	}
-	
+
 	public static final void initializeLogger() {
-		if(FileUtil.SETTINGS == null)
+		if (FileUtil.SETTINGS == null)
 			FileUtil.SETTINGS = new FileUtil.SettingsData();
 
 		System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
 		LOGGER = LogManager.getLogger("GIRC");
 		LOGGER.info("Starting Launcher!");
 	}
-	
+
 	public static final Thread SHUTDOWNHOOK = new Thread(FileUtil::saveSettings);
-		
+
 	@Override
 	public void start(Stage stage) throws Exception {
 		Footer.setProgress(0.001);
+
+		// loading images into list
+		images.add(Assets.getImage("background.png"));
+		images.add(Assets.getImage("background_2.png"));
+		images.add(Assets.getImage("background_3.png"));
+		images.add(Assets.getImage("background_4.png"));
+		images.add(Assets.getImage("background_5.png"));
+		images.add(Assets.getImage("background.png"));
 
 		OPTIONSSCENE = new OptionsScene();
 		HOMESCENE = new HomeScene();
@@ -64,68 +74,59 @@ public class Launcher extends Application {
 
 		Launcher.stage = stage;
 		stage.getIcons().add(Assets.getImage("icon.png"));
-		stage.setScene(AuthUtil.auth(null, null) == null ? LOGINSCENE:HOMESCENE);
+		stage.setScene(AuthUtil.auth(null, null) == null ? LOGINSCENE : HOMESCENE);
 		stage.setWidth(1280);
 		stage.setHeight(720);
 		stage.initStyle(StageStyle.TRANSPARENT);
 		stage.show();
 	}
-	
+
 	public static void setupScene(Scene scene, StackPane stackpane) {
-		
-		//pls don't kill me for this but it works somehow
-		ImageView backgroundImg = new ImageView();
-		List<Image> images = new ArrayList<>();
-		// load images into list
-		images.add(Assets.getImage("background.png"));
-		images.add(Assets.getImage("background_2.png"));
-		images.add(Assets.getImage("background_3.png"));
-		images.add(Assets.getImage("background_4.png"));
-		images.add(Assets.getImage("background_5.png"));
+		final ImageView backgroundImg = new ImageView();
 
 		Transition animation = new Transition() {
-		    {
-		        setCycleDuration(Duration.seconds(10)); // total time for animation
-		        setRate(1.5);
-		        setCycleCount(INDEFINITE);
-		    }
+			{
+				setCycleDuration(Duration.seconds(10)); // total time for animation
+				setRate(0.5); 
+				setCycleCount(INDEFINITE);
+			}
 
-		    @Override
-		    protected void interpolate(double fraction) {
-		        int index = (int) (fraction*(images.size()-1));
-		        backgroundImg.setImage(images.get(index)); 
-		    }
+			@Override
+			protected void interpolate(double fraction) {
+				int index = (int) (fraction * (images.size() - 1));
+				backgroundImg.setImage(images.get(index));
+			}
 		};
-		
+
 		animation.play();
-        
+
 		stackpane.getChildren().add(backgroundImg);
 		stackpane.getChildren().add(new Header(scene));
 		stackpane.getChildren().add(new Footer(scene));
 		scene.setFill(Color.TRANSPARENT);
 		scene.getStylesheets().add(Assets.getStyleSheet("style.css"));
 	}
-	
+
 	public static Scene getScene() {
 		return stage.getScene();
 	}
-	
+
 	public static void setScene(Scene scene) {
 		stage.setScene(scene);
 	}
-	
+
 	public static Stage getStage() {
 		return stage;
 	}
-	
+
 	public static void onError(Throwable e) {
 		// Decide what to do on error for now log
-		if(e == null)
+		if (e == null)
 			LOGGER.error("Error found but was passed null!");
-		else if(e.getMessage() == null)
+		else if (e.getMessage() == null)
 			LOGGER.trace("", e);
 		else
 			LOGGER.trace(e.getMessage(), e);
 	}
-	
+
 }
