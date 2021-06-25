@@ -33,6 +33,15 @@
 	-fx-border-radius: 30px;
 }
 
+TextArea {
+	-fx-background-color: transparent;
+	-fx-border: none;
+}
+
+.text-area .content {
+	-fx-background-color: transparent;
+}
+
 ScrollPane > .viewport{
 	-fx-background-color: transparent;
 	-fx-background-radius: 10px;
@@ -250,4 +259,10 @@ ComboBox{
 .closebutton:hover{
 	-fx-scale-x: 1.15;
     -fx-scale-y: 1.15;
+}
+
+.backbutton {
+	-fx-background-image: url(backbutton.png);
+	-fx-pref-height: 50px;
+	-fx-pref-width: 175px;
 }
