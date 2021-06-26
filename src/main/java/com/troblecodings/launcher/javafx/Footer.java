@@ -2,6 +2,7 @@ package com.troblecodings.launcher.javafx;
 
 import com.troblecodings.launcher.Launcher;
 
+import com.troblecodings.launcher.util.AuthUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Pos;
@@ -21,7 +22,7 @@ public class Footer extends StackPane {
 		bar.addListener((x, x2, x3) -> progressbar.setProgress(bar.get()));
 
 		Button button = new Button("Lizensen und Kredits");
-		button.setOnAction(event -> Launcher.setScene(sc instanceof CreditsScene ? Launcher.HOMESCENE:Launcher.CREDITSSCENE));
+		button.setOnAction(event -> Launcher.setScene(getCorrectScene(sc)));
 				
 		this.getChildren().addAll(button, progressbar);
 		
@@ -33,6 +34,15 @@ public class Footer extends StackPane {
 		
 	public static void setProgress(double progress) {
 		Platform.runLater(() -> bar.set(progress));
+	}
+
+	// Returns the correct scene based on the authentication status. Not authenticated -> LoginScene; Authenticated -> HomeScene.
+	private static Scene getCorrectScene(Scene currentScene) {
+		if(currentScene instanceof CreditsScene) {
+			return AuthUtil.auth(null, null) != null ? Launcher.HOMESCENE : Launcher.LOGINSCENE;
+		}
+
+		return Launcher.CREDITSSCENE;
 	}
 
 }

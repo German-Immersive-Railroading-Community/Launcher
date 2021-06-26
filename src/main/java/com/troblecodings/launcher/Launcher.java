@@ -20,6 +20,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import sun.rmi.runtime.Log;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -62,7 +63,13 @@ public class Launcher extends Application {
 
 		Launcher.stage = stage;
 		stage.getIcons().add(Assets.getImage("icon.png"));
-		stage.setScene(AuthUtil.auth(null, null) == null ? LOGINSCENE:HOMESCENE);
+
+		boolean authStatus = AuthUtil.auth(null, null) != null;
+
+		stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
+
+		Header.SetVisibility(authStatus);
+
 		stage.setWidth(1280);
 		stage.setHeight(720);
 		stage.initStyle(StageStyle.TRANSPARENT);
