@@ -70,6 +70,7 @@ public class LoginScene extends Scene {
 			try {
 				if ((FileUtil.DEFAULT = AuthUtil.auth(mail, pw)) != null) {
 					Platform.runLater(() -> {
+						Header.SetVisibility(true);
 						Launcher.setScene(Launcher.HOMESCENE);
 						error.setText("");
 					});

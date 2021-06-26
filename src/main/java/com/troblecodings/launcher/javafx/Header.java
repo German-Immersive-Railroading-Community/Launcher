@@ -1,5 +1,6 @@
 package com.troblecodings.launcher.javafx;
 
+import java.util.ArrayList;
 import java.util.function.Supplier;
 
 import com.troblecodings.launcher.Launcher;
@@ -29,6 +30,8 @@ public class Header extends StackPane {
 		}
 	}
 
+	private static final ArrayList<Button> _buttons = new ArrayList<>();
+
 	public Header(Scene scene) {
 		HBox hbox = new HBox();
 		if (!(scene instanceof LoginScene)) {
@@ -42,6 +45,7 @@ public class Header extends StackPane {
 				});
 				hbox.getChildren().add(btn);
 				HBox.setMargin(btn, new Insets(20, 20, 20, 20));
+				_buttons.add(btn);
 			}
 		}
 		hbox.setAlignment(Pos.CENTER);
@@ -74,6 +78,12 @@ public class Header extends StackPane {
 				Launcher.getStage().setY(event.getScreenY() - yOffset);
 			}
 		});
+	}
+
+	public static void SetVisibility(boolean isVisible) {
+		for(Button btn : _buttons) {
+			btn.setVisible(isVisible);
+		}
 	}
 
 }
