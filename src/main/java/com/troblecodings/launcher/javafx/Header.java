@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import com.troblecodings.launcher.Launcher;
 
+import com.troblecodings.launcher.util.AuthUtil;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -35,7 +36,10 @@ public class Header extends StackPane {
 				Button btn = new Button();
 				btn.getStyleClass().add("navbar");
 				btn.setText(page.name().toUpperCase());
-				btn.setOnAction(evt -> Launcher.setScene(page.supplier.get()));
+				btn.setOnAction(evt -> {
+					if(AuthUtil.auth(null, null) == null) return;
+					Launcher.setScene(page.supplier.get());
+				});
 				hbox.getChildren().add(btn);
 				HBox.setMargin(btn, new Insets(20, 20, 20, 20));
 			}
