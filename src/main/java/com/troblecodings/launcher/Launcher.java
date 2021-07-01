@@ -71,7 +71,7 @@ public class Launcher extends Application {
 		images.add(Assets.getImage("background_3.png"));
 		images.add(Assets.getImage("background_4.png"));
 		images.add(Assets.getImage("background_5.png"));
-		images.add(Assets.getImage("background.png"));
+		images.add(images.get(0));
 
 		OPTIONSSCENE = new OptionsScene();
 		HOMESCENE = new HomeScene();
@@ -99,7 +99,7 @@ public class Launcher extends Application {
 
 		Transition animation = new Transition() {
 			{
-				setCycleDuration(Duration.seconds(10)); // total time for animation
+				setCycleDuration(Duration.seconds(20)); // total time for animation
 				setRate(0.5); 
 				setCycleCount(INDEFINITE);
 			}
@@ -147,7 +147,7 @@ public class Launcher extends Application {
 
 		// See if this can be made better, seems overly clunky-like to me, but any other method doesn't generate a stack-trace.
 		// toString and getMessage only return the String representation of what the exception actually is.
-		if(stage.isShowing()) {
+		if(stage != null && stage.isShowing()) {
 			try {
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
