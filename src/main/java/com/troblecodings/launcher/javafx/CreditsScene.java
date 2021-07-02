@@ -36,6 +36,7 @@ public class CreditsScene extends Scene {
 		derzaubererbutton.setMnemonicParsing(false);
 		derzaubererbutton.setOnAction(event -> openWebsiteInBrowser("https://twitter.com/Der_Zauberer_DA"));
 		Button shirosakaButton = new Button("Shirosaka");
+		Button codingbytimoButton = new Button("Codingbytimo");
 		
 		Label libarieslabel = new Label("Libraries");
 		Button nidhoggbutton = new Button("Nidhogg by Cydhra [GitHub]");
@@ -45,7 +46,7 @@ public class CreditsScene extends Scene {
 		Button minecrafterbutton = new Button("MineCrafter Font by MadPixel [Dafont]");
 		minecrafterbutton.setOnAction(event -> openWebsiteInBrowser("https://www.dafont.com/de/minecrafter.font"));
 		
-		vbox.getChildren().addAll(graficslabel, mcjeronimo, programminglabel, mrtroblebutton, derzaubererbutton, shirosakaButton, libarieslabel, nidhoggbutton, jsonbutton, minecrafterbutton);
+		vbox.getChildren().addAll(graficslabel, mcjeronimo, programminglabel, mrtroblebutton, derzaubererbutton, shirosakaButton, codingbytimoButton, libarieslabel, nidhoggbutton, jsonbutton, minecrafterbutton);
 	}
 	
 	public static void openWebsiteInBrowser(String url) {
