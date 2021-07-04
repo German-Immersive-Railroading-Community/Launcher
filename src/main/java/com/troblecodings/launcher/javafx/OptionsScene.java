@@ -113,10 +113,16 @@ public class OptionsScene extends Scene {
 		final Button resetconfigs = new Button("Reset");
 		resetconfigs.getStyleClass().add("optionButton");
 		resetconfigs.setOnAction(evt -> FileUtil.resetFiles());
+
+		final Button optionalModsButton = new Button("Optional Mods");
+		optionalModsButton.getStyleClass().add("optionButton");
+		optionalModsButton.setOnAction(ev -> {
+			Launcher.setScene(Launcher.OPTIONALMODS);
+		});
 		
 		final HBox logouthbox = new HBox(10);
 		logouthbox.setPrefWidth(hbox.getPrefWidth());
-		logouthbox.getChildren().addAll(logout, resetconfigs);
+		logouthbox.getChildren().addAll(logout, resetconfigs, optionalModsButton);
 		
 		final Label lar = new Label("Logout & Reset");
 		lar.setStyle("-fx-padding: 20px 0px 10px 0px;");

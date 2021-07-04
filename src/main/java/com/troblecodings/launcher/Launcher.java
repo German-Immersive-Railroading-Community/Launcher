@@ -14,6 +14,7 @@ import com.troblecodings.launcher.javafx.Header;
 import com.troblecodings.launcher.javafx.HomeScene;
 import com.troblecodings.launcher.javafx.LoginScene;
 import com.troblecodings.launcher.javafx.OptionsScene;
+import com.troblecodings.launcher.javafx.OptionalModsScene;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 
@@ -26,6 +27,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
 import javafx.util.Duration;
 import sun.rmi.runtime.Log;
 import java.io.IOException;
@@ -41,6 +43,8 @@ public class Launcher extends Application {
 	public static OptionsScene OPTIONSSCENE;
 	public static LoginScene LOGINSCENE;
 	public static CreditsScene CREDITSSCENE;
+	public static OptionalModsScene OPTIONALMODS;
+	
 
 	private static Logger LOGGER;
 
@@ -77,6 +81,7 @@ public class Launcher extends Application {
 		HOMESCENE = new HomeScene();
 		LOGINSCENE = new LoginScene();
 		CREDITSSCENE = new CreditsScene();
+		OPTIONALMODS = new OptionalModsScene();
 
 		Launcher.stage = stage;
 		stage.getIcons().add(Assets.getImage("icon.png"));

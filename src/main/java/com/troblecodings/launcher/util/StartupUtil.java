@@ -215,6 +215,7 @@ public class StartupUtil {
 
 			JSONObject additional = object.getJSONObject("additional");
 			JSONArray arr = object.getJSONArray("libraries");
+			JSONArray optional = object.getJSONArray("optionalMods");
 			Path ojectspath = Paths.get(FileUtil.ASSET_DIR + "/objects");
 			if (!Files.exists(ojectspath))
 				Files.createDirectories(ojectspath);
@@ -291,6 +292,9 @@ public class StartupUtil {
 			additional.keySet().forEach(key -> {
 				try {
 					List<Object> array = additional.getJSONArray(key).toList();
+					
+					array.addAll(optional.toList());
+
 					Files.list(Paths.get(FileUtil.SETTINGS.baseDir, key)).filter(incom -> {
 						String filename = incom.getFileName().toString();
 						return Files.isRegularFile(incom) && array.stream().noneMatch(job -> {
@@ -319,6 +323,15 @@ public class StartupUtil {
 							Launcher.onError(e);
 						}
 					});
+
+			Path optionalMods = Paths.get(FileUtil.SETTINGS.baseDir, "optional-mods");
+			Files.createDirectories(optionalMods);
+
+			for(Object optionalObj : optional) {
+				JSONObject optionalJsonObj = (JSONObject) optionalObj;
+				Path optionalFilesPath = Paths.get(optionalMods.toString(), optionalJsonObj.getString("name"));
+				ConnectionUtil.validateDownloadRetry(optionalJsonObj.getString("url"), optionalFilesPath.toString(), optionalJsonObj.getString("sha1"));
+			}
 
 			Footer.setProgress(0.001);
 			return AuthUtil.make(AuthUtil.auth(null, null), object);
