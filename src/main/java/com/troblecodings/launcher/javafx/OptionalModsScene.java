@@ -71,6 +71,9 @@ public class OptionalModsScene extends Scene {
 
     private static void RefreshOptionalMods(VBox vBox) {
         try {
+            if(!Files.exists(optionalModsPath))
+                Files.createDirectories(optionalModsPath);
+
             optionalMods.forEach(mod -> {
                 vBox.getChildren().remove(mod);
             });
