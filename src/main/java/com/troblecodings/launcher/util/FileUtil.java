@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 
 import com.google.gson.Gson;
 import com.troblecodings.launcher.Launcher;
@@ -89,7 +90,7 @@ public class FileUtil {
 		public int width = 1280;
 		public int height = 720;
 		public int ram = 2048;
-
+		public ArrayList<String> optionalMods = new ArrayList<>();
 	}
 
 	public static final Gson GSON = new Gson();

@@ -193,6 +193,13 @@ ComboBox{
 	-fx-min-width: 200px;
 }
 
+CheckBox {
+	-fx-font-size: 15px;
+	-fx-font-weight: bold;
+	-fx-text-fill: white;
+	-fx-padding: 0px 0px 10px 0px;
+}
+
 .combo-box-base,
 .combo-box .list-cell {
 	-fx-background-color: #5e5e5e;
