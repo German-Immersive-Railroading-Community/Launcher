@@ -26,7 +26,6 @@
 }
 
 .root{
-	-fx-background-image: url(background.png);
 	-fx-font-family: Arial;
 	-fx-border-width: 0px;
 	-fx-background-radius: 30px;
