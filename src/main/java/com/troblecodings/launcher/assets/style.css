@@ -26,11 +26,19 @@
 }
 
 .root{
-	-fx-background-image: url(background.png);
 	-fx-font-family: Arial;
 	-fx-border-width: 0px;
 	-fx-background-radius: 30px;
 	-fx-border-radius: 30px;
+}
+
+TextArea {
+	-fx-background-color: transparent;
+	-fx-border: none;
+}
+
+.text-area .content {
+	-fx-background-color: transparent;
 }
 
 ScrollPane > .viewport{
@@ -116,7 +124,7 @@ ScrollPane {
 VBox{
 	-fx-background-color: #1b1b1b;
 	-fx-background-radius: 10px;
-	-fx-padding: 40px;
+	-fx-padding: 40px 140px;
 }
 
 Label{
@@ -182,6 +190,13 @@ ComboBox{
 	-fx-min-height: 40px;
 	-fx-background-radius: 5px;
 	-fx-min-width: 200px;
+}
+
+CheckBox {
+	-fx-font-size: 15px;
+	-fx-font-weight: bold;
+	-fx-text-fill: white;
+	-fx-padding: 0px 0px 10px 0px;
 }
 
 .combo-box-base,
@@ -250,4 +265,10 @@ ComboBox{
 .closebutton:hover{
 	-fx-scale-x: 1.15;
     -fx-scale-y: 1.15;
+}
+
+.backbutton {
+	-fx-background-image: url(backbutton.png);
+	-fx-pref-height: 50px;
+	-fx-pref-width: 175px;
 }

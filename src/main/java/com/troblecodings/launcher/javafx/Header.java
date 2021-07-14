@@ -1,9 +1,11 @@
 package com.troblecodings.launcher.javafx;
 
+import java.util.ArrayList;
 import java.util.function.Supplier;
 
 import com.troblecodings.launcher.Launcher;
 
+import com.troblecodings.launcher.util.AuthUtil;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,6 +30,8 @@ public class Header extends StackPane {
 		}
 	}
 
+	private static final ArrayList<Button> _buttons = new ArrayList<>();
+
 	public Header(Scene scene) {
 		HBox hbox = new HBox();
 		if (!(scene instanceof LoginScene)) {
@@ -35,9 +39,13 @@ public class Header extends StackPane {
 				Button btn = new Button();
 				btn.getStyleClass().add("navbar");
 				btn.setText(page.name().toUpperCase());
-				btn.setOnAction(evt -> Launcher.setScene(page.supplier.get()));
+				btn.setOnAction(evt -> {
+					if(AuthUtil.auth(null, null) == null) return;
+					Launcher.setScene(page.supplier.get());
+				});
 				hbox.getChildren().add(btn);
 				HBox.setMargin(btn, new Insets(20, 20, 20, 20));
+				_buttons.add(btn);
 			}
 		}
 		hbox.setAlignment(Pos.CENTER);
@@ -70,6 +78,12 @@ public class Header extends StackPane {
 				Launcher.getStage().setY(event.getScreenY() - yOffset);
 			}
 		});
+	}
+
+	public static void SetVisibility(boolean isVisible) {
+		for(Button btn : _buttons) {
+			btn.setVisible(isVisible);
+		}
 	}
 
 }

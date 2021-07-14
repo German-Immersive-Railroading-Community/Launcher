@@ -26,11 +26,13 @@ import java.util.stream.Stream;
 import javax.swing.JButton;
 import javax.swing.ProgressMonitor;
 
+import org.apache.logging.log4j.LogManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.troblecodings.launcher.Launcher;
+import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.Footer;
 
 import mslinks.ShellLink;
@@ -123,9 +125,21 @@ public class StartupUtil {
 		}
 		return Optional.empty();
 	}
+	
+	private static void addServerToData() {
+		Path pth = Paths.get(FileUtil.SETTINGS.baseDir, "servers.dat");
+		if(!Files.exists(pth)) {
+			try {
+				Files.copy(Assets.getResourceAsStream("servers.dat"), pth);
+			} catch (IOException e) {
+				Launcher.onError(e);
+			}
+		}
+	}
 
 	public static void update() {
 		try {
+			addServerToData();
 			String str = ConnectionUtil.getStringFromURL(RELEASE_API);
 			if (str == null) {
 				Launcher.getLogger().info("Couldn't read updater information!");
@@ -142,7 +156,7 @@ public class StartupUtil {
 			long size = Files.size(Paths.get(location.toURI()));
 			long newsize = newversion.getNumber("size").longValue();
 			if (newsize == size) {
-				Launcher.getLogger().info("The new verision (%i) is equal to the old (%i)", newsize, size);
+				Launcher.getLogger().info("The new verision (%d) is equal to the old (%d)", newsize, size);
 				return;
 			}
 			Launcher.getLogger().info("Updating Launcher!");
@@ -157,8 +171,11 @@ public class StartupUtil {
 				return;
 			}
 			stream.close();
-			new ProcessBuilder("java", "-jar", location.toString()).start().waitFor();
-			System.exit(0);
+			LogManager.shutdown(false, true);
+			ProcessBuilder builder = new ProcessBuilder("java", "-jar", location.toString());
+			builder.redirectError(Redirect.INHERIT);
+			builder.redirectOutput(Redirect.INHERIT);
+			System.exit(builder.start().waitFor());
 		} catch (Throwable e) {
 			Launcher.onError(e);
 		}
@@ -198,6 +215,7 @@ public class StartupUtil {
 
 			JSONObject additional = object.getJSONObject("additional");
 			JSONArray arr = object.getJSONArray("libraries");
+			JSONArray optional = object.getJSONArray("optionalMods");
 			Path ojectspath = Paths.get(FileUtil.ASSET_DIR + "/objects");
 			if (!Files.exists(ojectspath))
 				Files.createDirectories(ojectspath);
@@ -274,6 +292,9 @@ public class StartupUtil {
 			additional.keySet().forEach(key -> {
 				try {
 					List<Object> array = additional.getJSONArray(key).toList();
+					
+					array.addAll(optional.toList());
+
 					Files.list(Paths.get(FileUtil.SETTINGS.baseDir, key)).filter(incom -> {
 						String filename = incom.getFileName().toString();
 						return Files.isRegularFile(incom) && array.stream().noneMatch(job -> {
@@ -301,6 +322,15 @@ public class StartupUtil {
 					Launcher.onError(e);
 				}
 			});
+
+			Path optionalMods = Paths.get(FileUtil.SETTINGS.baseDir, "optional-mods");
+			Files.createDirectories(optionalMods);
+
+			for(Object optionalObj : optional) {
+				JSONObject optionalJsonObj = (JSONObject) optionalObj;
+				Path optionalFilesPath = Paths.get(optionalMods.toString(), optionalJsonObj.getString("name"));
+				ConnectionUtil.validateDownloadRetry(optionalJsonObj.getString("url"), optionalFilesPath.toString(), optionalJsonObj.getString("sha1"));
+			}
 
 			Footer.setProgress(0.001);
 			return AuthUtil.make(AuthUtil.auth(null, null), object);

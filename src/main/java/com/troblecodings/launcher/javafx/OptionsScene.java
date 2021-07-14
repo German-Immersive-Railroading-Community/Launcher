@@ -6,6 +6,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 import com.troblecodings.launcher.Launcher;
+import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 import com.troblecodings.launcher.util.StartupUtil;
@@ -18,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -40,7 +42,7 @@ public class OptionsScene extends Scene {
 
 		final VBox vbox = new VBox();
 		sp.setMaxHeight(400);
-		sp.setMaxWidth(500);
+		sp.setMaxWidth(650);
 		sp.setContent(vbox);
 		vbox.setPrefSize(sp.getMaxWidth(), sp.getMaxHeight());
 
@@ -139,17 +141,27 @@ public class OptionsScene extends Scene {
 
 		final Button logout = new Button("Logout");
 		logout.getStyleClass().add("optionButton");
-		logout.setOnAction(evt -> AuthUtil.logout());
+		logout.setOnAction(evt -> {
+			AuthUtil.logout();
+			Header.SetVisibility(false);
+		});
 
 		final Button resetconfigs = new Button("Reset");
 		resetconfigs.getStyleClass().add("optionButton");
 		resetconfigs.setOnAction(evt -> FileUtil.resetFiles());
 
+
+		final Button optionalModsButton = new Button("Optional Mods");
+		optionalModsButton.getStyleClass().add("optionButton");
+		optionalModsButton.setOnAction(ev -> {
+			Launcher.setScene(Launcher.OPTIONALMODS);
+		});
+		
 		final HBox logouthbox = new HBox(10);
 		logouthbox.setPrefWidth(hbox.getPrefWidth());
-		logouthbox.getChildren().addAll(logout, resetconfigs);
-
-		final Label lar = new Label("Logout & Rest");
+		logouthbox.getChildren().addAll(logout, resetconfigs, optionalModsButton);
+		
+		final Label lar = new Label("Logout & Reset");
 		lar.setStyle("-fx-padding: 20px 0px 10px 0px;");
 
 		final HBox javaversion1 = new HBox(10);
@@ -159,6 +171,11 @@ public class OptionsScene extends Scene {
 		vbox.getChildren().addAll(ramlabel, ramcombobox, resolution, resolutioncombobox, baseDir, hbox, lar, logouthbox,
 				javaversion, javaversion1);
 
+		ImageView settingstrainview = new ImageView(Assets.getImage("train3.png"));
+		settingstrainview.setScaleX(-1);
+		settingstrainview.setTranslateX((-1280/1.75) + settingstrainview.getImage().getWidth());
+		settingstrainview.setTranslateY(360 - settingstrainview.getImage().getHeight());
+		stackpane.getChildren().add(settingstrainview);
 	}
 
 }

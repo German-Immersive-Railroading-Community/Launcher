@@ -6,3 +6,5 @@
 Settings.txt
 /bin/
 /logs/
+/.idea/
+*.iml
