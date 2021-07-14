@@ -289,19 +289,23 @@ public class StartupUtil {
 				});
 			});
 
+			Path optionalMods = Paths.get(FileUtil.SETTINGS.baseDir, "optional-mods");
+			Files.createDirectories(optionalMods);
+
 			additional.keySet().forEach(key -> {
 				try {
 					List<Object> array = additional.getJSONArray(key).toList();
-					
-					array.addAll(optional.toList());
+
+					Files.list(optionalMods).filter(file -> file.toString().endsWith(".jar")).forEach(file -> {
+						Path filePath = Paths.get(FileUtil.SETTINGS.baseDir, "mods", file.getFileName().toString());
+						array.add(filePath.toString());
+					});
 
 					Files.list(Paths.get(FileUtil.SETTINGS.baseDir, key)).filter(incom -> {
 						String filename = incom.getFileName().toString();
-						return Files.isRegularFile(incom) && array.stream().noneMatch(job -> {
-							return ((HashMap<String, Object>) job).get("name").equals(filename);
-						});
+						return Files.isRegularFile(incom) && array.stream().noneMatch(job -> job.toString().contains(filename));
 					}).forEach(t -> {
-						Launcher.getLogger().debug("Deleted file " + t.toString());
+						Launcher.getLogger().debug("Deleted file " + t);
 						try { // I hate this language
 							Files.deleteIfExists(t);
 						} catch (IOException e) {
@@ -323,8 +327,6 @@ public class StartupUtil {
 				}
 			});
 
-			Path optionalMods = Paths.get(FileUtil.SETTINGS.baseDir, "optional-mods");
-			Files.createDirectories(optionalMods);
 
 			for(Object optionalObj : optional) {
 				JSONObject optionalJsonObj = (JSONObject) optionalObj;

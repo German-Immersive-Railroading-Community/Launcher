@@ -29,7 +29,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import javafx.util.Duration;
-import sun.rmi.runtime.Log;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
