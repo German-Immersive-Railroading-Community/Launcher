@@ -58,8 +58,8 @@ public class StartupUtil {
 		}
 		return "unknown";
 	}
-		
-	private static boolean isJavaAnd8(Path pathToDictionary) {
+
+	public static boolean isJavaAnd8(Path pathToDictionary) {
 		Path pathtoJava = pathToDictionary.resolve("java.exe");
 		if (Files.notExists(pathtoJava))
 			return false;
@@ -149,7 +149,7 @@ public class StartupUtil {
 			JSONObject newversion = obj.getJSONObject(0).getJSONArray("assets").getJSONObject(0);
 			String downloadURL = newversion.getString("browser_download_url");
 			File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-			if(!location.isFile()) {
+			if (!location.isFile()) {
 				Launcher.getLogger().debug("Dev version no update!");
 				return;
 			}
@@ -186,7 +186,7 @@ public class StartupUtil {
 		try {
 			String clientJson = FileUtil.SETTINGS.baseDir + "/GIR.json";
 			ConnectionUtil.download("https://girc.eu/Launcher/GIR.json", clientJson);
-			
+
 			String content = new String(Files.readAllBytes(Paths.get(clientJson)));
 			JSONObject object;
 			object = new JSONObject(content);
@@ -315,14 +315,13 @@ public class StartupUtil {
 
 			Path additionalMods = Paths.get(FileUtil.SETTINGS.baseDir, "additional-mods");
 			Files.createDirectories(additionalMods);
-			Files.list(additionalMods).filter(pth -> !pth.toString().endsWith(".dis"))
-					.forEach(pth -> {
-						try {
-							Files.copy(pth, Paths.get(pth.toString().replace("additional-mods", "mods")));
-						} catch (IOException e) {
-							Launcher.onError(e);
-						}
-					});
+			Files.list(additionalMods).filter(pth -> !pth.toString().endsWith(".dis")).forEach(pth -> {
+				try {
+					Files.copy(pth, Paths.get(pth.toString().replace("additional-mods", "mods")));
+				} catch (IOException e) {
+					Launcher.onError(e);
+				}
+			});
 
 			Path optionalMods = Paths.get(FileUtil.SETTINGS.baseDir, "optional-mods");
 			Files.createDirectories(optionalMods);
@@ -365,10 +364,14 @@ public class StartupUtil {
 	}
 
 	public static Process start() {
-		Optional<String> javaVers = findJavaVersion();
-		if (!javaVers.isPresent()) {
-			Launcher.onError(new IllegalStateException("No valid Java version found!"));
-			// try to start normaly
+		String javaVersionPath = FileUtil.SETTINGS.javaPath;
+		if (javaVersionPath.isEmpty()) {
+			Optional<String> javaVers = findJavaVersion();
+			if (!javaVers.isPresent()) {
+				Launcher.onError(new IllegalStateException("No valid Java version found!"));
+				// try to start normaly
+			}
+			javaVersionPath = javaVers.get();
 		}
 
 		String[] parameter = prestart();
@@ -378,7 +381,7 @@ public class StartupUtil {
 		String width = String.valueOf(FileUtil.SETTINGS.width);
 		String height = String.valueOf(FileUtil.SETTINGS.height);
 		String ram = String.valueOf(FileUtil.SETTINGS.ram);
-		String[] preparameter = new String[] { javaVers.isPresent() ? javaVers.get() + "/java":"java", "-Xmx" + ram + "M", "-Xms" + ram + "M",
+		String[] preparameter = new String[] { javaVersionPath + "/java", "-Xmx" + ram + "M", "-Xms" + ram + "M",
 				"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
 				"-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", width, "-height",
 				height };
@@ -391,7 +394,7 @@ public class StartupUtil {
 			return builder.start();
 		} catch (IOException e) {
 			Launcher.onError(e);
-	    }
+		}
 		return null;
 	}
 }

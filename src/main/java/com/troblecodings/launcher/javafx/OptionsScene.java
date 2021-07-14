@@ -3,11 +3,13 @@ package com.troblecodings.launcher.javafx;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
+import java.nio.file.Path;
 
 import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
+import com.troblecodings.launcher.util.StartupUtil;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -22,6 +24,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class OptionsScene extends Scene {
 
@@ -42,6 +46,8 @@ public class OptionsScene extends Scene {
 		sp.setContent(vbox);
 		vbox.setPrefSize(sp.getMaxWidth(), sp.getMaxHeight());
 
+		// Ram
+
 		final Label ramlabel = new Label("RAM");
 		ramlabel.setStyle("-fx-padding: 0px 0px 10px 0px;");
 
@@ -58,6 +64,8 @@ public class OptionsScene extends Scene {
 			} catch (Exception e) {
 			}
 		});
+
+		// Auflösung
 
 		final Label resolution = new Label("Resolution");
 		resolution.setStyle("-fx-padding: 20px 0px 10px 0px;");
@@ -81,20 +89,48 @@ public class OptionsScene extends Scene {
 			} catch (Exception e) {
 			}
 		});
-		
+
+		// javaversion selection
+
+		final Label javaversion = new Label("Javaversion");
+		javaversion.setStyle("-fx-padding: 0px 0px 10px 0px;");
+
+		final TextField javaversionfield = new TextField(FileUtil.SETTINGS.javaPath);
+		javaversionfield.setEditable(false);
+
+		final Button javaversionbutton = new Button("Open Folder");
+		javaversionbutton.getStyleClass().add("optionButton");
+		javaversionbutton.setOnAction(evt -> {
+
+			final FileChooser chooser = new FileChooser();
+			chooser.getExtensionFilters().add(new ExtensionFilter("Java executable", "java.exe"));
+			File selectedFile = chooser.showOpenDialog(Launcher.getStage());
+			if (selectedFile != null) {
+				Path javapath = selectedFile.toPath().getParent();
+				if (StartupUtil.isJavaAnd8(javapath)) {
+					String javastring = javapath.toString();
+					javaversionfield.setText(javastring);
+					FileUtil.SETTINGS.javaPath = javastring;
+				}
+
+			}
+		});
+
+		// folder
+
 		final Label baseDir = new Label("Folder");
 		baseDir.setStyle("-fx-padding: 20px 0px 10px 0px;");
-		
+
 		final TextField baseDirField = new TextField(FileUtil.SETTINGS.baseDir);
 		baseDirField.textProperty().addListener((obs, old, ne) -> FileUtil.moveBaseDir(baseDirField.getText()));
-		
+
 		final Button baseDirFinder = new Button("Open Folder");
 		baseDirFinder.getStyleClass().add("optionButton");
 		baseDirFinder.setOnAction(evt -> {
 			final DirectoryChooser chooser = new DirectoryChooser();
 			chooser.setInitialDirectory(new File(FileUtil.SETTINGS.baseDir));
 			final File fl = chooser.showDialog(Launcher.getStage());
-			if(fl != null && fl.exists() && fl.isDirectory()) {
+			if (fl != null && fl.exists() && fl.isDirectory()) {
 				baseDirField.setText(fl.toString());
 			}
 		});
@@ -102,7 +138,7 @@ public class OptionsScene extends Scene {
 		final HBox hbox = new HBox(10);
 		hbox.setPrefWidth(500);
 		hbox.getChildren().addAll(baseDirField, baseDirFinder);
-		
+
 		final Button logout = new Button("Logout");
 		logout.getStyleClass().add("optionButton");
 		logout.setOnAction(evt -> {
@@ -113,6 +149,7 @@ public class OptionsScene extends Scene {
 		final Button resetconfigs = new Button("Reset");
 		resetconfigs.getStyleClass().add("optionButton");
 		resetconfigs.setOnAction(evt -> FileUtil.resetFiles());
+
 
 		final Button optionalModsButton = new Button("Optional Mods");
 		optionalModsButton.getStyleClass().add("optionButton");
@@ -126,8 +163,13 @@ public class OptionsScene extends Scene {
 		
 		final Label lar = new Label("Logout & Reset");
 		lar.setStyle("-fx-padding: 20px 0px 10px 0px;");
-		
-		vbox.getChildren().addAll(ramlabel, ramcombobox, resolution, resolutioncombobox, baseDir, hbox, lar, logouthbox);
+
+		final HBox javaversion1 = new HBox(10);
+		javaversion1.setPrefWidth(hbox.getPrefWidth());
+		javaversion1.getChildren().addAll(javaversionfield, javaversionbutton);
+
+		vbox.getChildren().addAll(ramlabel, ramcombobox, resolution, resolutioncombobox, baseDir, hbox, lar, logouthbox,
+				javaversion, javaversion1);
 
 		ImageView settingstrainview = new ImageView(Assets.getImage("train3.png"));
 		settingstrainview.setScaleX(-1);
