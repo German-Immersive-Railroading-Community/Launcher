@@ -5,10 +5,6 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.nio.file.Path;
 
-import javax.management.openmbean.OpenDataException;
-
-import com.sun.glass.ui.MenuItem;
-import com.sun.prism.Image;
 import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
@@ -19,7 +15,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TextField;
@@ -98,7 +93,8 @@ public class OptionsScene extends Scene {
 		final Label javaversion = new Label("Javaversion");
 		javaversion.setStyle("-fx-padding: 0px 0px 10px 0px;");
 
-		final TextField javaversionfield = new TextField("java.exe");
+		final TextField javaversionfield = new TextField(FileUtil.SETTINGS.javaPath);
+		javaversionfield.setEditable(false);
 
 		final Button javaversionbutton = new Button("Open Folder");
 		javaversionbutton.getStyleClass().add("optionButton");
@@ -112,7 +108,7 @@ public class OptionsScene extends Scene {
 				if (StartupUtil.isJavaAnd8(javapath)) {
 					String javastring = javapath.toString();
 					javaversionfield.setText(javastring);
-
+					FileUtil.SETTINGS.javaPath = javastring;
 				}
 
 			}
@@ -160,8 +156,8 @@ public class OptionsScene extends Scene {
 		javaversion1.setPrefWidth(hbox.getPrefWidth());
 		javaversion1.getChildren().addAll(javaversionfield, javaversionbutton);
 
-		vbox.getChildren().addAll(ramlabel, ramcombobox, resolution, resolutioncombobox, baseDir, hbox, lar, logouthbox, javaversion,
-				javaversion1);
+		vbox.getChildren().addAll(ramlabel, ramcombobox, resolution, resolutioncombobox, baseDir, hbox, lar, logouthbox,
+				javaversion, javaversion1);
 
 	}
 
