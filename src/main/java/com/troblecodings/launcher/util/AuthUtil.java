@@ -4,91 +4,97 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.json.JSONObject;
 
+import com.google.gson.JsonParseException;
 import com.troblecodings.launcher.Launcher;
 
-import javafx.application.Platform;
-import net.cydhra.nidhogg.MojangClient;
-import net.cydhra.nidhogg.YggdrasilAgent;
-import net.cydhra.nidhogg.YggdrasilClient;
-import net.cydhra.nidhogg.data.AccountCredentials;
-import net.cydhra.nidhogg.data.Profile;
-import net.cydhra.nidhogg.data.Session;
+import net.hycrafthd.minecraft_authenticator.login.AuthenticationException;
+import net.hycrafthd.minecraft_authenticator.login.AuthenticationFile;
+import net.hycrafthd.minecraft_authenticator.login.Authenticator;
+import net.hycrafthd.minecraft_authenticator.login.User;
 
 public class AuthUtil {
-
-	private static YggdrasilClient client = new YggdrasilClient();
-	private static MojangClient mclient = new MojangClient();
-
-	public static String[] START_PARAMS = null;
-
-	public static Session auth(final String username, final String passw) {
-		Session session = FileUtil.DEFAULT;
-
-		if (session == null) {
-			if (username == null || passw == null)
-				return null;
-			session = client.login(new AccountCredentials(username, passw), YggdrasilAgent.MINECRAFT);
-			CryptoUtil.saveEncrypted(FileUtil.REMEMBERFILE, session);
+	
+	private static volatile User SESSION;
+	
+	public static boolean checkSession() {
+		if (SESSION != null) {
+			return true;
 		}
-
+		
+		final AuthenticationFile file;
+		
 		try {
-			if (client.validate(session))
-				return session;
-		} catch (Throwable e) {
-			try {
-				client.refresh(session);
-				CryptoUtil.saveEncrypted(FileUtil.REMEMBERFILE, session);
-				return session;
-			} catch (Throwable ex) {
-				Platform.runLater(() -> {
-					FileUtil.DEFAULT = null;
-					Launcher.setScene(Launcher.LOGINSCENE);
-				});
-				Launcher.onError(ex);
-			}
-			Launcher.onError(e);
+			file = CryptoUtil.readEncrypted(FileUtil.REMEMBERFILE, AuthenticationFile.class);
+		} catch (JsonParseException ex) {
+			return false;
 		}
-		return session;
+		
+		if (file == null) {
+			return false;
+		}
+		
+		try {
+			final Authenticator authenticator = Authenticator.of(file).shouldAuthenticate().run();
+			refreshAuthFile(authenticator.getResultFile());
+			
+			if (authenticator.getUser().isPresent()) {
+				SESSION = authenticator.getUser().get();
+				return true;
+			}
+		} catch (AuthenticationException ex) {
+		}
+		
+		return false;
+	}
+	
+	public static void mojangLogin(String user, String password) throws AuthenticationException {
+		final Authenticator authenticator = Authenticator.ofYggdrasil(UUID.randomUUID().toString(), user, password).run();
+		refreshAuthFile(authenticator.getResultFile());
+		
+		SESSION = authenticator.getUser().get();
+	}
+	
+	public static void refreshAuthFile(AuthenticationFile file) {
+		CryptoUtil.saveEncrypted(FileUtil.REMEMBERFILE, file);
 	}
 	
 	public static void logout() {
-		client.invalidate(FileUtil.DEFAULT);
-		FileUtil.DEFAULT = null;
 		try {
 			Files.deleteIfExists(FileUtil.REMEMBERFILE);
-		} catch (IOException e) {
-			Launcher.onError(e);
+		} catch (IOException ex) {
+			Launcher.onError(ex);
 		}
 		Launcher.setScene(Launcher.LOGINSCENE);
 	}
-
+	
 	private static final String DEFAULT_ARGS = "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userType ${user_type} --tweakClass net.minecraftforge.fml.common.launcher.FMLTweaker --versionType Forge";
-
+	
 	private static final String getOrDefault(final JSONObject json, final String id, final String def) {
 		if (json.has(id))
 			return json.getString(id);
 		Launcher.getLogger().warn("Couldn't find %s in %s! Using default!", id, json.toString());
 		return def;
 	}
-
-	public static String[] make(final Session session, final JSONObject json) {
-		if(session == null)
+	
+	public static String[] make(final JSONObject json) {
+		final User user = SESSION;
+		if (user == null)
 			return null;
-		Profile profile = mclient.getProfileByUUID(session.getUuid());
 		Map<String, String> list = new HashMap<>();
-		list.put("${auth_player_name}", profile.getName());
+		list.put("${auth_player_name}", user.getName());
 		list.put("${version_name}", getOrDefault(json, "id", "1.12.2"));
 		list.put("${game_directory}", FileUtil.SETTINGS.baseDir);
 		list.put("${assets_root}", FileUtil.ASSET_DIR);
 		final JSONObject obj = json.getJSONObject("assetIndex");
 		list.put("${assets_index_name}", getOrDefault(obj, "id", "1.12"));
-		list.put("${auth_uuid}", session.getUuid().toString());
-		list.put("${auth_access_token}", session.getAccessToken());
-		list.put("${user_type}", "mojang");
-
+		list.put("${auth_uuid}", user.getUuid().toString());
+		list.put("${auth_access_token}", user.getAccessToken());
+		list.put("${user_type}", user.getType());
+		
 		String[] arguments = getOrDefault(json, "minecraftArguments", DEFAULT_ARGS).split(" ");
 		for (int i = 0; i < arguments.length; i++) {
 			String newArg = list.get(arguments[i]);
@@ -97,5 +103,5 @@ public class AuthUtil {
 		}
 		return arguments;
 	}
-
+	
 }

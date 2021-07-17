@@ -3,7 +3,6 @@ package com.troblecodings.launcher.javafx;
 import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.util.AuthUtil;
-import com.troblecodings.launcher.util.FileUtil;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -16,7 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import net.cydhra.nidhogg.exception.InvalidCredentialsException;
+import net.hycrafthd.minecraft_authenticator.login.AuthenticationException;
 
 public class LoginScene extends Scene {
 
@@ -68,20 +67,13 @@ public class LoginScene extends Scene {
 
 		new Thread(() -> {
 			try {
-				if ((FileUtil.DEFAULT = AuthUtil.auth(mail, pw)) != null) {
-					Platform.runLater(() -> {
-						Header.SetVisibility(true);
-						Launcher.setScene(Launcher.HOMESCENE);
-						error.setText("");
-					});
-					return;
-				}
-			} catch (InvalidCredentialsException e) {
+				AuthUtil.mojangLogin(mail, pw);
+			} catch (AuthenticationException ex) {
 				Platform.runLater(() -> error.setText("Wrong credentials!"));
-				Launcher.onError(e);
-			} catch (Exception e) {
+				Launcher.onError(ex);
+			} catch (Exception ex) {
 				Platform.runLater(() -> error.setText("Unexpected Error, try later!"));
-				Launcher.onError(e);
+				Launcher.onError(ex);
 			}
 		}).start();
 	}

@@ -40,7 +40,7 @@ public class Header extends StackPane {
 				btn.getStyleClass().add("navbar");
 				btn.setText(page.name().toUpperCase());
 				btn.setOnAction(evt -> {
-					if(AuthUtil.auth(null, null) == null) return;
+					if(!AuthUtil.checkSession()) return;
 					Launcher.setScene(page.supplier.get());
 				});
 				hbox.getChildren().add(btn);

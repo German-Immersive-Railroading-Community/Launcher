@@ -85,7 +85,7 @@ public class Launcher extends Application {
 		Launcher.stage = stage;
 		stage.getIcons().add(Assets.getImage("icon.png"));
 
-		boolean authStatus = AuthUtil.auth(null, null) != null;
+		boolean authStatus = AuthUtil.checkSession();
 
 		stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
 
@@ -135,7 +135,7 @@ public class Launcher extends Application {
 	public static Stage getStage() {
 		return stage;
 	}
-
+	
 	public static void onError(Throwable e) {
 		// Return here since we cannot show any error.
 		if(e == null)
