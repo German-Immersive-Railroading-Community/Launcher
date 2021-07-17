@@ -4,6 +4,7 @@ import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -21,6 +22,7 @@ public class LoginScene extends Scene {
 		VBox vbox = new VBox();
 		vbox.setMaxHeight(400);
 		vbox.setMaxWidth(625);
+		vbox.setAlignment(Pos.CENTER);
 		stackpane.getChildren().add(vbox);
 
 		final Button mojangLoginButton = new Button();

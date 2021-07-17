@@ -253,14 +253,14 @@ CheckBox {
 
 .mojangLoginButton{
 	-fx-background-image: url(mojang-login-button.png);
-	-fx-pref-height: 42px;
-	-fx-pref-width: 210px;
+	-fx-pref-height: 62px;
+	-fx-pref-width: 310px;
 }
 
 .microsoftLoginButton{
 	-fx-background-image: url(microsoft-login-button.png);
-	-fx-pref-height: 42px;
-	-fx-pref-width: 210px;
+	-fx-pref-height: 62px;
+	-fx-pref-width: 310px;
 }
 
 .closebutton {
