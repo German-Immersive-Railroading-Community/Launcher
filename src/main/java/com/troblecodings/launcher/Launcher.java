@@ -136,6 +136,10 @@ public class Launcher extends Application {
 		return stage;
 	}
 	
+	public static void onWarn(String string) {
+		LOGGER.warn(string);
+	}
+	
 	public static void onError(Throwable e) {
 		// Return here since we cannot show any error.
 		if(e == null)

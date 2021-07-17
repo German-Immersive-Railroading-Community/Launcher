@@ -8,6 +8,7 @@ import java.util.Random;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.google.gson.JsonParseException;
 import com.troblecodings.launcher.Launcher;
 
 public class CryptoUtil {
@@ -45,6 +46,8 @@ public class CryptoUtil {
 					return FileUtil.GSON.fromJson(session, t);
 				}
 			}
+		} catch(JsonParseException ex) {
+			Launcher.onWarn("Could not parse encrypted file");
 		} catch (Throwable e) {
 			Launcher.onError(e);
 		}
