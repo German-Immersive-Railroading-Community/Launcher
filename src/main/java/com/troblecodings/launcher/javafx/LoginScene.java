@@ -69,6 +69,7 @@ public class LoginScene extends Scene {
 			try {
 				AuthUtil.mojangLogin(mail, pw);
 				Platform.runLater(() -> {
+					Header.SetVisibility(true);
 					Launcher.setScene(Launcher.HOMESCENE);
 					error.setText("");
 				});
