@@ -36,7 +36,7 @@ public class LoginScene extends Scene {
 		microsoftLoginButton.getStyleClass().add("microsoftLoginButton");
 		VBox.setMargin(microsoftLoginButton, new Insets(20, 0, 20, 0));
 		microsoftLoginButton.setOnAction(event -> {
-			Launcher.setScene(Launcher.MOJANGLOGINSCENE);
+			Launcher.setScene(Launcher.MICROSOFTLOGINSCENE);
 		});
 
 		vbox.getChildren().addAll(mojangLoginButton, microsoftLoginButton);

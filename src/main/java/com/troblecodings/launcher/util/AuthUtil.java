@@ -58,6 +58,13 @@ public class AuthUtil {
 		SESSION = authenticator.getUser().get();
 	}
 	
+	public static void microsoftLogin(String authCode) throws AuthenticationException {
+		final Authenticator authenticator = Authenticator.ofMicrosoft(authCode).shouldAuthenticate().run();
+		refreshAuthFile(authenticator.getResultFile());
+		
+		SESSION = authenticator.getUser().get();
+	}
+	
 	public static void refreshAuthFile(AuthenticationFile file) {
 		CryptoUtil.saveEncrypted(FileUtil.REMEMBERFILE, file);
 	}
