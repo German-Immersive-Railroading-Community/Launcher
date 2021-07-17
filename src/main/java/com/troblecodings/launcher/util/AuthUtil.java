@@ -52,7 +52,7 @@ public class AuthUtil {
 	}
 	
 	public static void mojangLogin(String user, String password) throws AuthenticationException {
-		final Authenticator authenticator = Authenticator.ofYggdrasil(UUID.randomUUID().toString(), user, password).run();
+		final Authenticator authenticator = Authenticator.ofYggdrasil(UUID.randomUUID().toString(), user, password).shouldAuthenticate().run();
 		refreshAuthFile(authenticator.getResultFile());
 		
 		SESSION = authenticator.getUser().get();
@@ -68,6 +68,7 @@ public class AuthUtil {
 		} catch (IOException ex) {
 			Launcher.onError(ex);
 		}
+		SESSION = null;
 		Launcher.setScene(Launcher.LOGINSCENE);
 	}
 	

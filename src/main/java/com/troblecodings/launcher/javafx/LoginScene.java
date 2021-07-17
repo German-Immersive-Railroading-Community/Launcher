@@ -68,6 +68,10 @@ public class LoginScene extends Scene {
 		new Thread(() -> {
 			try {
 				AuthUtil.mojangLogin(mail, pw);
+				Platform.runLater(() -> {
+					Launcher.setScene(Launcher.HOMESCENE);
+					error.setText("");
+				});
 			} catch (AuthenticationException ex) {
 				Platform.runLater(() -> error.setText("Wrong credentials!"));
 				Launcher.onError(ex);
