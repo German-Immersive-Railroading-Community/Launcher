@@ -13,6 +13,7 @@ import com.troblecodings.launcher.javafx.Footer;
 import com.troblecodings.launcher.javafx.Header;
 import com.troblecodings.launcher.javafx.HomeScene;
 import com.troblecodings.launcher.javafx.LoginScene;
+import com.troblecodings.launcher.javafx.MojangLoginScene;
 import com.troblecodings.launcher.javafx.OptionsScene;
 import com.troblecodings.launcher.javafx.OptionalModsScene;
 import com.troblecodings.launcher.util.AuthUtil;
@@ -41,6 +42,7 @@ public class Launcher extends Application {
 	public static HomeScene HOMESCENE;
 	public static OptionsScene OPTIONSSCENE;
 	public static LoginScene LOGINSCENE;
+	public static MojangLoginScene MOJANGLOGINSCENE;
 	public static CreditsScene CREDITSSCENE;
 	public static OptionalModsScene OPTIONALMODS;
 	
@@ -79,6 +81,7 @@ public class Launcher extends Application {
 		OPTIONSSCENE = new OptionsScene();
 		HOMESCENE = new HomeScene();
 		LOGINSCENE = new LoginScene();
+		MOJANGLOGINSCENE = new MojangLoginScene();
 		CREDITSSCENE = new CreditsScene();
 		OPTIONALMODS = new OptionalModsScene();
 
