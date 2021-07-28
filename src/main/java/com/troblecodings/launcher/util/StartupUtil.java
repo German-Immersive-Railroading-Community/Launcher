@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -335,7 +334,7 @@ public class StartupUtil {
 			}
 
 			Footer.setProgress(0.001);
-			return AuthUtil.make(AuthUtil.auth(null, null), object);
+			return AuthUtil.make(object);
 		} catch (Throwable e) {
 			Launcher.onError(e);
 			return null;
