@@ -8,6 +8,8 @@ import com.troblecodings.launcher.Launcher;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -19,10 +21,20 @@ public class CreditsScene extends Scene {
 		super(stackpane);
 		Launcher.setupScene(this, stackpane);
 		
+		ScrollPane sp = new ScrollPane();
+
+		sp.setHbarPolicy(ScrollBarPolicy.NEVER);
+		sp.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+		sp.setMaxHeight(500);
+		sp.setMaxWidth(650);
+		
 		VBox vbox = new VBox();
-		vbox.setMaxHeight(400);
-		vbox.setMaxWidth(650);
-		stackpane.getChildren().add(vbox);
+		
+		sp.setContent(vbox);		
+		vbox.setPrefSize(sp.getMaxWidth(), sp.getMaxHeight());
+		
+		vbox.setStyle("-fx-padding: 40px 60px;");
+		stackpane.getChildren().add(sp);
 		
 		Label graficslabel = new Label("Graphics");
 		graficslabel.setStyle("-fx-padding: 0px 0px 10px 0px;");
@@ -39,14 +51,18 @@ public class CreditsScene extends Scene {
 		Button codingbytimoButton = new Button("Codingbytimo");
 		
 		Label libarieslabel = new Label("Libraries");
-		Button nidhoggbutton = new Button("Nidhogg by Cydhra [GitHub]");
-		nidhoggbutton.setOnAction(event -> openWebsiteInBrowser("https://github.com/Cydhra/Nidhogg/blob/master/LICENSE"));
+		Button mcauthenticatorbutton = new Button("Minecraft-Authenticator by HyCraftHD [GitHub]");
+		mcauthenticatorbutton.setOnAction(event -> openWebsiteInBrowser("https://github.com/HyCraftHD/Minecraft-Authenticator/blob/main/LICENSE"));
 		Button jsonbutton = new Button("JSON-java by stleary [GitHub]");
 		jsonbutton.setOnAction(event -> openWebsiteInBrowser("https://github.com/stleary/JSON-java/blob/master/LICENSE"));
 		Button minecrafterbutton = new Button("MineCrafter Font by MadPixel [Dafont]");
 		minecrafterbutton.setOnAction(event -> openWebsiteInBrowser("https://www.dafont.com/de/minecrafter.font"));
+		Button gsonbutton = new Button("Gson by Google [GitHub]");
+		gsonbutton.setOnAction(event -> openWebsiteInBrowser("https://github.com/google/gson/blob/master/LICENSE"));
+		Button mslinksbutton = new Button("MsLinks by vatbub [GitHub]");
+		mslinksbutton.setOnAction(event -> openWebsiteInBrowser("https://github.com/vatbub/mslinks/blob/master/LICENSE.txt"));
 		
-		vbox.getChildren().addAll(graficslabel, mcjeronimo, programminglabel, mrtroblebutton, derzaubererbutton, shirosakaButton, codingbytimoButton, libarieslabel, nidhoggbutton, jsonbutton, minecrafterbutton);
+		vbox.getChildren().addAll(graficslabel, mcjeronimo, programminglabel, mrtroblebutton, derzaubererbutton, shirosakaButton, codingbytimoButton, libarieslabel, mcauthenticatorbutton, jsonbutton, minecrafterbutton, gsonbutton, mslinksbutton);
 	}
 	
 	public static void openWebsiteInBrowser(String url) {
