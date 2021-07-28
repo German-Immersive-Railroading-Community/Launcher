@@ -3,6 +3,7 @@ package com.troblecodings.launcher;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -164,9 +165,12 @@ public class Launcher extends Application {
 				PrintWriter pw = new PrintWriter(sw);
 				
 				e.printStackTrace(pw);
-				
+
 				ErrorScene errorScene = new ErrorScene(sw.toString(), stage.getScene());
-				Launcher.setScene(errorScene);
+
+				Platform.runLater(() -> {
+					Launcher.setScene(errorScene);
+				});
 				
 				sw.close();
 				pw.close();
