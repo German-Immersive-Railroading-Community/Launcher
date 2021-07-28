@@ -25,6 +25,8 @@ public class MicrosoftLoginScene extends Scene {
 	
 	private static StackPane stackpane = new StackPane();
 	
+	private static WebEngine engine; 
+	
 	public MicrosoftLoginScene() {
 		super(stackpane);
 		Launcher.setupScene(this, stackpane);
@@ -42,7 +44,7 @@ public class MicrosoftLoginScene extends Scene {
 		
 		final WebView webView = new WebView();
 		webView.setMinWidth(600);
-		final WebEngine engine = webView.getEngine();
+		engine = webView.getEngine();
 		
 		engine.setJavaScriptEnabled(true);
 		engine.load(Authenticator.microsoftLogin().toString());
@@ -57,7 +59,7 @@ public class MicrosoftLoginScene extends Scene {
 		stackpane.getChildren().add(trainImageView);
 	}
 	
-	private void loginCheck(ListChangeListener.Change<? extends WebHistory.Entry> event) {
+	private void loginCheck(ListChangeListener.Change<? extends WebHistory.Entry> event) {		
 		if (event.next() && event.wasAdded()) {
 			for (WebHistory.Entry entry : event.getAddedSubList()) {
 				if (entry.getUrl().startsWith(Authenticator.microsoftLoginRedirect())) {
@@ -70,6 +72,7 @@ public class MicrosoftLoginScene extends Scene {
 						});
 					} catch (AuthenticationException ex) {
 						// Platform.runLater(() -> error.setText("Wrong credentials!"));
+						engine.reload();
 						Launcher.onError(ex);
 					}
 				}
