@@ -100,34 +100,6 @@ public class StartupUtil {
 			if (isJavaAnd8(pathToHome))
 				return Optional.of(pathToHome.toString());
 		}
-		// This is just fallback
-		Path commonStartup = Paths.get("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\");
-		Path userStartup = Paths.get("%appdata%\\Microsoft\\Windows\\Start Menu\\Programs\\");
-		try {
-			Predicate<Path> pathPred = pth -> {
-				try {
-					if (!Files.isRegularFile(pth) || !pth.toString().endsWith(".lnk"))
-						return false;
-					Path path = Paths.get(new ShellLink(pth).resolveTarget()).getParent();
-					Launcher.getLogger().info(path.toString());
-					return isJavaAnd8(path);
-				} catch (IOException e) {
-					Launcher.onError(e);
-				} catch (ShellLinkException e) {
-					Launcher.onError(e);
-				}
-				return false;
-			};
-			Optional<Path> opt2 = Files.walk(commonStartup).filter(pathPred).findFirst();
-			if (opt2.isPresent())
-				return Optional.of(opt2.get().getParent().toString());
-
-			Optional<Path> opt3 = Files.walk(userStartup).filter(pathPred).findFirst();
-			if (opt3.isPresent())
-				return Optional.of(opt3.get().getParent().toString());
-		} catch (IOException e) {
-			Launcher.onError(e);
-		}
 		return Optional.empty();
 	}
 	
