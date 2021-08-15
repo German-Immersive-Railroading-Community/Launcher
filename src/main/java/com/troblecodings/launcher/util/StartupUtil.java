@@ -80,7 +80,13 @@ public class StartupUtil {
 	}
 
 	public static Optional<String> findJavaVersion() {
-		Optional<String> opt1 = Arrays.stream(System.getenv("path").split(";")).filter(str -> {
+		String pathVar = System.getenv("path");
+		if(pathVar == null) {
+			pathVar = System.getenv("PATH");
+			if(pathVar == null)
+				pathVar = "";
+		}
+		Optional<String> opt1 = Arrays.stream(pathVar.split(";")).filter(str -> {
 			Path pathto = Paths.get(str);
 			if (Files.notExists(pathto))
 				return false;
