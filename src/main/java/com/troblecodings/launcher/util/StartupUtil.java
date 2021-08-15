@@ -180,7 +180,6 @@ public class StartupUtil {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private static String[] prestart() {
 		try {
 			String clientJson = FileUtil.SETTINGS.baseDir + "/GIR.json";
