@@ -43,6 +43,8 @@ public class FileUtil {
 		Path old = Paths.get(SETTINGS.baseDir);
 		if (ptof.equals(old))
 			return false;
+		
+		SETTINGS.baseDir = file;
 
 		try { // Why? WHY? Let me disable Exceptions pls
 			Files.walk(old).forEach(pt -> {
@@ -74,7 +76,6 @@ public class FileUtil {
 			Launcher.onError(e);
 			return false;
 		}
-		SETTINGS.baseDir = file;
 		init();
 		return true;
 	}
