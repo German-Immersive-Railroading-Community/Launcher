@@ -324,11 +324,16 @@ public class StartupUtil {
 					Path path;
 
 					if (activeBeta != null && name.toLowerCase().contains(activeBeta.getModName())) {
-						//Launcher.getLogger().debug("Downloading beta mod: {}", activeBeta.toString());
-						path = Paths.get(FileUtil.SETTINGS.baseDir, key, activeBeta.getModName() + "-" + activeBeta.getPrName() + ".jar");
+						try {
+							if(Files.deleteIfExists(Paths.get(FileUtil.SETTINGS.baseDir, key, name)))
+								Launcher.getLogger().info("Deleted {} in favour of {}!", name, activeBeta.getJarFileName());
+						} catch (IOException e) {
+							Launcher.getLogger().trace("Failed to delete normal mod file for beta mod: " + activeBeta.toString() + "!", e);
+						}
+
+						path = Paths.get(FileUtil.SETTINGS.baseDir, key, activeBeta.getJarFileName());
 						ConnectionUtil.download(activeBeta.getPrDownload(), path.toString(), in -> Footer.setProgress((counter.get() + in) / max));
 					} else {
-						//Launcher.getLogger().info("Downloading normal mod: {}", name);
 						path = Paths.get(FileUtil.SETTINGS.baseDir, key, name);
 						ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
 								jfileobj.getString("sha1"), in -> Footer.setProgress((counter.get() + in) / max));
@@ -344,6 +349,10 @@ public class StartupUtil {
 			additional.keySet().forEach(key -> {
 				try {
 					List<Object> array = additional.getJSONArray(key).toList();
+
+					if(activeBeta != null) {
+						array.add(activeBeta.getJarFileName());
+					}
 
 					Files.list(optionalMods).filter(file -> file.toString().endsWith(".jar")).forEach(file -> {
 						Path filePath = Paths.get(FileUtil.SETTINGS.baseDir, "mods", file.getFileName().toString());
