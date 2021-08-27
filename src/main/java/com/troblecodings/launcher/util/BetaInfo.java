@@ -36,7 +36,7 @@ public class BetaInfo {
     }
 
     public String getJarFileName() {
-        return modName + "-" + prName + ".jar";
+        return modName + "-" + prNum + ".jar";
     }
 
     @Override
