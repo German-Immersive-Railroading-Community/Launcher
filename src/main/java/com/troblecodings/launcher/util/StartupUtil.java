@@ -12,12 +12,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
@@ -34,17 +34,73 @@ import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.Footer;
 
-import mslinks.ShellLink;
-import mslinks.ShellLinkException;
-
 public class StartupUtil {
 
 	private static final String RELEASE_API = "https://api.github.com/repos/German-Immersive-Railroading-Community/Launcher/releases";
+	private static final String BETA_API = "https://girc.eu/Launcher/Beta/beta.json";
 
 	private static String LIBPATHS = "";
 	private static String MAINCLASS = null;
 
 	public static final String OSSHORTNAME = getOSShortName();
+
+	private static BetaInfo activeBeta = null;
+	public static void setActiveBeta(BetaInfo info) {
+		if(activeBeta == info)
+			return;
+
+		Launcher.getLogger().info("Changed active beta to " + info.toString());
+		activeBeta = info;
+	}
+
+	/**
+	 * Gets the beta versions of a specified mod.
+	 * @param refreshBetaData Indicates whether to re-download the beta.json.
+	 * @return An array of Strings containing the beta versions of the mod; or null in case of the mod not having any.
+	 */
+	public static BetaInfo[] getBetaVersions(boolean refreshBetaData) {
+		if (!Launcher.getBetaMode())
+			return new BetaInfo[0];
+
+		String betaJsonPath = FileUtil.SETTINGS.baseDir + "/beta.json";
+		String content;
+
+		try {
+			if(refreshBetaData || !Files.exists(Paths.get(betaJsonPath)))
+				refreshBetaJson();
+
+			content = new String(Files.readAllBytes(Paths.get(betaJsonPath)));
+		} catch (IOException e) {
+			Launcher.onError(e);
+			return new BetaInfo[0];
+		}
+
+		List<BetaInfo> betaInfo = new ArrayList<>();
+
+		JSONObject root = new JSONObject(content);
+
+		root.keySet().forEach(key -> {
+			JSONObject mod = root.getJSONObject(key);
+			mod.keySet().forEach(pr -> {
+				JSONObject prObj = mod.getJSONObject(pr);
+				BetaInfo info = new BetaInfo(key, Integer.parseInt(pr), prObj.getString("name"), prObj.getString("download"), prObj.getInt("port"));
+				betaInfo.add(info);
+			});
+		});
+
+		return betaInfo.toArray(new BetaInfo[0]);
+	}
+
+	public static void refreshBetaJson() {
+		if (!Launcher.getBetaMode())
+			return;
+
+		if (!ConnectionUtil.download(BETA_API, FileUtil.SETTINGS.baseDir + "/beta.json")) {
+			Launcher.getLogger().warn("Could not download beta.json!");
+		} else {
+			Launcher.getLogger().info("Refreshed beta.json!");
+		}
+	}
 
 	private static String getOSShortName() {
 		String longname = System.getProperty("os.name").toLowerCase();
