@@ -35,6 +35,10 @@ public class BetaInfo {
         return this.prPort;
     }
 
+    public String getJarFileName() {
+        return modName + "-" + prName + ".jar";
+    }
+
     @Override
     public String toString() {
         return modName + " - #" + prNum + ": " + prName;

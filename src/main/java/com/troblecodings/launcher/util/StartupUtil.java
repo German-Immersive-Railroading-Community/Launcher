@@ -66,7 +66,7 @@ public class StartupUtil {
 		String content;
 
 		try {
-			if(refreshBetaData || !Files.exists(Paths.get(betaJsonPath)))
+			if (refreshBetaData || !Files.exists(Paths.get(betaJsonPath)))
 				refreshBetaJson();
 
 			content = new String(Files.readAllBytes(Paths.get(betaJsonPath)));
@@ -77,16 +77,21 @@ public class StartupUtil {
 
 		List<BetaInfo> betaInfo = new ArrayList<>();
 
-		JSONObject root = new JSONObject(content);
+		try {
+			JSONObject root = new JSONObject(content);
 
-		root.keySet().forEach(key -> {
-			JSONObject mod = root.getJSONObject(key);
-			mod.keySet().forEach(pr -> {
-				JSONObject prObj = mod.getJSONObject(pr);
-				BetaInfo info = new BetaInfo(key, Integer.parseInt(pr), prObj.getString("name"), prObj.getString("download"), prObj.getInt("port"));
-				betaInfo.add(info);
+			root.keySet().forEach(key -> {
+				JSONObject mod = root.getJSONObject(key);
+				mod.keySet().forEach(pr -> {
+					JSONObject prObj = mod.getJSONObject(pr);
+					BetaInfo info = new BetaInfo(key, Integer.parseInt(pr), prObj.getString("name"), prObj.getString("download"), prObj.getInt("port"));
+					betaInfo.add(info);
+				});
 			});
-		});
+		} catch (Exception e) {
+			Launcher.getLogger().trace("Beta.json is incorrectly formatted!", e);
+			return new BetaInfo[0];
+		}
 
 		return betaInfo.toArray(new BetaInfo[0]);
 	}

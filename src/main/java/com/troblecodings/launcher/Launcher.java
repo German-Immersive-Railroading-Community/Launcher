@@ -166,7 +166,6 @@ public class Launcher extends Application {
 			LOGGER.error("Error found but was passed null!");
 			return;
 		} else if (e.getMessage() == null)
-			
 			LOGGER.trace("", e);
 		else
 			LOGGER.trace(e.getMessage(), e);

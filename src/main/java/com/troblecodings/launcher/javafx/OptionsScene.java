@@ -195,6 +195,7 @@ public class OptionsScene extends Scene {
 			});
 
 			betaComboBox.setEditable(true);
+			betaComboBox.setPrefWidth(vbox.getPrefWidth());
 			betaComboBox.getItems().addAll(StartupUtil.getBetaVersions(false));
 			betaComboBox.setOnAction(ev -> {
 				int index = betaComboBox.getSelectionModel().selectedIndexProperty().get();
