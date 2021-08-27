@@ -8,10 +8,12 @@ import java.nio.file.Path;
 import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.util.AuthUtil;
+import com.troblecodings.launcher.util.BetaInfo;
 import com.troblecodings.launcher.util.FileUtil;
 import com.troblecodings.launcher.util.StartupUtil;
 
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -29,7 +31,8 @@ import javafx.stage.FileChooser.ExtensionFilter;
 
 public class OptionsScene extends Scene {
 
-	private static StackPane stackpane = new StackPane();
+	private static final StackPane stackpane = new StackPane();
+	private static final ComboBox<BetaInfo> betaComboBox = new ComboBox<>();
 
 	public OptionsScene() {
 		super(stackpane);
@@ -93,7 +96,7 @@ public class OptionsScene extends Scene {
 		// javaversion selection
 
 		final Label javaversion = new Label("Javaversion");
-		javaversion.setStyle("-fx-padding: 0px 0px 10px 0px;");
+		javaversion.setStyle("-fx-padding: 20px 0px 10px 0px;");
 
 		final TextField javaversionfield = new TextField(FileUtil.SETTINGS.javaPath);
 		javaversionfield.setEditable(false);
@@ -172,11 +175,52 @@ public class OptionsScene extends Scene {
 		vbox.getChildren().addAll(ramlabel, ramcombobox, resolution, resolutioncombobox, baseDir, hbox, lar, logouthbox,
 				javaversion, javaversion1);
 
-		ImageView settingstrainview = new ImageView(Assets.getImage("train3.png"));
-		settingstrainview.setScaleX(-1);
-		settingstrainview.setTranslateX((-1280/1.75) + settingstrainview.getImage().getWidth());
-		settingstrainview.setTranslateY(360 - settingstrainview.getImage().getHeight());
-		stackpane.getChildren().add(settingstrainview);
+		if(Launcher.getBetaMode()) {
+			final Label betaLabel = new Label("Beta Version Selection");
+			betaLabel.setStyle("-fx-padding: 20px 0px 10px 0px");
+
+			final Button betaRefreshButton = new Button("Refresh");
+			betaRefreshButton.getStyleClass().add("optionButton");
+			betaRefreshButton.setOnAction(ev -> {
+				betaComboBox.getSelectionModel().clearSelection();
+				betaComboBox.getItems().clear();
+				betaComboBox.getItems().addAll(StartupUtil.getBetaVersions(true));
+			});
+
+			final Button betaClearButton = new Button("Clear");
+			betaClearButton.getStyleClass().add("optionButton");
+			betaClearButton.setOnAction(ev -> {
+				betaComboBox.getSelectionModel().clearSelection();
+				betaComboBox.getItems().clear();
+			});
+
+			betaComboBox.setEditable(true);
+			betaComboBox.getItems().addAll(StartupUtil.getBetaVersions(false));
+			betaComboBox.setOnAction(ev -> {
+				int index = betaComboBox.getSelectionModel().selectedIndexProperty().get();
+
+				if(index < 0)
+					return;
+
+				BetaInfo selectedInfo = betaComboBox.getItems().get(index);
+				StartupUtil.setActiveBeta(selectedInfo);
+				Launcher.getLogger().info("Selected beta: " + selectedInfo.toString());
+			});
+
+			final HBox betaHBox = new HBox(10);
+			betaHBox.setStyle("-fx-padding: 15px 0px 10px 0px");
+			betaHBox.setPrefWidth(hbox.getPrefWidth());
+			betaHBox.setAlignment(Pos.CENTER);
+			betaHBox.getChildren().addAll(betaRefreshButton, betaClearButton);
+
+			vbox.getChildren().addAll(betaLabel, betaComboBox, betaHBox);
+		}
+
+		ImageView settingsTrainView = new ImageView(Assets.getImage("train3.png"));
+		settingsTrainView.setScaleX(-1);
+		settingsTrainView.setTranslateX((-1280/1.75) + settingsTrainView.getImage().getWidth());
+		settingsTrainView.setTranslateY(360 - settingsTrainView.getImage().getHeight());
+		stackpane.getChildren().add(settingsTrainView);
 	}
 
 }
