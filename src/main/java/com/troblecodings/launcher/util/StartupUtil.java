@@ -25,6 +25,8 @@ import java.util.stream.Stream;
 import javax.swing.JButton;
 import javax.swing.ProgressMonitor;
 
+import org.apache.logging.log4j.LogManager;
+
 import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.io.NBTUtil;
 import net.querz.nbt.tag.CompoundTag;
