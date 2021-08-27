@@ -182,6 +182,7 @@ public class OptionsScene extends Scene {
 			final Button betaRefreshButton = new Button("Refresh");
 			betaRefreshButton.getStyleClass().add("optionButton");
 			betaRefreshButton.setOnAction(ev -> {
+				StartupUtil.setActiveBeta(null);
 				betaComboBox.getSelectionModel().clearSelection();
 				betaComboBox.getItems().clear();
 				betaComboBox.getItems().addAll(StartupUtil.getBetaVersions(true));
@@ -190,6 +191,7 @@ public class OptionsScene extends Scene {
 			final Button betaClearButton = new Button("Clear");
 			betaClearButton.getStyleClass().add("optionButton");
 			betaClearButton.setOnAction(ev -> {
+				StartupUtil.setActiveBeta(null);
 				betaComboBox.getSelectionModel().clearSelection();
 				betaComboBox.getItems().clear();
 			});
