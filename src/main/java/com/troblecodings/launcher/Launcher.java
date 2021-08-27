@@ -64,6 +64,20 @@ public class Launcher extends Application {
 		LOGGER = LogManager.getLogger("GIRC");
 		LOGGER.info("Starting Launcher!");
 	}
+
+	private static boolean BETA_MODE = false;
+
+	public static void setBetaMode(boolean betaMode) {
+		if(BETA_MODE == betaMode)
+			return;
+
+		Launcher.getLogger().info("Changed beta mode: " + BETA_MODE + " → " + betaMode);
+		BETA_MODE = betaMode;
+	}
+
+	public static boolean getBetaMode() {
+		return BETA_MODE;
+	}
 	
 	public static final Thread SHUTDOWNHOOK = new Thread(FileUtil::saveSettings);
 	
