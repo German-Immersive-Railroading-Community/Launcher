@@ -189,7 +189,7 @@ public class StartupUtil {
 			long size = Files.size(Paths.get(location.toURI()));
 			long newsize = newversion.getNumber("size").longValue();
 			if (newsize == size) {
-				Launcher.getLogger().info("The new verision (%d) is equal to the old (%d)", newsize, size);
+				Launcher.getLogger().info("The new version ({}) is equal to the old ({})", newsize, size);
 				return;
 			}
 			Launcher.getLogger().info("Updating Launcher!");
@@ -314,9 +314,21 @@ public class StartupUtil {
 			additional.keySet().forEach(key -> {
 				additional.getJSONArray(key).forEach(fileobj -> {
 					JSONObject jfileobj = (JSONObject) fileobj;
-					Path path = Paths.get(FileUtil.SETTINGS.baseDir, key, jfileobj.getString("name"));
-					ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
-							jfileobj.getString("sha1"), in -> Footer.setProgress((counter.get() + in) / max));
+					String name = jfileobj.getString("name");
+
+					Path path;
+
+					if (activeBeta != null && name.toLowerCase().contains(activeBeta.getModName())) {
+						//Launcher.getLogger().debug("Downloading beta mod: {}", activeBeta.toString());
+						path = Paths.get(FileUtil.SETTINGS.baseDir, key, activeBeta.getModName() + "-" + activeBeta.getPrName() + ".jar");
+						ConnectionUtil.download(activeBeta.getPrDownload(), path.toString(), in -> Footer.setProgress((counter.get() + in) / max));
+					} else {
+						//Launcher.getLogger().info("Downloading normal mod: {}", name);
+						path = Paths.get(FileUtil.SETTINGS.baseDir, key, name);
+						ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
+								jfileobj.getString("sha1"), in -> Footer.setProgress((counter.get() + in) / max));
+					}
+
 					counter.getAndAdd(jfileobj.getInt("size"));
 				});
 			});
