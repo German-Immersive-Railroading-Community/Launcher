@@ -12,12 +12,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
@@ -26,6 +26,12 @@ import javax.swing.JButton;
 import javax.swing.ProgressMonitor;
 
 import org.apache.logging.log4j.LogManager;
+
+import net.querz.nbt.io.NamedTag;
+import net.querz.nbt.io.NBTUtil;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.StringTag;
+import net.querz.nbt.tag.ListTag;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -34,17 +40,78 @@ import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.Footer;
 
-import mslinks.ShellLink;
-import mslinks.ShellLinkException;
-
 public class StartupUtil {
 
 	private static final String RELEASE_API = "https://api.github.com/repos/German-Immersive-Railroading-Community/Launcher/releases";
+	private static final String BETA_API = "https://girc.eu/Launcher/Beta/beta.json";
 
 	private static String LIBPATHS = "";
 	private static String MAINCLASS = null;
 
 	public static final String OSSHORTNAME = getOSShortName();
+
+	private static BetaInfo activeBeta = null;
+	public static void setActiveBeta(BetaInfo info) {
+		if(activeBeta == info)
+			return;
+
+		Launcher.getLogger().info("Changed active beta to " + info.toString());
+		activeBeta = info;
+	}
+
+	/**
+	 * Gets the beta versions of a specified mod.
+	 * @param refreshBetaData Indicates whether to re-download the beta.json.
+	 * @return An array of Strings containing the beta versions of the mod; or null in case of the mod not having any.
+	 */
+	public static BetaInfo[] getBetaVersions(boolean refreshBetaData) {
+		if (!Launcher.getBetaMode())
+			return new BetaInfo[0];
+
+		String betaJsonPath = FileUtil.SETTINGS.baseDir + "/beta.json";
+		String content;
+
+		try {
+			if (refreshBetaData || !Files.exists(Paths.get(betaJsonPath)))
+				refreshBetaJson();
+
+			content = new String(Files.readAllBytes(Paths.get(betaJsonPath)));
+		} catch (IOException e) {
+			Launcher.onError(e);
+			return new BetaInfo[0];
+		}
+
+		List<BetaInfo> betaInfo = new ArrayList<>();
+
+		try {
+			JSONObject root = new JSONObject(content);
+
+			root.keySet().forEach(key -> {
+				JSONObject mod = root.getJSONObject(key);
+				mod.keySet().forEach(pr -> {
+					JSONObject prObj = mod.getJSONObject(pr);
+					BetaInfo info = new BetaInfo(key, Integer.parseInt(pr), prObj.getString("name"), prObj.getString("download"), prObj.getInt("port"));
+					betaInfo.add(info);
+				});
+			});
+		} catch (Exception e) {
+			Launcher.getLogger().trace("Beta.json is incorrectly formatted!", e);
+			return new BetaInfo[0];
+		}
+
+		return betaInfo.toArray(new BetaInfo[0]);
+	}
+
+	public static void refreshBetaJson() {
+		if (!Launcher.getBetaMode())
+			return;
+
+		if (!ConnectionUtil.download(BETA_API, FileUtil.SETTINGS.baseDir + "/beta.json")) {
+			Launcher.getLogger().warn("Could not download beta.json!");
+		} else {
+			Launcher.getLogger().info("Refreshed beta.json!");
+		}
+	}
 
 	private static String getOSShortName() {
 		String longname = System.getProperty("os.name").toLowerCase();
@@ -133,7 +200,7 @@ public class StartupUtil {
 			long size = Files.size(Paths.get(location.toURI()));
 			long newsize = newversion.getNumber("size").longValue();
 			if (newsize == size) {
-				Launcher.getLogger().info("The new verision (%d) is equal to the old (%d)", newsize, size);
+				Launcher.getLogger().info("The new version ({}) is equal to the old ({})", newsize, size);
 				return;
 			}
 			Launcher.getLogger().info("Updating Launcher!");
@@ -158,6 +225,7 @@ public class StartupUtil {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private static String[] prestart() {
 		try {
 			String clientJson = FileUtil.SETTINGS.baseDir + "/GIR.json";
@@ -258,9 +326,26 @@ public class StartupUtil {
 			additional.keySet().forEach(key -> {
 				additional.getJSONArray(key).forEach(fileobj -> {
 					JSONObject jfileobj = (JSONObject) fileobj;
-					Path path = Paths.get(FileUtil.SETTINGS.baseDir, key, jfileobj.getString("name"));
-					ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
-							jfileobj.getString("sha1"), in -> Footer.setProgress((counter.get() + in) / max));
+					String name = jfileobj.getString("name");
+
+					Path path;
+
+					if (activeBeta != null && name.toLowerCase().contains(activeBeta.getModName())) {
+						try {
+							if(Files.deleteIfExists(Paths.get(FileUtil.SETTINGS.baseDir, key, name)))
+								Launcher.getLogger().info("Deleted {} in favour of {}!", name, activeBeta.getJarFileName());
+						} catch (IOException e) {
+							Launcher.getLogger().trace("Failed to delete normal mod file for beta mod: " + activeBeta.toString() + "!", e);
+						}
+
+						path = Paths.get(FileUtil.SETTINGS.baseDir, key, activeBeta.getJarFileName());
+						ConnectionUtil.download(activeBeta.getPrDownload(), path.toString(), in -> Footer.setProgress((counter.get() + in) / max));
+					} else {
+						path = Paths.get(FileUtil.SETTINGS.baseDir, key, name);
+						ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
+								jfileobj.getString("sha1"), in -> Footer.setProgress((counter.get() + in) / max));
+					}
+
 					counter.getAndAdd(jfileobj.getInt("size"));
 				});
 			});
@@ -271,6 +356,10 @@ public class StartupUtil {
 			additional.keySet().forEach(key -> {
 				try {
 					List<Object> array = additional.getJSONArray(key).toList();
+
+					if(activeBeta != null) {
+						array.add(activeBeta.getJarFileName());
+					}
 
 					Files.list(optionalMods).filter(file -> file.toString().endsWith(".jar")).forEach(file -> {
 						Path filePath = Paths.get(FileUtil.SETTINGS.baseDir, "mods", file.getFileName().toString());
@@ -309,6 +398,27 @@ public class StartupUtil {
 				Path optionalFilesPath = Paths.get(optionalMods.toString(), optionalJsonObj.getString("name"));
 				ConnectionUtil.validateDownloadRetry(optionalJsonObj.getString("url"), optionalFilesPath.toString(), optionalJsonObj.getString("sha1"));
 			}
+
+			Path serverDatPath = Paths.get(FileUtil.SETTINGS.baseDir, "servers.dat");
+			NamedTag rootTag = NBTUtil.read(serverDatPath.toString());
+			CompoundTag rootCt = (CompoundTag) rootTag.getTag();
+			ListTag<CompoundTag> serverListTag = (ListTag<CompoundTag>) rootCt.get("servers");
+
+			if(serverListTag.size() > 1) {
+				while(serverListTag.size() > 1)
+					serverListTag.remove(1);
+			}
+
+			if(activeBeta != null) {
+				CompoundTag betaTag = new CompoundTag();
+				betaTag.put("ip", new StringTag("wgrmur2iejm3iuat.myfritz.net:" + activeBeta.getPrPort()));
+				betaTag.put("name", new StringTag("GIR Beta Server"));
+				betaTag.put("icon", serverListTag.get(0).getStringTag("icon"));
+
+				serverListTag.add(1, betaTag);
+			}
+
+			NBTUtil.write(rootTag, serverDatPath.toString(), false);
 
 			Footer.setProgress(0.001);
 			return AuthUtil.make(object);
