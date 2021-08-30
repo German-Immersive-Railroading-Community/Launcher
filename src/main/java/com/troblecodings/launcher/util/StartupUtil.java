@@ -386,7 +386,12 @@ public class StartupUtil {
 			Files.createDirectories(additionalMods);
 			Files.list(additionalMods).filter(pth -> !pth.toString().endsWith(".dis")).forEach(pth -> {
 				try {
-					Files.copy(pth, Paths.get(pth.toString().replace("additional-mods", "mods")));
+					Path path = Paths.get(pth.toString().replace("additional-mods", "mods"));
+
+					if(Files.exists(path))
+						return;
+					
+					Files.copy(pth, path);
 				} catch (IOException e) {
 					Launcher.onError(e);
 				}
