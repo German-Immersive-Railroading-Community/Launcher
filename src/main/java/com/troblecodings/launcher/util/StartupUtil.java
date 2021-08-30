@@ -68,6 +68,7 @@ public class StartupUtil {
 		if (!Launcher.getBetaMode())
 			return new BetaInfo[0];
 
+		List<BetaInfo> betaInfo = new ArrayList<>();
 		String betaJsonPath = FileUtil.SETTINGS.baseDir + "/beta.json";
 		String content;
 
@@ -76,26 +77,22 @@ public class StartupUtil {
 				refreshBetaJson();
 
 			content = new String(Files.readAllBytes(Paths.get(betaJsonPath)));
-		} catch (IOException e) {
-			Launcher.onError(e);
-			return new BetaInfo[0];
-		}
 
-		List<BetaInfo> betaInfo = new ArrayList<>();
-
-		try {
 			JSONObject root = new JSONObject(content);
 
 			root.keySet().forEach(key -> {
 				JSONObject mod = root.getJSONObject(key);
 				mod.keySet().forEach(pr -> {
-					JSONObject prObj = mod.getJSONObject(pr);
-					BetaInfo info = new BetaInfo(key, Integer.parseInt(pr), prObj.getString("name"), prObj.getString("download"), prObj.getInt("port"));
-					betaInfo.add(info);
+					try {
+						JSONObject prObj = mod.getJSONObject(pr);
+						BetaInfo info = new BetaInfo(key, Integer.parseInt(pr), prObj.getString("name"), prObj.getString("download"), prObj.getInt("port"));
+						betaInfo.add(info);
+					} catch (Exception ignored) {
+					}
 				});
 			});
 		} catch (Exception e) {
-			Launcher.getLogger().trace("Beta.json is incorrectly formatted!", e);
+			Launcher.getLogger().trace("Could not parse beta.json!", e);
 			return new BetaInfo[0];
 		}
 
@@ -390,7 +387,7 @@ public class StartupUtil {
 
 					if(Files.exists(path))
 						return;
-					
+
 					Files.copy(pth, path);
 				} catch (IOException e) {
 					Launcher.onError(e);
