@@ -84,7 +84,7 @@ public class OptionalModsScene extends Scene {
                 String fileName = filePath.toFile().getName();
                 final CheckBox chkBox = new CheckBox();
                 chkBox.setSelected(FileUtil.SETTINGS.optionalMods.contains(fileName));
-                chkBox.setText(fileName.split("\\.")[0]);
+                chkBox.setText(fileName.split("\\.jar$")[0]);
                 chkBox.setOnAction(ev -> {
                     if(chkBox.isIndeterminate())
                         return;
