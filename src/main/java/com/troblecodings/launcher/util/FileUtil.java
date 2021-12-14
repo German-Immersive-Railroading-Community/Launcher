@@ -85,7 +85,7 @@ public class FileUtil {
 		public String baseDir = System.getenv("APPDATA") + "/gir";
 		public int width = 1280;
 		public int height = 720;
-		public int ram = 2048;
+		public int ram = 4096;
 		public ArrayList<String> optionalMods = new ArrayList<>();
 		public String javaPath = "";
 	}
