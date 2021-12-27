@@ -123,19 +123,22 @@ public class StartupUtil {
 	}
 
 	public static boolean isJavaAnd8(Path pathToDictionary) {
-		Path pathtoJava = pathToDictionary.resolve("java.exe");
+		final Path pathtoJava = pathToDictionary.resolve("java.exe");
 		if (Files.notExists(pathtoJava))
 			return false;
 		try {
-			ProcessBuilder builder = new ProcessBuilder(pathtoJava.toString(), "-version");
+			final ProcessBuilder builder = new ProcessBuilder(pathtoJava.toString(), "-version");
 			builder.redirectErrorStream(true);
-			Process process = builder.start();
-			Scanner scanner = new Scanner(process.getInputStream());
+			final Process process = builder.start();
+			final Scanner scanner = new Scanner(process.getInputStream());
 			if (!scanner.hasNextLine())
 				return false;
-			String version = scanner.nextLine();
+			final String version = scanner.nextLine();
 			scanner.close();
-			if (version.split("\"")[1].startsWith("1.8.0"))
+			final String[] versionSplit = version.split("\"");
+			if(versionSplit.length < 2)
+			    return false;
+			if (versionSplit[1].startsWith("1.8.0"))
 				return true;
 		} catch (Exception e) {
 			Launcher.onError(e);

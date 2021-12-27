@@ -59,10 +59,8 @@ public class CreditsScene extends Scene {
 		minecrafterbutton.setOnAction(event -> openWebsiteInBrowser("https://www.dafont.com/de/minecrafter.font"));
 		Button gsonbutton = new Button("Gson by Google [GitHub]");
 		gsonbutton.setOnAction(event -> openWebsiteInBrowser("https://github.com/google/gson/blob/master/LICENSE"));
-		Button mslinksbutton = new Button("MsLinks by vatbub [GitHub]");
-		mslinksbutton.setOnAction(event -> openWebsiteInBrowser("https://github.com/vatbub/mslinks/blob/master/LICENSE.txt"));
 		
-		vbox.getChildren().addAll(graficslabel, mcjeronimo, programminglabel, mrtroblebutton, derzaubererbutton, shirosakaButton, codingbytimoButton, libarieslabel, mcauthenticatorbutton, jsonbutton, minecrafterbutton, gsonbutton, mslinksbutton);
+		vbox.getChildren().addAll(graficslabel, mcjeronimo, programminglabel, mrtroblebutton, derzaubererbutton, shirosakaButton, codingbytimoButton, libarieslabel, mcauthenticatorbutton, jsonbutton, minecrafterbutton, gsonbutton);
 	}
 	
 	public static void openWebsiteInBrowser(String url) {
