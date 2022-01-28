@@ -60,7 +60,7 @@ public class StartupUtil {
 	}
 
 	/**
-	 * Gets the beta versions of a specified mod.
+	 * Gets all currently available pull-request artifacts for GIRC-related mods.
 	 * @param refreshBetaData Indicates whether to re-download the beta.json.
 	 * @return An array of Strings containing the beta versions of the mod; or null in case of the mod not having any.
 	 */
@@ -69,16 +69,14 @@ public class StartupUtil {
 			return new BetaInfo[0];
 
 		List<BetaInfo> betaInfo = new ArrayList<>();
-		String betaJsonPath = FileUtil.SETTINGS.baseDir + "/beta.json";
-		String content;
 
 		try {
-			if (refreshBetaData || !Files.exists(Paths.get(betaJsonPath)))
+			Path betaJsonPath = Paths.get(FileUtil.SETTINGS.baseDir + "/beta.json");
+
+			if (refreshBetaData || !Files.exists(betaJsonPath))
 				refreshBetaJson();
 
-			content = new String(Files.readAllBytes(Paths.get(betaJsonPath)));
-
-			JSONObject root = new JSONObject(content);
+			JSONObject root = new JSONObject(Files.readString(betaJsonPath));
 
 			root.keySet().forEach(key -> {
 				JSONObject mod = root.getJSONObject(key);

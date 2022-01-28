@@ -17,8 +17,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.function.Consumer;
 
-import javax.xml.ws.http.HTTPException;
-
 import com.troblecodings.launcher.Launcher;
 
 public class ConnectionUtil {
@@ -48,7 +46,7 @@ public class ConnectionUtil {
 				addHeader(connection);
 			}
 			if(resp == HttpURLConnection.HTTP_FORBIDDEN) {
-				Launcher.onError(new HTTPException(resp));
+				Launcher.onError(new Exception("Forbidden"));
 				return false;
 			}
 			InputStream stream = connection.getInputStream();
