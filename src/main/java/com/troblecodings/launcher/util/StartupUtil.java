@@ -55,7 +55,7 @@ public class StartupUtil {
 		if(activeBeta == info)
 			return;
 
-		Launcher.getLogger().info("Changed active beta to " + info.toString());
+		Launcher.getLogger().info("Changed active beta to " + info);
 		activeBeta = info;
 	}
 
