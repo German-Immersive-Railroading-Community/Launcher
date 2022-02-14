@@ -68,6 +68,7 @@ public class MicrosoftLoginScene extends Scene {
 					try {
 						AuthUtil.microsoftLogin(authCode);
 						Platform.runLater(() -> {
+							Header.setVisibility(true);
 							Launcher.setScene(Launcher.HOMESCENE);
 						});
 					} catch (AuthenticationException ex) {

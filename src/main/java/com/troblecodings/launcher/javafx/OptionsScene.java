@@ -147,7 +147,7 @@ public class OptionsScene extends Scene {
 		logout.getStyleClass().add("optionButton");
 		logout.setOnAction(evt -> {
 			AuthUtil.logout();
-			Header.SetVisibility(false);
+			Header.setVisibility(false);
 		});
 
 		final Button resetconfigs = new Button("Reset");

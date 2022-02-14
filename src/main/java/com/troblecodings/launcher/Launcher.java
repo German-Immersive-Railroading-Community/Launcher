@@ -108,7 +108,7 @@ public class Launcher extends Application {
 		
 		stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
 		
-		Header.SetVisibility(authStatus);
+		Header.setVisibility(authStatus);
 		
 		stage.setWidth(1280);
 		stage.setHeight(720);
