@@ -461,12 +461,15 @@ public class StartupUtil {
 		if (javaVersionPath.isEmpty()) {
 			Optional<String> javaVers = findJavaVersion();
 			if (!javaVers.isPresent()) {
-				javaVersionPath = "";
+				javaVersionPath = "java";
 				Launcher.getLogger().warn("Java version not found! Falling back!");
 			} else {
 				javaVersionPath = javaVers.get() + "/";
 			}
 		}
+
+        if(!Files.exists(Paths.get(javaVersionPath)) || !javaVersionPath.endsWith("java.exe"))
+            javaVersionPath = "java";
 
 		String[] parameter = prestart();
 		if (parameter == null)
@@ -475,7 +478,7 @@ public class StartupUtil {
 		String width = String.valueOf(FileUtil.SETTINGS.width);
 		String height = String.valueOf(FileUtil.SETTINGS.height);
 		String ram = String.valueOf(FileUtil.SETTINGS.ram);
-		String[] preparameter = new String[] { javaVersionPath + "java", "-Xmx" + ram + "M", "-Xms" + ram + "M",
+		String[] preparameter = new String[] { javaVersionPath, "-Xmx" + ram + "M", "-Xms" + ram + "M",
 				"-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
 				"-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", width, "-height",
 				height };
