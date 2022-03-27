@@ -19,6 +19,7 @@ public class Footer extends StackPane {
 		ProgressBar progressbar = new ProgressBar();
 		progressbar.setTranslateY(-10);
 		progressbar.setPrefWidth(1280);
+		progressbar.setProgress(0.001);
 		bar.addListener((x, x2, x3) -> progressbar.setProgress(bar.get()));
 
 		Button button = new Button("Lizensen und Kredits");
