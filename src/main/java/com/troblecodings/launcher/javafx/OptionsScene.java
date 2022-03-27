@@ -3,7 +3,6 @@ package com.troblecodings.launcher.javafx;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
-import java.nio.file.Path;
 
 import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
@@ -109,13 +108,7 @@ public class OptionsScene extends Scene {
 			chooser.getExtensionFilters().add(new ExtensionFilter("Java executable", "java.exe"));
 			File selectedFile = chooser.showOpenDialog(Launcher.getStage());
 			if (selectedFile != null) {
-				Path javapath = selectedFile.toPath().getParent();
-				if (StartupUtil.isJavaAnd8(javapath)) {
-					String javastring = javapath.toString();
-					javaversionfield.setText(javastring);
-					FileUtil.SETTINGS.javaPath = javastring;
-				}
-
+    			javaversionfield.setText(FileUtil.SETTINGS.javaPath = selectedFile.getPath());
 			}
 		});
 
@@ -160,11 +153,11 @@ public class OptionsScene extends Scene {
 		optionalModsButton.setOnAction(ev -> {
 			Launcher.setScene(Launcher.OPTIONALMODS);
 		});
-		
+
 		final HBox logouthbox = new HBox(10);
 		logouthbox.setPrefWidth(hbox.getPrefWidth());
 		logouthbox.getChildren().addAll(logout, resetconfigs, optionalModsButton);
-		
+
 		final Label lar = new Label("Logout & Reset");
 		lar.setStyle("-fx-padding: 20px 0px 10px 0px;");
 
@@ -225,5 +218,4 @@ public class OptionsScene extends Scene {
 		settingsTrainView.setTranslateY(360 - settingsTrainView.getImage().getHeight());
 		stackpane.getChildren().add(settingsTrainView);
 	}
-
 }
