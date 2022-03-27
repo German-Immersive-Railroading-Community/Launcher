@@ -85,8 +85,8 @@ public class OptionsScene extends Scene {
 			try {
 				if (text.contains("x")) {
 					String[] arr = text.split("x");
-					FileUtil.SETTINGS.width = Integer.valueOf(arr[0]);
-					FileUtil.SETTINGS.height = Integer.valueOf(arr[1]);
+					FileUtil.SETTINGS.width = Integer.parseInt(arr[0]);
+					FileUtil.SETTINGS.height = Integer.parseInt(arr[1]);
 				}
 			} catch (Exception e) {
 			}
@@ -150,9 +150,7 @@ public class OptionsScene extends Scene {
 
 		final Button optionalModsButton = new Button("Optional Mods");
 		optionalModsButton.getStyleClass().add("optionButton");
-		optionalModsButton.setOnAction(ev -> {
-			Launcher.setScene(Launcher.OPTIONALMODS);
-		});
+		optionalModsButton.setOnAction(ev -> Launcher.setScene(Launcher.OPTIONALMODSSCENE));
 
 		final HBox logouthbox = new HBox(10);
 		logouthbox.setPrefWidth(hbox.getPrefWidth());

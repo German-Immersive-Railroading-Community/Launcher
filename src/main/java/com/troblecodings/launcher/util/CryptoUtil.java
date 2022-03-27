@@ -47,7 +47,7 @@ public class CryptoUtil {
 				}
 			}
 		} catch(JsonParseException ex) {
-			Launcher.onWarn("Could not parse encrypted file");
+			Launcher.getLogger().warn("Could not parse encrypted file");
 		} catch (Throwable e) {
 			Launcher.onError(e);
 		}

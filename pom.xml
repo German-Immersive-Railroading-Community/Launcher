@@ -75,7 +75,7 @@
 							<archive>
 								<manifest>
 									<mainClass>
-										com.troblecodings.launcher.LaunchSystem
+										com.troblecodings.launcher.Launcher
 									</mainClass>
 								</manifest>
 							</archive>
