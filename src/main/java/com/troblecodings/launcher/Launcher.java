@@ -25,9 +25,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Launcher extends Application {
-
-    private static Stage stage;
     private static Logger logger;
+    private static Launcher instance = null;
+    private static boolean beta_mode = false;
+
+    private static final List<Image> images = new ArrayList<>();
 
     public static HomeScene HOMESCENE;
     public static OptionsScene OPTIONSSCENE;
@@ -37,17 +39,16 @@ public class Launcher extends Application {
     public static CreditsScene CREDITSSCENE;
     public static OptionalModsScene OPTIONALMODSSCENE;
 
-    private static final List<Image> images = new ArrayList<>();
+    private Stage stage;
 
-    public static Logger getLogger() {
-        return logger;
+    public Launcher() {
+        instance = this;
     }
-
-    private static boolean beta_mode = false;
 
     @Override
     public void init() {
         FileUtil.init();
+        FileUtil.readSettings();
 
         if (FileUtil.SETTINGS == null)
             FileUtil.SETTINGS = new FileUtil.SettingsData();
@@ -83,10 +84,7 @@ public class Launcher extends Application {
         images.add(Assets.getImage("background_4.png"));
         images.add(Assets.getImage("background_5.png"));
         images.add(images.get(0));
-    }
-
-    @Override
-    public void start(Stage stage) {
+        
         OPTIONSSCENE = new OptionsScene();
         HOMESCENE = new HomeScene();
         LOGINSCENE = new LoginScene();
@@ -94,13 +92,16 @@ public class Launcher extends Application {
         MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
         CREDITSSCENE = new CreditsScene();
         OPTIONALMODSSCENE = new OptionalModsScene();
+    }
 
-        Launcher.stage = stage;
-        stage.getIcons().add(Assets.getImage("icon.png"));
+    @Override
+    public void start(Stage stage) {
+        this.stage = stage;
 
         boolean authStatus = AuthUtil.checkSession();
-
         stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
+
+        stage.getIcons().add(Assets.getImage("icon.png"));
 
         Header.setVisibility(authStatus);
 
@@ -120,7 +121,6 @@ public class Launcher extends Application {
         final ImageView backgroundImg = new ImageView();
 
         Transition animation = new Transition() {
-
             {
                 setCycleDuration(Duration.seconds(20)); // total time for animation
                 setRate(0.5);
@@ -148,15 +148,15 @@ public class Launcher extends Application {
     }
 
     public static Scene getScene() {
-        return stage.getScene();
+        return getInstance().stage.getScene();
     }
 
     public static void setScene(Scene scene) {
-        stage.setScene(scene);
+        getInstance().stage.setScene(scene);
     }
 
     public static Stage getStage() {
-        return stage;
+        return getInstance().stage;
     }
 
     public static void onError(Throwable e) {
@@ -171,14 +171,14 @@ public class Launcher extends Application {
 
         // See if this can be made better, seems overly clunky-like to me, but any other method doesn't generate a stack-trace.
         // toString and getMessage only return the String representation of what the exception actually is.
-        if (stage != null && stage.isShowing()) {
+        if (getInstance().stage != null && getInstance().stage.isShowing()) {
             try {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
 
                 e.printStackTrace(pw);
 
-                ErrorScene errorScene = new ErrorScene(sw.toString(), stage.getScene());
+                ErrorScene errorScene = new ErrorScene(sw.toString(), getInstance().stage.getScene());
 
                 Platform.runLater(() -> Launcher.setScene(errorScene));
 
@@ -188,5 +188,18 @@ public class Launcher extends Application {
                 ioe.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Gets the Launcher instance.
+     *
+     * @return The Launcher instance.
+     */
+    public static Launcher getInstance() {
+        return instance;
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 }
