@@ -11,8 +11,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.langlevel>16</java.langlevel>
 		<javafx.version>18</javafx.version>
+        <maven.compiler.release>16</maven.compiler.release>
 		<javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
 	</properties>
 
@@ -56,11 +56,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
-				<configuration>
-					<source>${java.langlevel}</source>
-					<target>${java.langlevel}</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
