@@ -69,7 +69,7 @@ public class MojangLoginScene extends Scene {
 			try {
 				AuthUtil.mojangLogin(mail, pw);
 				Platform.runLater(() -> {
-					Header.SetVisibility(true);
+					Header.setVisibility(true);
 					Launcher.setScene(Launcher.HOMESCENE);
 					error.setText("");
 				});

@@ -80,7 +80,7 @@ public class Header extends StackPane {
 		});
 	}
 
-	public static void SetVisibility(boolean isVisible) {
+	public static void setVisibility(boolean isVisible) {
 		for(Button btn : _buttons) {
 			btn.setVisible(isVisible);
 		}
