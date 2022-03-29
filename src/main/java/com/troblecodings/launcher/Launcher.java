@@ -84,18 +84,18 @@ public class Launcher extends Application {
         images.add(Assets.getImage("background_4.png"));
         images.add(Assets.getImage("background_5.png"));
         images.add(images.get(0));
-        
-        OPTIONSSCENE = new OptionsScene();
-        HOMESCENE = new HomeScene();
-        LOGINSCENE = new LoginScene();
-        MOJANGLOGINSCENE = new MojangLoginScene();
-        MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
-        CREDITSSCENE = new CreditsScene();
-        OPTIONALMODSSCENE = new OptionalModsScene();
     }
 
     @Override
     public void start(Stage stage) {
+        OPTIONSSCENE = new OptionsScene();
+        HOMESCENE = new HomeScene();
+        LOGINSCENE = new LoginScene();
+        MOJANGLOGINSCENE = new MojangLoginScene();
+        CREDITSSCENE = new CreditsScene();
+        OPTIONALMODSSCENE = new OptionalModsScene();
+        MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
+
         this.stage = stage;
 
         boolean authStatus = AuthUtil.checkSession();
