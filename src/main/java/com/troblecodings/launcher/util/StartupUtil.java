@@ -301,7 +301,7 @@ public class StartupUtil {
 			}
 
 			// Asset lockup and download
-			String baseurl = "http://resources.download.minecraft.net/";
+			String baseurl = "https://resources.download.minecraft.net/";
 			objects.keySet().forEach((key) -> {
 				try {
 					JSONObject asset = objects.getJSONObject(key);
