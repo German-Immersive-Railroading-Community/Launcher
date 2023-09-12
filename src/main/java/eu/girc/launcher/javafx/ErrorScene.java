@@ -1,7 +1,6 @@
 package eu.girc.launcher.javafx;
 
 import eu.girc.launcher.Launcher;
-import eu.girc.launcher.assets.Assets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -47,7 +46,7 @@ public class ErrorScene extends Scene {
 
         vbox.getChildren().addAll(errorHeader, errorReason, button);
 
-        final ImageView trainImageView = new ImageView(Assets.getImage("train1.png"));
+        final ImageView trainImageView = new ImageView(Launcher.getImage("train1.png"));
         trainImageView.setTranslateX(720 - trainImageView.getImage().getWidth());
         trainImageView.setTranslateY(250 - trainImageView.getImage().getHeight());
         _stackPane.getChildren().add(trainImageView);

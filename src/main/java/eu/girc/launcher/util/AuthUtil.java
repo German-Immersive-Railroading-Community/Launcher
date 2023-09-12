@@ -37,32 +37,32 @@ public class AuthUtil {
 			return false;
 		}
 		
-		try {
-			final Authenticator authenticator = Authenticator.of(file).shouldAuthenticate().run();
-			refreshAuthFile(authenticator.getResultFile());
-			
-			if (authenticator.getUser().isPresent()) {
-				SESSION = authenticator.getUser().get();
-				return true;
-			}
-		} catch (AuthenticationException ex) {
-		}
+//		try {
+//			final Authenticator authenticator = Authenticator.of(file).shouldAuthenticate().run();
+//			refreshAuthFile(authenticator.getResultFile());
+//
+//			if (authenticator.getUser().isPresent()) {
+//				SESSION = authenticator.getUser().get();
+//				return true;
+//			}
+//		} catch (AuthenticationException ex) {
+//		}
 		
 		return false;
 	}
 	
 	public static void mojangLogin(String user, String password) throws AuthenticationException {
-		final Authenticator authenticator = Authenticator.ofYggdrasil(UUID.randomUUID().toString(), user, password).shouldAuthenticate().run();
-		refreshAuthFile(authenticator.getResultFile());
-		
-		SESSION = authenticator.getUser().get();
+//		final Authenticator authenticator = Authenticator.ofYggdrasil(UUID.randomUUID().toString(), user, password).shouldAuthenticate().run();
+//		refreshAuthFile(authenticator.getResultFile());
+//
+//		SESSION = authenticator.getUser().get();
 	}
 	
 	public static void microsoftLogin(String authCode) throws AuthenticationException {
-		final Authenticator authenticator = Authenticator.ofMicrosoft(authCode).shouldAuthenticate().run();
-		refreshAuthFile(authenticator.getResultFile());
-		
-		SESSION = authenticator.getUser().get();
+//		final Authenticator authenticator = Authenticator.ofMicrosoft(authCode).shouldAuthenticate().run();
+//		refreshAuthFile(authenticator.getResultFile());
+//
+//		SESSION = authenticator.getUser().get();
 	}
 	
 	public static void refreshAuthFile(AuthenticationFile file) {
@@ -93,15 +93,15 @@ public class AuthUtil {
 		if (user == null)
 			return null;
 		Map<String, String> list = new HashMap<>();
-		list.put("${auth_player_name}", user.getName());
-		list.put("${version_name}", getOrDefault(json, "id", "1.12.2"));
-		list.put("${game_directory}", FileUtil.SETTINGS.baseDir);
-		list.put("${assets_root}", FileUtil.ASSET_DIR);
-		final JSONObject obj = json.getJSONObject("assetIndex");
-		list.put("${assets_index_name}", getOrDefault(obj, "id", "1.12"));
-		list.put("${auth_uuid}", user.getUuid().toString());
-		list.put("${auth_access_token}", user.getAccessToken());
-		list.put("${user_type}", user.getType());
+//		list.put("${auth_player_name}", user.getName());
+//		list.put("${version_name}", getOrDefault(json, "id", "1.12.2"));
+//		list.put("${game_directory}", FileUtil.SETTINGS.baseDir);
+//		list.put("${assets_root}", FileUtil.ASSET_DIR);
+//		final JSONObject obj = json.getJSONObject("assetIndex");
+//		list.put("${assets_index_name}", getOrDefault(obj, "id", "1.12"));
+//		list.put("${auth_uuid}", user.getUuid().toString());
+//		list.put("${auth_access_token}", user.getAccessToken());
+//		list.put("${user_type}", user.getType());
 		
 		String[] arguments = getOrDefault(json, "minecraftArguments", DEFAULT_ARGS).split(" ");
 		for (int i = 0; i < arguments.length; i++) {
