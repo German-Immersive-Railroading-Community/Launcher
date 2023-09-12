@@ -37,7 +37,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import eu.girc.launcher.Launcher;
-import eu.girc.launcher.assets.Assets;
 import eu.girc.launcher.javafx.Footer;
 
 public class StartupUtil {
@@ -172,7 +171,7 @@ public class StartupUtil {
 		Path pth = Paths.get(FileUtil.SETTINGS.baseDir, "servers.dat");
 		if(!Files.exists(pth)) {
 			try {
-				Files.copy(Assets.getResourceAsStream("servers.dat"), pth);
+				Files.copy(Launcher.getResourceAsStream("servers.dat"), pth);
 			} catch (IOException e) {
 				Launcher.onError(e);
 			}

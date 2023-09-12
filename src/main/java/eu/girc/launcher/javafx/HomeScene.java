@@ -1,7 +1,6 @@
 package eu.girc.launcher.javafx;
 
 import eu.girc.launcher.Launcher;
-import eu.girc.launcher.assets.Assets;
 import eu.girc.launcher.util.StartupUtil;
 
 import javafx.scene.Scene;
@@ -18,7 +17,7 @@ public class HomeScene extends Scene {
 		super(stackpane);
 		Launcher.setupScene(this, stackpane);
 
-		ImageView imagelogo = new ImageView(Assets.getImage("logo.png"));
+		ImageView imagelogo = new ImageView(Launcher.getImage("logo.png"));
 
 		Button launchbutton = new Button();
 		launchbutton.getStyleClass().add("launchbutton");

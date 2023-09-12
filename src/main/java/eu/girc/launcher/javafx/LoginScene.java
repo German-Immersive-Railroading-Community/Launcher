@@ -1,7 +1,6 @@
 package eu.girc.launcher.javafx;
 
 import eu.girc.launcher.Launcher;
-import eu.girc.launcher.assets.Assets;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -41,7 +40,7 @@ public class LoginScene extends Scene {
 
 		vbox.getChildren().addAll(mojangLoginButton, microsoftLoginButton);
 		
-		final ImageView trainImageView = new ImageView(Assets.getImage("train2.png"));
+		final ImageView trainImageView = new ImageView(Launcher.getImage("train2.png"));
 		trainImageView.setTranslateX(760 - trainImageView.getImage().getWidth());
 		trainImageView.setTranslateY(325 - trainImageView.getImage().getHeight());
 		stackpane.getChildren().add(trainImageView);

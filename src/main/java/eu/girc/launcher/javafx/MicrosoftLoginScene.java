@@ -5,7 +5,6 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 
 import eu.girc.launcher.Launcher;
-import eu.girc.launcher.assets.Assets;
 import eu.girc.launcher.util.AuthUtil;
 
 import javafx.application.Platform;
@@ -53,7 +52,7 @@ public class MicrosoftLoginScene extends Scene {
 		
 		vbox.getChildren().addAll(webView);
 		
-		final ImageView trainImageView = new ImageView(Assets.getImage("train2.png"));
+		final ImageView trainImageView = new ImageView(Launcher.getImage("train2.png"));
 		trainImageView.setTranslateX(760 - trainImageView.getImage().getWidth());
 		trainImageView.setTranslateY(325 - trainImageView.getImage().getHeight());
 		stackpane.getChildren().add(trainImageView);

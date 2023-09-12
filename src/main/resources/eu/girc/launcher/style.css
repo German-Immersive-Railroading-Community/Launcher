@@ -234,7 +234,7 @@ CheckBox {
 }
 
 .launchbutton{
-	-fx-background-image: url(launchbutton.png);
+	-fx-background-image: url(images/launchbutton.png);
 	-fx-pref-height: 100px;
 	-fx-pref-width: 350px;
 }
@@ -246,25 +246,25 @@ CheckBox {
 }
 
 .loginbutton{
-	-fx-background-image: url(loginbutton.png);
+	-fx-background-image: url(images/loginbutton.png);
 	-fx-pref-height: 42px;
 	-fx-pref-width: 164px;
 }
 
 .mojangLoginButton{
-	-fx-background-image: url(mojang-login-button.png);
+	-fx-background-image: url(images/mojang-login-button.png);
 	-fx-pref-height: 62px;
 	-fx-pref-width: 310px;
 }
 
 .microsoftLoginButton{
-	-fx-background-image: url(microsoft-login-button.png);
+	-fx-background-image: url(images/microsoft-login-button.png);
 	-fx-pref-height: 62px;
 	-fx-pref-width: 310px;
 }
 
 .closebutton {
-	-fx-background-image: url(closebutton.png);
+	-fx-background-image: url(images/closebutton.png);
 	-fx-pref-height: 67px;
 	-fx-pref-width: 52px;
 }
@@ -280,7 +280,7 @@ CheckBox {
 }
 
 .backbutton {
-	-fx-background-image: url(backbutton.png);
+	-fx-background-image: url(images/backbutton.png);
 	-fx-pref-height: 50px;
 	-fx-pref-width: 175px;
 }

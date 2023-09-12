@@ -5,7 +5,6 @@ import java.awt.Toolkit;
 import java.io.File;
 
 import eu.girc.launcher.Launcher;
-import eu.girc.launcher.assets.Assets;
 import eu.girc.launcher.util.AuthUtil;
 import eu.girc.launcher.util.BetaInfo;
 import eu.girc.launcher.util.FileUtil;
@@ -210,7 +209,7 @@ public class OptionsScene extends Scene {
 			vbox.getChildren().addAll(betaLabel, betaComboBox, betaHBox);
 		}
 
-		ImageView settingsTrainView = new ImageView(Assets.getImage("train3.png"));
+		ImageView settingsTrainView = new ImageView(Launcher.getImage("train3.png"));
 		settingsTrainView.setScaleX(-1);
 		settingsTrainView.setTranslateX((-1280/1.75) + settingsTrainView.getImage().getWidth());
 		settingsTrainView.setTranslateY(360 - settingsTrainView.getImage().getHeight());

@@ -1,16 +1,17 @@
 package eu.girc.launcher;
 
-import eu.girc.launcher.assets.Assets;
-import com.troblecodings.launcher.javafx.*;
 import eu.girc.launcher.javafx.*;
 import eu.girc.launcher.util.AuthUtil;
 import eu.girc.launcher.util.FileUtil;
 import eu.girc.launcher.util.StartupUtil;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javafx.animation.Transition;
 import javafx.application.Application;
@@ -80,13 +81,13 @@ public class Launcher extends Application {
             StartupUtil.update();
 
         // loading images into list
-        images.add(Assets.getImage("background.png"));
-        images.add(Assets.getImage("background_2.png"));
-        images.add(Assets.getImage("background_3.png"));
-        images.add(Assets.getImage("background_4.png"));
-        images.add(Assets.getImage("background_5.png"));
+        images.add(getImage("background.png"));
+        images.add(getImage("background_2.png"));
+        images.add(getImage("background_3.png"));
+        images.add(getImage("background_4.png"));
+        images.add(getImage("background_5.png"));
         images.add(images.get(0));
-        
+
         OPTIONSSCENE = new OptionsScene();
         HOMESCENE = new HomeScene();
         LOGINSCENE = new LoginScene();
@@ -103,7 +104,7 @@ public class Launcher extends Application {
         boolean authStatus = AuthUtil.checkSession();
         stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
 
-        stage.getIcons().add(Assets.getImage("icon.png"));
+        stage.getIcons().add(getImage("icon.png"));
 
         Header.setVisibility(authStatus);
 
@@ -142,7 +143,7 @@ public class Launcher extends Application {
         stackpane.getChildren().add(new Header(scene));
         stackpane.getChildren().add(new Footer(scene));
         scene.setFill(Color.TRANSPARENT);
-        scene.getStylesheets().add(Assets.getStyleSheet("style.css"));
+        scene.getStylesheets().add(getStyleSheet("style.css"));
     }
 
     public static boolean getBetaMode() {
@@ -203,5 +204,32 @@ public class Launcher extends Application {
 
     public static Logger getLogger() {
         return logger;
+    }
+
+    public static String getStyleSheet(String name) {
+        return Objects.requireNonNull(Launcher.class.getResource(name)).toExternalForm();
+    }
+
+    /**
+     *
+     * @param name The name of the image to retrieve.
+     * @return The image, or null if not found or an exception occurs.
+     */
+    public static Image getImage(String name) {
+        try (InputStream imageStream = Launcher.class.getResourceAsStream("images/" + name)) {
+            if (imageStream == null) {
+                return null;
+            }
+
+            return new Image(imageStream);
+        } catch (final IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static InputStream getResourceAsStream(String name) {
+        return Launcher.class.getResourceAsStream(name);
     }
 }
