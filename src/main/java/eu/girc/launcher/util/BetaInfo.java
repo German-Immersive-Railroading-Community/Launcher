@@ -1,4 +1,4 @@
-package com.troblecodings.launcher.util;
+package eu.girc.launcher.util;
 
 public class BetaInfo {
     private final String modName;

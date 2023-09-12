@@ -1,12 +1,12 @@
-package com.troblecodings.launcher.javafx;
+package eu.girc.launcher.javafx;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 
-import com.troblecodings.launcher.Launcher;
-import com.troblecodings.launcher.assets.Assets;
-import com.troblecodings.launcher.util.AuthUtil;
+import eu.girc.launcher.Launcher;
+import eu.girc.launcher.assets.Assets;
+import eu.girc.launcher.util.AuthUtil;
 
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;

@@ -1,4 +1,4 @@
-package com.troblecodings.launcher.assets;
+package eu.girc.launcher.assets;
 
 import java.io.InputStream;
 import javafx.scene.image.Image;

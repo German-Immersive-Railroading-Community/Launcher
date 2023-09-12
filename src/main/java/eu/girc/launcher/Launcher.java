@@ -1,15 +1,17 @@
-package com.troblecodings.launcher;
+package eu.girc.launcher;
 
-import com.troblecodings.launcher.assets.Assets;
+import eu.girc.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.*;
-import com.troblecodings.launcher.util.AuthUtil;
-import com.troblecodings.launcher.util.FileUtil;
-import com.troblecodings.launcher.util.StartupUtil;
+import eu.girc.launcher.javafx.*;
+import eu.girc.launcher.util.AuthUtil;
+import eu.girc.launcher.util.FileUtil;
+import eu.girc.launcher.util.StartupUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;

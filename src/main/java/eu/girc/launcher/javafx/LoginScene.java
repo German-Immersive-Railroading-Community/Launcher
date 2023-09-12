@@ -1,7 +1,7 @@
-package com.troblecodings.launcher.javafx;
+package eu.girc.launcher.javafx;
 
-import com.troblecodings.launcher.Launcher;
-import com.troblecodings.launcher.assets.Assets;
+import eu.girc.launcher.Launcher;
+import eu.girc.launcher.assets.Assets;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

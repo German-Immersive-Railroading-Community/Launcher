@@ -1,11 +1,11 @@
-package com.troblecodings.launcher.javafx;
+package eu.girc.launcher.javafx;
 
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-import com.troblecodings.launcher.Launcher;
+import eu.girc.launcher.Launcher;
 
-import com.troblecodings.launcher.util.AuthUtil;
+import eu.girc.launcher.util.AuthUtil;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

@@ -1,4 +1,4 @@
-package com.troblecodings.launcher.util;
+package eu.girc.launcher.util;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,7 +9,7 @@ import java.util.UUID;
 import org.json.JSONObject;
 
 import com.google.gson.JsonParseException;
-import com.troblecodings.launcher.Launcher;
+import eu.girc.launcher.Launcher;
 
 import net.hycrafthd.minecraft_authenticator.login.AuthenticationException;
 import net.hycrafthd.minecraft_authenticator.login.AuthenticationFile;

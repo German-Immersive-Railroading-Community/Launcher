@@ -1,10 +1,10 @@
-package com.troblecodings.launcher.javafx;
+package eu.girc.launcher.javafx;
 
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import com.troblecodings.launcher.Launcher;
+import eu.girc.launcher.Launcher;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
