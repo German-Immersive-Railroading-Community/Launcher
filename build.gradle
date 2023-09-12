@@ -1,0 +1,67 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.javamodularity.moduleplugin' version '1.8.12'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
+    id 'org.beryx.jlink' version '2.25.0'
+}
+
+group 'eu.girc'
+version '1.1.0'
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.u-team.info')
+    }
+
+    maven {
+        url = uri('https://repo1.maven.org/maven2')
+    }
+
+    maven {
+        url = uri('https://jitpack.io')
+    }
+
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+ext {
+    junitVersion = '5.9.2'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+application {
+    mainModule = 'eu.girc.launcher'
+    mainClass = 'eu.girc.launcher.Launcher'
+}
+
+javafx {
+    version = '17.0.6'
+    modules = [ 'javafx.controls', 'javafx.web' ]
+}
+
+dependencies {
+    implementation 'com.github.Querz:NBT:6.1'
+    implementation 'org.apache.logging.log4j:log4j-api:2.18.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.18.0'
+    implementation 'net.hycrafthd:minecraft_authenticator:1.0.1'
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'org.json:json:20220320'
+    implementation 'org.openjfx:javafx-controls:18.0.1'
+    implementation 'org.openjfx:javafx-web:18.0.1'
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+}
+
+test {
+    useJUnitPlatform()
+}
