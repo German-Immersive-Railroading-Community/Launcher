@@ -1,15 +1,15 @@
-package com.troblecodings.launcher.javafx;
+package eu.girc.launcher.javafx;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
 
-import com.troblecodings.launcher.Launcher;
-import com.troblecodings.launcher.assets.Assets;
-import com.troblecodings.launcher.util.AuthUtil;
-import com.troblecodings.launcher.util.BetaInfo;
-import com.troblecodings.launcher.util.FileUtil;
-import com.troblecodings.launcher.util.StartupUtil;
+import eu.girc.launcher.Launcher;
+import eu.girc.launcher.assets.Assets;
+import eu.girc.launcher.util.AuthUtil;
+import eu.girc.launcher.util.BetaInfo;
+import eu.girc.launcher.util.FileUtil;
+import eu.girc.launcher.util.StartupUtil;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;

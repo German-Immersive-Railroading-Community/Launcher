@@ -1,8 +1,8 @@
-package com.troblecodings.launcher.javafx;
+package eu.girc.launcher.javafx;
 
-import com.troblecodings.launcher.Launcher;
-import com.troblecodings.launcher.assets.Assets;
-import com.troblecodings.launcher.util.StartupUtil;
+import eu.girc.launcher.Launcher;
+import eu.girc.launcher.assets.Assets;
+import eu.girc.launcher.util.StartupUtil;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Button;

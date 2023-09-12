@@ -1,4 +1,4 @@
-package com.troblecodings.launcher.util;
+package eu.girc.launcher.util;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,7 +9,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.google.gson.JsonParseException;
-import com.troblecodings.launcher.Launcher;
+import eu.girc.launcher.Launcher;
 
 public class CryptoUtil {
 	

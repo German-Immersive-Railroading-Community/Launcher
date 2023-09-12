@@ -1,4 +1,4 @@
-package com.troblecodings.launcher.util;
+package eu.girc.launcher.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
-import com.troblecodings.launcher.Launcher;
+import eu.girc.launcher.Launcher;
 
 public class FileUtil {
 
