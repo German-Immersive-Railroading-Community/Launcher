@@ -8,11 +8,13 @@ import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
 import net.querz.nbt.tag.StringTag;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.ProgressMonitor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,6 +35,7 @@ import java.util.stream.Stream;
 public class StartupUtil {
 
     public static final String OSSHORTNAME = getOSShortName();
+    private static final Logger LOGGER = LogManager.getLogger();
     private static final String RELEASE_API = "https://api.github.com/repos/German-Immersive-Railroading-Community/Launcher/releases";
     private static final String BETA_API = "https://girc.eu/Launcher/Beta/beta.json";
     private static String LIBPATHS = "";
@@ -42,7 +45,7 @@ public class StartupUtil {
     public static void setActiveBeta(BetaInfo info) {
         if (activeBeta == info) return;
 
-        Launcher.getLogger().info("Changed active beta to " + info);
+        LOGGER.info("Changed active beta to " + info);
         activeBeta = info;
     }
 
@@ -76,7 +79,7 @@ public class StartupUtil {
                 });
             });
         } catch (Exception e) {
-            Launcher.getLogger().trace("Could not parse beta.json!", e);
+            LOGGER.trace("Could not parse beta.json!", e);
             return new BetaInfo[0];
         }
 
@@ -87,9 +90,9 @@ public class StartupUtil {
         if (!Launcher.getBetaMode()) return;
 
         if (!ConnectionUtil.download(BETA_API, FileUtil.SETTINGS.baseDir + "/beta.json")) {
-            Launcher.getLogger().warn("Could not download beta.json!");
+            LOGGER.warn("Could not download beta.json!");
         } else {
-            Launcher.getLogger().info("Refreshed beta.json!");
+            LOGGER.info("Refreshed beta.json!");
         }
     }
 
@@ -146,8 +149,10 @@ public class StartupUtil {
     }
 
     private static void ensureServersDatExists() throws IOException {
+        LOGGER.debug("Verifying valid servers.dat");
         Path pth = Paths.get(FileUtil.SETTINGS.baseDir, "servers.dat");
         if (!Files.exists(pth)) {
+            LOGGER.warn("Couldn't find an existing servers.dat file! Recreating.");
             Files.copy(Launcher.getResourceAsStream("servers.dat"), pth);
         }
     }
@@ -159,7 +164,7 @@ public class StartupUtil {
             ensureServersDatExists();
             String str = ConnectionUtil.getStringFromURL(RELEASE_API);
             if (str == null) {
-                Launcher.getLogger().info("Couldn't read updater information!");
+                LOGGER.info("Couldn't read updater information!");
                 return;
             }
             JSONArray obj = new JSONArray(str);
@@ -167,16 +172,16 @@ public class StartupUtil {
             String downloadURL = newversion.getString("browser_download_url");
             File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             if (!location.isFile()) {
-                Launcher.getLogger().debug("Dev version no update!");
+                LOGGER.debug("Dev version no update!");
                 return;
             }
             long size = Files.size(Paths.get(location.toURI()));
             long newsize = newversion.getNumber("size").longValue();
             if (newsize == size) {
-                Launcher.getLogger().info("The new version ({}) is equal to the old ({})", newsize, size);
+                LOGGER.info("The new version ({}) is equal to the old ({})", newsize, size);
                 return;
             }
-            Launcher.getLogger().info("Updating Launcher!");
+            LOGGER.info("Updating Launcher!");
             ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
             Path pth = Paths.get(location.toURI());
             Path tempFilePath = Paths.get(pth + ".tmp");
@@ -303,9 +308,9 @@ public class StartupUtil {
 
                 if (activeBeta != null && name.toLowerCase().contains(activeBeta.getModName())) {
                     try {
-                        if (Files.deleteIfExists(Paths.get(FileUtil.SETTINGS.baseDir, key, name))) Launcher.getLogger().info("Deleted {} in favour of {}!", name, activeBeta.getJarFileName());
+                        if (Files.deleteIfExists(Paths.get(FileUtil.SETTINGS.baseDir, key, name))) LOGGER.info("Deleted {} in favour of {}!", name, activeBeta.getJarFileName());
                     } catch (IOException e) {
-                        Launcher.getLogger().trace("Failed to delete normal mod file for beta mod: " + activeBeta.toString() + "!", e);
+                        LOGGER.trace("Failed to delete normal mod file for beta mod: " + activeBeta.toString() + "!", e);
                     }
 
                     path = Paths.get(FileUtil.SETTINGS.baseDir, key, activeBeta.getJarFileName());
@@ -338,7 +343,7 @@ public class StartupUtil {
                         String filename = incom.getFileName().toString();
                         return Files.isRegularFile(incom) && array.stream().noneMatch(job -> job.toString().contains(filename));
                     }).forEach(t -> {
-                        Launcher.getLogger().debug("Deleted file " + t);
+                        LOGGER.debug("Deleted file " + t);
                         try { // I hate this language
                             Files.deleteIfExists(t);
                         } catch (IOException e) {
@@ -428,7 +433,7 @@ public class StartupUtil {
             Optional<String> javaVers = findJavaVersion();
             if (javaVers.isEmpty()) {
                 javaVersionPath = "java";
-                Launcher.getLogger().warn("Java version not found! Falling back!");
+                LOGGER.warn("Java version not found! Falling back!");
             } else {
                 javaVersionPath = javaVers.get() + "/";
             }
