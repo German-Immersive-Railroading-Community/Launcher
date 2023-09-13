@@ -40,7 +40,7 @@ public class Footer extends StackPane {
 	// Returns the correct scene based on the authentication status. Not authenticated -> LoginScene; Authenticated -> HomeScene.
 	private static Scene getCorrectScene(Scene currentScene) {
 		if(currentScene instanceof CreditsScene) {
-			return AuthUtil.checkSession() ? Launcher.HOMESCENE : Launcher.LOGINSCENE;
+			return AuthUtil.login() ? Launcher.HOMESCENE : Launcher.LOGINSCENE;
 		}
 
 		return Launcher.CREDITSSCENE;
