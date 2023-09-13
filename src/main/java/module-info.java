@@ -10,6 +10,8 @@ module eu.girc.launcher {
     requires org.json;
     requires NBT;
 
+    exports eu.girc.launcher.models to com.google.gson;
+
     opens eu.girc.launcher.util to com.google.gson;
     opens eu.girc.launcher to javafx.graphics;
 }
