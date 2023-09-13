@@ -37,7 +37,6 @@ public class Launcher extends Application {
     public static HomeScene HOMESCENE;
     public static OptionsScene OPTIONSSCENE;
     public static LoginScene LOGINSCENE;
-    public static MojangLoginScene MOJANGLOGINSCENE;
     public static MicrosoftLoginScene MICROSOFTLOGINSCENE;
     public static CreditsScene CREDITSSCENE;
     public static OptionalModsScene OPTIONALMODSSCENE;
@@ -91,7 +90,6 @@ public class Launcher extends Application {
         OPTIONSSCENE = new OptionsScene();
         HOMESCENE = new HomeScene();
         LOGINSCENE = new LoginScene();
-        MOJANGLOGINSCENE = new MojangLoginScene();
         MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
         CREDITSSCENE = new CreditsScene();
         OPTIONALMODSSCENE = new OptionalModsScene();
@@ -101,7 +99,7 @@ public class Launcher extends Application {
     public void start(Stage stage) {
         this.stage = stage;
 
-        boolean authStatus = AuthUtil.checkSession();
+        boolean authStatus = AuthUtil.login();
         stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
 
         stage.getIcons().add(getImage("icon.png"));
