@@ -1,9 +1,10 @@
 package eu.girc.launcher.javafx;
 
 import eu.girc.launcher.Launcher;
+import eu.girc.launcher.SceneManager;
+import eu.girc.launcher.View;
 import eu.girc.launcher.util.FileUtil;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -18,18 +19,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-public class OptionalModsScene extends Scene {
+public class OptionalModsScene extends StackPane {
 
-    private static final StackPane stackPane = new StackPane();
     private static final ArrayList<CheckBox> optionalMods = new ArrayList<>();
     private static final Path modsPath = Paths.get(FileUtil.SETTINGS.baseDir, "mods");
     private static final Path optionalModsPath = Paths.get(FileUtil.SETTINGS.baseDir, "optional-mods");
 
     public OptionalModsScene() {
-        super(stackPane);
-
-        Launcher.setupScene(this, stackPane);
-
         final VBox wrapperBox = new VBox();
         wrapperBox.setMaxHeight(400);
         wrapperBox.setMaxWidth(600);
@@ -56,7 +52,7 @@ public class OptionalModsScene extends Scene {
 
         final Button backButton = new Button("Back");
         backButton.getStyleClass().add("optionButton");
-        backButton.setOnAction(ev -> Launcher.setScene(Launcher.OPTIONSSCENE));
+        backButton.setOnAction(ev -> SceneManager.switchView(View.OPTIONS));
 
         final Button refreshButton = new Button("Refresh");
         refreshButton.getStyleClass().add("optionButton");
@@ -65,13 +61,12 @@ public class OptionalModsScene extends Scene {
         buttonHBox.getChildren().addAll(backButton, refreshButton);
 
         wrapperBox.getChildren().addAll(optionalModsLabel, sp, buttonHBox);
-
-        stackPane.getChildren().add(wrapperBox);
+        getChildren().add(wrapperBox);
     }
 
     private static void RefreshOptionalMods(VBox vBox) {
         try {
-            if(!Files.exists(optionalModsPath))
+            if (!Files.exists(optionalModsPath))
                 Files.createDirectories(optionalModsPath);
 
             optionalMods.forEach(mod -> {
@@ -86,7 +81,7 @@ public class OptionalModsScene extends Scene {
                 chkBox.setSelected(FileUtil.SETTINGS.optionalMods.contains(fileName));
                 chkBox.setText(fileName.split("\\.jar$")[0]);
                 chkBox.setOnAction(ev -> {
-                    if(chkBox.isIndeterminate())
+                    if (chkBox.isIndeterminate())
                         return;
 
                     SetOptionalModState(chkBox.getText(), chkBox.isSelected());
@@ -94,7 +89,7 @@ public class OptionalModsScene extends Scene {
                 optionalMods.add(chkBox);
                 vBox.getChildren().add(chkBox);
             });
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             Launcher.onError(ioe);
         }
     }
@@ -105,8 +100,7 @@ public class OptionalModsScene extends Scene {
 
         Path optionalModPath = optionalModsPath.resolve(modName);
 
-        if(!Files.exists(optionalModPath))
-        {
+        if (!Files.exists(optionalModPath)) {
             Launcher.onError(new IOException("Could not find the mod " + optionalModPath));
             return;
         }
@@ -114,16 +108,16 @@ public class OptionalModsScene extends Scene {
         Path modPath = modsPath.resolve(modName);
 
         try {
-            if(Files.exists(modPath)) {
+            if (Files.exists(modPath)) {
                 Files.delete(modPath);
                 FileUtil.SETTINGS.optionalMods.remove(modName);
             }
 
-            if(state) {
+            if (state) {
                 Files.copy(optionalModPath, modPath);
                 FileUtil.SETTINGS.optionalMods.add(modName);
             }
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             Launcher.onError(ioe);
         }
     }

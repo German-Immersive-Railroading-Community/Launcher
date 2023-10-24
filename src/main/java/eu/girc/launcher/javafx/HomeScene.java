@@ -9,14 +9,10 @@ import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
-public class HomeScene extends Scene {
+public class HomeScene extends StackPane {
 
-	private static StackPane stackpane = new StackPane();
 
 	public HomeScene() {
-		super(stackpane);
-		Launcher.setupScene(this, stackpane);
-
 		ImageView imagelogo = new ImageView(Launcher.getImage("logo.png"));
 
 		Button launchbutton = new Button();
@@ -35,6 +31,7 @@ public class HomeScene extends Scene {
 				if ((process = StartupUtil.start()) == null) {
 					// TODO
 					launchbutton.setDisable(false);
+		getChildren().addAll(imagelogo, launchButton);
 					return;
 				}
 				try {

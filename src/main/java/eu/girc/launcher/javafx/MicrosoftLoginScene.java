@@ -1,11 +1,12 @@
 package eu.girc.launcher.javafx;
 
 import eu.girc.launcher.Launcher;
+import eu.girc.launcher.SceneManager;
+import eu.girc.launcher.View;
 import eu.girc.launcher.util.AuthUtil;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -14,26 +15,24 @@ import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import net.hycrafthd.minecraft_authenticator.login.AuthenticationException;
 import net.hycrafthd.minecraft_authenticator.login.Authenticator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 
-public class MicrosoftLoginScene extends Scene {
-
-    private static final StackPane stackpane = new StackPane();
+public class MicrosoftLoginScene extends StackPane {
+    private static final Logger logger = LogManager.getLogger();
 
     private static WebEngine engine;
 
     public MicrosoftLoginScene() {
-        super(stackpane);
-        Launcher.setupScene(this, stackpane);
-
         VBox vbox = new VBox();
         vbox.setMaxHeight(500);
         vbox.setMaxWidth(625);
         vbox.setAlignment(Pos.CENTER);
-        stackpane.getChildren().add(vbox);
+        getChildren().add(vbox);
 
         // Setup cookie manager
         final CookieManager manager = new CookieManager();
@@ -45,6 +44,7 @@ public class MicrosoftLoginScene extends Scene {
         engine = webView.getEngine();
 
         engine.setJavaScriptEnabled(true);
+        engine.setOnError(err -> logger.error("WebEngine encountered error: {}", err.getMessage(), err.getException()));
         engine.load(Authenticator.microsoftLogin().toString());
 
         webView.getEngine().getHistory().getEntries().addListener(this::loginCheck);
@@ -54,7 +54,7 @@ public class MicrosoftLoginScene extends Scene {
         final ImageView trainImageView = new ImageView(Launcher.getImage("train2.png"));
         trainImageView.setTranslateX(760 - trainImageView.getImage().getWidth());
         trainImageView.setTranslateY(325 - trainImageView.getImage().getHeight());
-        stackpane.getChildren().add(trainImageView);
+        getChildren().add(trainImageView);
     }
 
     private void loginCheck(ListChangeListener.Change<? extends WebHistory.Entry> event) {
@@ -67,7 +67,7 @@ public class MicrosoftLoginScene extends Scene {
                         AuthUtil.microsoftLogin(authCode);
                         Platform.runLater(() -> {
                             Header.setVisibility(true);
-                            Launcher.setScene(Launcher.HOMESCENE);
+                            SceneManager.switchView(View.HOME);
                         });
                     } catch (AuthenticationException ex) {
 //						 Platform.runLater(() -> error.setText("Wrong credentials!"));

@@ -4,7 +4,6 @@ import eu.girc.launcher.Launcher;
 import eu.girc.launcher.util.AuthUtil;
 import eu.girc.launcher.util.FileUtil;
 import javafx.collections.ObservableList;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -22,18 +21,13 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import java.awt.*;
 import java.io.File;
 
-public class OptionsScene extends Scene {
-
-    private static final StackPane stackpane = new StackPane();
+public class OptionsScene extends StackPane {
 
     public OptionsScene() {
-        super(stackpane);
-        Launcher.setupScene(this, stackpane);
-
         final ScrollPane sp = new ScrollPane();
         sp.setHbarPolicy(ScrollBarPolicy.NEVER);
         sp.setVbarPolicy(ScrollBarPolicy.ALWAYS);
-        stackpane.getChildren().add(sp);
+        getChildren().add(sp);
 
         final VBox vbox = new VBox();
         sp.setMaxHeight(400);
@@ -171,6 +165,6 @@ public class OptionsScene extends Scene {
         settingsTrainView.setScaleX(-1);
         settingsTrainView.setTranslateX((-1280 / 1.75) + settingsTrainView.getImage().getWidth());
         settingsTrainView.setTranslateY(360 - settingsTrainView.getImage().getHeight());
-        stackpane.getChildren().add(settingsTrainView);
+        getChildren().add(settingsTrainView);
     }
 }
