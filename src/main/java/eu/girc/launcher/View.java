@@ -8,5 +8,6 @@ public enum View {
     MSLOGIN,
     CREDITS,
     MODS,
-    ERROR
+    ERROR,
+    NONE
 }

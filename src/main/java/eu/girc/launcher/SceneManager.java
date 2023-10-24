@@ -20,6 +20,7 @@ public final class SceneManager {
     private static final Logger logger = LogManager.getLogger();
     private static final Map<View, Parent> viewCache = new HashMap<>();
 
+    private static View currentView = View.NONE;
     private static Scene currentScene;
 
     private SceneManager() {
@@ -96,5 +97,21 @@ public final class SceneManager {
         }
 
         currentScene.setRoot(root);
+    }
+
+    public static void switchError(String error) {
+        if (currentScene == null) {
+            logger.error("SceneManager was not assigned a Scene!");
+            return;
+        }
+
+        logger.debug("Switching view to ERROR");
+        Parent root = new ErrorScene(error, currentView);
+        currentView = View.ERROR;
+        currentScene.setRoot(root);
+    }
+
+    public static View getCurrentView() {
+        return currentView;
     }
 }

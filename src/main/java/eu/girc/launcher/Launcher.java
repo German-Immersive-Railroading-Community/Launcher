@@ -2,7 +2,6 @@ package eu.girc.launcher;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import eu.girc.launcher.javafx.ErrorScene;
 import eu.girc.launcher.javafx.Header;
 import eu.girc.launcher.util.AuthUtil;
 import eu.girc.launcher.util.FileUtil;
@@ -75,8 +74,7 @@ public class Launcher extends Application {
         if (getInstance().stage != null && getInstance().stage.isShowing()) {
             try (final StringWriter sw = new StringWriter(); final PrintWriter pw = new PrintWriter(sw)) {
                 e.printStackTrace(pw);
-                ErrorScene errorScene = new ErrorScene(sw.toString(), getInstance().stage.getScene());
-                Platform.runLater(() -> Launcher.setScene(errorScene));
+                Platform.runLater(() -> SceneManager.switchError(sw.toString()));
             } catch (final IOException ioe) {
                 getLogger().error("Failed to present error.", ioe);
             }
