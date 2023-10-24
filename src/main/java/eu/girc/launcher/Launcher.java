@@ -2,21 +2,18 @@ package eu.girc.launcher;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import eu.girc.launcher.javafx.*;
+import eu.girc.launcher.javafx.ErrorScene;
+import eu.girc.launcher.javafx.Header;
 import eu.girc.launcher.util.AuthUtil;
 import eu.girc.launcher.util.FileUtil;
-import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,14 +31,7 @@ public class Launcher extends Application {
      */
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    private static final List<Image> images = new ArrayList<>();
-
-    public static HomeScene HOMESCENE;
-    public static OptionsScene OPTIONSSCENE;
-    public static LoginScene LOGINSCENE;
-    public static MicrosoftLoginScene MICROSOFTLOGINSCENE;
-    public static CreditsScene CREDITSSCENE;
-    public static OptionalModsScene OPTIONALMODSSCENE;
+    private static final List<Image> backgroundImages = new ArrayList<>();
 
     private static Launcher instance = null;
     private final Logger LOGGER;
@@ -54,32 +44,6 @@ public class Launcher extends Application {
         System.setProperty("config_dir", LauncherPaths.getConfigDir().toString());
 
         LOGGER = LogManager.getLogger();
-    }
-
-    public static void setupScene(Scene scene, StackPane stackpane) {
-        final ImageView backgroundImg = new ImageView();
-
-        Transition animation = new Transition() {
-            {
-                setCycleDuration(Duration.seconds(20)); // total time for animation
-                setRate(0.5);
-                setCycleCount(INDEFINITE);
-            }
-
-            @Override
-            protected void interpolate(double fraction) {
-                int index = (int) (fraction * (images.size() - 1));
-                backgroundImg.setImage(images.get(index));
-            }
-        };
-
-        animation.play();
-
-        stackpane.getChildren().add(backgroundImg);
-        stackpane.getChildren().add(new Header(scene));
-        stackpane.getChildren().add(new Footer(scene));
-        scene.setFill(Color.TRANSPARENT);
-        scene.getStylesheets().add(getStyleSheet("style.css"));
     }
 
     public static Scene getScene() {
@@ -132,6 +96,10 @@ public class Launcher extends Application {
         return getInstance().LOGGER;
     }
 
+    public static List<Image> getBackgroundImages() {
+        return backgroundImages;
+    }
+
     public static String getStyleSheet(String name) {
         return Objects.requireNonNull(Launcher.class.getResource(name)).toExternalForm();
     }
@@ -148,7 +116,7 @@ public class Launcher extends Application {
 
             return new Image(imageStream);
         } catch (final IOException ioe) {
-            ioe.printStackTrace();
+            getLogger().error("Failed resolving image {}", name, ioe);
         }
 
         return null;
@@ -183,29 +151,24 @@ public class Launcher extends Application {
         // StartupUtil.update();
 
         // loading images into list
-        images.add(getImage("background.png"));
-        images.add(getImage("background_2.png"));
-        images.add(getImage("background_3.png"));
-        images.add(getImage("background_4.png"));
-        images.add(getImage("background_5.png"));
-        images.add(images.get(0));
-
-        OPTIONSSCENE = new OptionsScene();
-        HOMESCENE = new HomeScene();
-        LOGINSCENE = new LoginScene();
-        CREDITSSCENE = new CreditsScene();
-        OPTIONALMODSSCENE = new OptionalModsScene();
+        backgroundImages.add(getImage("background.png"));
+        backgroundImages.add(getImage("background_2.png"));
+        backgroundImages.add(getImage("background_3.png"));
+        backgroundImages.add(getImage("background_4.png"));
+        backgroundImages.add(getImage("background_5.png"));
+        backgroundImages.add(backgroundImages.get(0));
     }
 
     @Override
     public void start(Stage stage) {
         this.stage = stage;
-        MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
         boolean authStatus = AuthUtil.login();
         final Scene scene = new Scene(new Pane());
+        scene.setFill(Color.TRANSPARENT);
+        scene.getStylesheets().add(getStyleSheet("style.css"));
 
         SceneManager.setScene(scene);
-        SceneManager.switchView(authStatus ? View.HOME: View.LOGIN);
+        SceneManager.switchView(authStatus ? View.HOME : View.LOGIN);
 
         stage.getIcons().add(getImage("icon.png"));
 

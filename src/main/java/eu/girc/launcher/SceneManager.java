@@ -1,12 +1,19 @@
 package eu.girc.launcher;
 
 import eu.girc.launcher.javafx.*;
+import javafx.animation.Transition;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class SceneManager {
@@ -20,6 +27,31 @@ public final class SceneManager {
 
     public static void setScene(Scene scene) {
         currentScene = scene;
+    }
+
+    public static void setupView(View view, StackPane stackPane) {
+        final ImageView backgroundImageView = new ImageView();
+        final List<Image> backgroundImages = Launcher.getBackgroundImages();
+
+        Transition animation = new Transition() {
+            {
+                setCycleDuration(Duration.seconds(20)); // total time for animation
+                setRate(0.5);
+                setCycleCount(INDEFINITE);
+            }
+
+            @Override
+            protected void interpolate(double fraction) {
+                int index = (int) (fraction * (backgroundImages.size() - 1));
+                backgroundImageView.setImage(backgroundImages.get(index));
+            }
+        };
+
+        animation.play();
+
+        stackPane.getChildren().add(backgroundImageView);
+        stackPane.getChildren().add(new Header(view));
+        stackPane.getChildren().add(new Footer(view));
     }
 
     public static void switchView(View view) {
