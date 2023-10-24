@@ -115,7 +115,6 @@ public class Launcher extends Application {
                 Platform.runLater(() -> Launcher.setScene(errorScene));
             } catch (final IOException ioe) {
                 getLogger().error("Failed to present error.", ioe);
-                ioe.printStackTrace();
             }
         }
     }
