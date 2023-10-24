@@ -45,14 +45,6 @@ public class Launcher extends Application {
         LOGGER = LogManager.getLogger();
     }
 
-    public static Scene getScene() {
-        return getInstance().stage.getScene();
-    }
-
-    public static void setScene(Scene scene) {
-        getInstance().stage.setScene(scene);
-    }
-
     public static Stage getStage() {
         return getInstance().stage;
     }
