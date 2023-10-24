@@ -61,7 +61,7 @@ public final class SceneManager {
             return;
         }
 
-        logger.debug("Switching view to {}", view);
+        logger.debug("Switching view to {}.", view);
         Parent root;
 
         if (viewCache.containsKey(view)) {
@@ -89,7 +89,7 @@ public final class SceneManager {
                     root = new OptionalModsScene();
                     break;
                 default:
-                    logger.error("Tried switching to unsupported view {}", view);
+                    logger.error("Tried switching to unsupported view {}.", view);
                     return;
             }
 

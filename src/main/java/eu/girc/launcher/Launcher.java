@@ -153,17 +153,16 @@ public class Launcher extends Application {
     public void start(Stage stage) {
         this.stage = stage;
         boolean authStatus = AuthUtil.login();
+        Header.setVisibility(authStatus);
         final Scene scene = new Scene(new Pane());
-        scene.setFill(Color.TRANSPARENT);
-        scene.getStylesheets().add(getStyleSheet("style.css"));
+        stage.setScene(scene);
 
         SceneManager.setScene(scene);
         SceneManager.switchView(authStatus ? View.HOME : View.LOGIN);
 
+        scene.setFill(Color.TRANSPARENT);
+        scene.getStylesheets().add(getStyleSheet("style.css"));
         stage.getIcons().add(getImage("icon.png"));
-
-        Header.setVisibility(authStatus);
-
         stage.setWidth(1280);
         stage.setHeight(720);
         stage.initStyle(StageStyle.TRANSPARENT);
