@@ -28,6 +28,7 @@ public class MicrosoftLoginScene extends StackPane {
     private static WebEngine engine;
 
     public MicrosoftLoginScene() {
+        SceneManager.setupView(View.MSLOGIN, this);
         VBox vbox = new VBox();
         vbox.setMaxHeight(500);
         vbox.setMaxWidth(625);

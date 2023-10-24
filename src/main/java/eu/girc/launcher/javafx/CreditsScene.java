@@ -1,5 +1,7 @@
 package eu.girc.launcher.javafx;
 
+import eu.girc.launcher.SceneManager;
+import eu.girc.launcher.View;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -15,6 +17,7 @@ import java.net.URL;
 public class CreditsScene extends StackPane {
 
     public CreditsScene() {
+        SceneManager.setupView(View.CREDITS, this);
         ScrollPane sp = new ScrollPane();
 
         sp.setHbarPolicy(ScrollBarPolicy.NEVER);

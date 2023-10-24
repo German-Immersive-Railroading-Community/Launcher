@@ -26,6 +26,7 @@ public class OptionalModsScene extends StackPane {
     private static final Path optionalModsPath = Paths.get(FileUtil.SETTINGS.baseDir, "optional-mods");
 
     public OptionalModsScene() {
+        SceneManager.setupView(View.MODS, this);
         final VBox wrapperBox = new VBox();
         wrapperBox.setMaxHeight(400);
         wrapperBox.setMaxWidth(600);

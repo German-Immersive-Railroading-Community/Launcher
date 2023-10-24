@@ -26,6 +26,7 @@ import java.io.File;
 public class OptionsScene extends StackPane {
 
     public OptionsScene() {
+        SceneManager.setupView(View.OPTIONS, this);
         final ScrollPane sp = new ScrollPane();
         sp.setHbarPolicy(ScrollBarPolicy.NEVER);
         sp.setVbarPolicy(ScrollBarPolicy.ALWAYS);

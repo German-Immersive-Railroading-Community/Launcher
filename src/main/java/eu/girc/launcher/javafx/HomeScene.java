@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Optional;
 
 import eu.girc.launcher.Launcher;
+import eu.girc.launcher.SceneManager;
+import eu.girc.launcher.View;
 import eu.girc.launcher.util.StartupUtil;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -17,6 +19,7 @@ public class HomeScene extends StackPane {
 	private final Button launchButton;
 
 	public HomeScene() {
+		SceneManager.setupView(View.HOME, this);
 		ImageView imagelogo = new ImageView(Launcher.getImage("logo.png"));
 
 		launchButton = new Button();

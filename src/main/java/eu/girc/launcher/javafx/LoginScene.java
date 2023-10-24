@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 public class LoginScene extends StackPane {
 
     public LoginScene() {
+        SceneManager.setupView(View.LOGIN, this);
         VBox vbox = new VBox();
         vbox.setMaxHeight(400);
         vbox.setMaxWidth(625);
