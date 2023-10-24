@@ -1,5 +1,7 @@
 package eu.girc.launcher;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import eu.girc.launcher.javafx.*;
 import eu.girc.launcher.util.AuthUtil;
 import eu.girc.launcher.util.FileUtil;
@@ -30,6 +32,10 @@ import org.apache.logging.log4j.Logger;
 public class Launcher extends Application {
     private static Logger logger;
     private static Launcher instance = null;
+    /**
+     * Global GSON instance.
+     */
+    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private static final List<Image> images = new ArrayList<>();
 
