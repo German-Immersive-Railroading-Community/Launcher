@@ -8,8 +8,8 @@ module eu.girc.launcher {
     requires org.apache.commons.lang3;
     requires java.base;
     requires java.desktop;
+    requires java.net.http;
     requires net.hycrafthd.minecraft_authenticator;
-    requires org.json;
     requires NBT;
 
     exports eu.girc.launcher.models to com.google.gson;
