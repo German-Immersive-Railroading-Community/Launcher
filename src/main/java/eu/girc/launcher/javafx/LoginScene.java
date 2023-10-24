@@ -1,6 +1,8 @@
 package eu.girc.launcher.javafx;
 
 import eu.girc.launcher.Launcher;
+import eu.girc.launcher.SceneManager;
+import eu.girc.launcher.View;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -20,9 +22,7 @@ public class LoginScene extends StackPane {
         final Button microsoftLoginButton = new Button();
         microsoftLoginButton.getStyleClass().add("microsoftLoginButton");
         VBox.setMargin(microsoftLoginButton, new Insets(20, 0, 20, 0));
-        microsoftLoginButton.setOnAction(event -> {
-            Launcher.setScene(Launcher.MICROSOFTLOGINSCENE);
-        });
+        microsoftLoginButton.setOnAction(event -> SceneManager.switchView(View.MSLOGIN));
 
         vbox.getChildren().add(microsoftLoginButton);
 

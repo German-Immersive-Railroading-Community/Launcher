@@ -1,6 +1,8 @@
 package eu.girc.launcher.javafx;
 
 import eu.girc.launcher.Launcher;
+import eu.girc.launcher.SceneManager;
+import eu.girc.launcher.View;
 import eu.girc.launcher.util.AuthUtil;
 import eu.girc.launcher.util.FileUtil;
 import javafx.collections.ObservableList;
@@ -136,7 +138,7 @@ public class OptionsScene extends StackPane {
 
         final Button optionalModsButton = new Button("Optional Mods");
         optionalModsButton.getStyleClass().add("optionButton");
-        optionalModsButton.setOnAction(ev -> Launcher.setScene(Launcher.OPTIONALMODSSCENE));
+        optionalModsButton.setOnAction(ev -> SceneManager.switchView(View.MODS));
 
         final HBox logouthbox = new HBox(10);
         logouthbox.setPrefWidth(hbox.getPrefWidth());
