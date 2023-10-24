@@ -1,6 +1,8 @@
 package eu.girc.launcher.javafx;
 
 import eu.girc.launcher.Launcher;
+import eu.girc.launcher.SceneManager;
+import eu.girc.launcher.View;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -10,13 +12,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-public class ErrorScene extends Scene {
-    private static StackPane _stackPane = new StackPane();
-
-    public ErrorScene(String error, Scene sourceScene) {
-        super(_stackPane);
-
-        Launcher.setupScene(this, _stackPane);
+public class ErrorScene extends StackPane {
+    public ErrorScene(String error, View sourceView) {
+        SceneManager.setupView(View.ERROR, this);
 
         final VBox vbox = new VBox();
         vbox.setMaxWidth(750);
@@ -24,7 +22,7 @@ public class ErrorScene extends Scene {
         vbox.setAlignment(Pos.CENTER);
         vbox.setStyle("-fx-padding: 40px 80px;");
 
-        _stackPane.getChildren().add(vbox);
+        getChildren().add(vbox);
 
         final Label errorHeader = new Label();
         errorHeader.setText("Error");
@@ -38,10 +36,7 @@ public class ErrorScene extends Scene {
         errorReason.setStyle("-fx-font-size: 13px; -fx-text-inner-color: white; -fx-padding: 0px 0px 30px 0px;");
 
         final Button button = new Button();
-        button.setOnAction(ev -> {
-            _stackPane = new StackPane();
-            Launcher.setScene(sourceScene);
-        });
+        button.setOnAction(ev -> SceneManager.switchView(sourceView));
         button.getStyleClass().add("backbutton");
 
         vbox.getChildren().addAll(errorHeader, errorReason, button);
@@ -49,6 +44,6 @@ public class ErrorScene extends Scene {
         final ImageView trainImageView = new ImageView(Launcher.getImage("train1.png"));
         trainImageView.setTranslateX(720 - trainImageView.getImage().getWidth());
         trainImageView.setTranslateY(250 - trainImageView.getImage().getHeight());
-        _stackPane.getChildren().add(trainImageView);
+        getChildren().add(trainImageView);
     }
 }

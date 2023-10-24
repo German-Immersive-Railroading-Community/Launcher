@@ -7,5 +7,6 @@ public enum View {
     LOGIN,
     MSLOGIN,
     CREDITS,
-    MODS
+    MODS,
+    ERROR
 }
