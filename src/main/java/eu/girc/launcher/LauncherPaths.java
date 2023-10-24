@@ -19,6 +19,10 @@ public final class LauncherPaths {
 
     private static Path assetsDir;
 
+    private static Path objectsDir;
+
+    private static Path indexesDir;
+
     private static Path librariesDir;
 
     private static Path modsDir;
@@ -50,6 +54,8 @@ public final class LauncherPaths {
 
         configFile = configDir.resolve("config.json");
         assetsDir = configDir.resolve("assets");
+        objectsDir = assetsDir.resolve("objects");
+        indexesDir = assetsDir.resolve("indexes");
         librariesDir = configDir.resolve("libraries");
         modsDir = configDir.resolve("mods");
         authFile = configDir.resolve("ac.ce");
@@ -87,6 +93,14 @@ public final class LauncherPaths {
 
     public static Path getAssetsDir() {
         return assetsDir;
+    }
+
+    public static Path getObjectsDir() {
+        return objectsDir;
+    }
+
+    public static Path getIndexesDir() {
+        return indexesDir;
     }
 
     public static Path getLibrariesDir() {
