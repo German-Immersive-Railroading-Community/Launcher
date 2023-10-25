@@ -1,10 +1,9 @@
-package eu.girc.launcher.util;
+package eu.girc.launcher;
 
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
-import eu.girc.launcher.Launcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

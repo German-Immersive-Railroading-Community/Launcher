@@ -3,7 +3,7 @@ package eu.girc.launcher.javafx;
 import eu.girc.launcher.Launcher;
 import eu.girc.launcher.SceneManager;
 import eu.girc.launcher.View;
-import eu.girc.launcher.util.StartupUtil;
+import eu.girc.launcher.StartupUtil;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.effect.ColorAdjust;

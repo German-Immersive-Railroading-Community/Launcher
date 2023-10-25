@@ -1,7 +1,5 @@
-package eu.girc.launcher.util;
+package eu.girc.launcher;
 
-import eu.girc.launcher.Launcher;
-import eu.girc.launcher.LauncherPaths;
 import eu.girc.launcher.models.AssetIndex;
 import eu.girc.launcher.models.GirJson;
 import eu.girc.launcher.models.MojangAsset;

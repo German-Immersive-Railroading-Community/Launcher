@@ -14,6 +14,5 @@ module eu.girc.launcher {
 
     exports eu.girc.launcher.models to com.google.gson;
 
-    opens eu.girc.launcher.util to com.google.gson;
     opens eu.girc.launcher to javafx.graphics;
 }
