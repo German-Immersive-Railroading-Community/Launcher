@@ -1,6 +1,7 @@
 package eu.girc.launcher.javafx;
 
 import eu.girc.launcher.Launcher;
+import eu.girc.launcher.LauncherPaths;
 import eu.girc.launcher.SceneManager;
 import eu.girc.launcher.View;
 import eu.girc.launcher.util.FileUtil;
@@ -13,20 +14,27 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import java.awt.Desktop;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 public class OptionalModsScene extends StackPane {
 
     private static final ArrayList<CheckBox> optionalMods = new ArrayList<>();
-    private static final Path modsPath = Paths.get(FileUtil.SETTINGS.baseDir, "mods");
-    private static final Path optionalModsPath = Paths.get(FileUtil.SETTINGS.baseDir, "optional-mods");
+    private static final Path modsPath = LauncherPaths.getModsDir();
+    private static final Path optionalModsPath = LauncherPaths.getConfigDir().resolve("optional-mods");
 
     public OptionalModsScene() {
         SceneManager.setupView(View.MODS, this);
+
+        try {
+            Files.createDirectories(optionalModsPath);
+        } catch (IOException ignored) {
+        }
+
         final VBox wrapperBox = new VBox();
         wrapperBox.setMaxHeight(400);
         wrapperBox.setMaxWidth(600);
@@ -67,29 +75,26 @@ public class OptionalModsScene extends StackPane {
 
     private static void RefreshOptionalMods(VBox vBox) {
         try {
-            if (!Files.exists(optionalModsPath))
-                Files.createDirectories(optionalModsPath);
+            if (!Files.exists(optionalModsPath)) Files.createDirectories(optionalModsPath);
 
-            optionalMods.forEach(mod -> {
-                vBox.getChildren().remove(mod);
-            });
-
+            optionalMods.forEach(mod -> vBox.getChildren().remove(mod));
             optionalMods.clear();
 
-            Files.list(optionalModsPath).forEach(filePath -> {
-                String fileName = filePath.toFile().getName();
-                final CheckBox chkBox = new CheckBox();
-                chkBox.setSelected(FileUtil.SETTINGS.optionalMods.contains(fileName));
-                chkBox.setText(fileName.split("\\.jar$")[0]);
-                chkBox.setOnAction(ev -> {
-                    if (chkBox.isIndeterminate())
-                        return;
+            try (final Stream<Path> pathStream = Files.list(optionalModsPath)) {
+                pathStream.forEach(filePath -> {
+                    String fileName = filePath.getFileName().toString();
+                    final CheckBox chkBox = new CheckBox();
+                    chkBox.setSelected(FileUtil.SETTINGS.optionalMods.contains(fileName));
+                    chkBox.setText(fileName.split("\\.jar$")[0]);
+                    chkBox.setOnAction(ev -> {
+                        if (chkBox.isIndeterminate()) return;
 
-                    SetOptionalModState(chkBox.getText(), chkBox.isSelected());
+                        SetOptionalModState(chkBox.getText(), chkBox.isSelected());
+                    });
+                    optionalMods.add(chkBox);
+                    vBox.getChildren().add(chkBox);
                 });
-                optionalMods.add(chkBox);
-                vBox.getChildren().add(chkBox);
-            });
+            }
         } catch (IOException ioe) {
             Launcher.onError(ioe);
         }

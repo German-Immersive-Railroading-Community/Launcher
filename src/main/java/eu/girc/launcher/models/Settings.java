@@ -5,9 +5,13 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class Settings {
     private int width;
+
     private int height;
+
     private int ram;
+
     private List<String> optionalMods;
+
     private List<String> activatedMods;
 
     public Settings(int width, int height, int ram, List<String> optionalMods, List<String> activatedMods) {

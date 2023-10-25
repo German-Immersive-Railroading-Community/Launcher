@@ -1,13 +1,16 @@
 package eu.girc.launcher.util;
 
 import eu.girc.launcher.Launcher;
+import eu.girc.launcher.LauncherPaths;
+import eu.girc.launcher.SceneManager;
+import eu.girc.launcher.View;
+import eu.girc.launcher.models.GirJson;
 import net.hycrafthd.minecraft_authenticator.login.AuthenticationException;
 import net.hycrafthd.minecraft_authenticator.login.AuthenticationFile;
 import net.hycrafthd.minecraft_authenticator.login.Authenticator;
 import net.hycrafthd.minecraft_authenticator.login.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,18 +23,17 @@ import java.util.Optional;
 public final class AuthUtil {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final String DEFAULT_ARGS_TEMPLATE = "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userType ${user_type} --tweakClass net.minecraftforge.fml.common.launcher.FMLTweaker --versionType Forge";
+
     private static volatile User userSession;
 
-    private AuthUtil() {
-    }
+    private AuthUtil() { }
 
     public static void microsoftLogin(final String authCode) throws AuthenticationException {
         if (userSession != null) {
             return;
         }
 
-        try (OutputStream os = Files.newOutputStream(FileUtil.REMEMBERFILE)) {
+        try (OutputStream os = Files.newOutputStream(LauncherPaths.getAuthFile())) {
             final Authenticator authenticator = Authenticator.ofMicrosoft(authCode).shouldAuthenticate().build();
 
             try {
@@ -62,15 +64,15 @@ public final class AuthUtil {
             return true;
         }
 
-        if (!FileUtil.REMEMBERFILE.toFile().exists()) {
+        if (!LauncherPaths.getAuthFile().toFile().exists()) {
             return false;
         }
 
-        try (InputStream is = Files.newInputStream(FileUtil.REMEMBERFILE)) {
+        try (InputStream is = Files.newInputStream(LauncherPaths.getAuthFile())) {
             final AuthenticationFile authFile = AuthenticationFile.readCompressed(is);
             final Authenticator authenticator = Authenticator.of(authFile).shouldAuthenticate().build();
 
-            try (OutputStream os = Files.newOutputStream(FileUtil.REMEMBERFILE)) {
+            try (OutputStream os = Files.newOutputStream(LauncherPaths.getAuthFile())) {
                 try {
                     authenticator.run();
                 } catch (final AuthenticationException aex) {
@@ -89,32 +91,23 @@ public final class AuthUtil {
             final Optional<User> user = authenticator.getUser();
             userSession = user.orElse(null);
             return true;
-        } catch (final IOException ioex) {
-            LOGGER.error("Exception during authentication!", ioex);
+        } catch (final IOException ioe) {
+            LOGGER.error("Exception during authentication!", ioe);
             return false;
         }
     }
 
     public static void logout() {
         try {
-            Files.deleteIfExists(FileUtil.REMEMBERFILE);
-        } catch (final IOException ioex) {
-            Launcher.onError(ioex);
+            Files.deleteIfExists(LauncherPaths.getAuthFile());
+        } catch (final IOException ioe) {
+            Launcher.onError(ioe);
         }
         userSession = null;
-        Launcher.setScene(Launcher.LOGINSCENE);
+        SceneManager.switchView(View.LOGIN);
     }
 
-    private static String getOrDefault(final JSONObject json, final String id, final String def) {
-        if (json.has(id)) {
-            return json.getString(id);
-        }
-
-        LOGGER.warn("Couldn't find {} in {}! Using default value {}!", id, json.toString(), def);
-        return def;
-    }
-
-    public static String[] make(final JSONObject json) {
+    public static String[] make(final GirJson girJson) {
         final User user = userSession;
 
         if (user == null) {
@@ -123,17 +116,16 @@ public final class AuthUtil {
 
         Map<String, String> list = new HashMap<>();
         list.put("${auth_player_name}", user.name());
-        list.put("${version_name}", getOrDefault(json, "id", "1.12.2"));
+        list.put("${version_name}", girJson.id());
         list.put("${game_directory}", FileUtil.SETTINGS.baseDir);
         list.put("${assets_root}", FileUtil.ASSET_DIR);
 
-        final JSONObject obj = json.getJSONObject("assetIndex");
-        list.put("${assets_index_name}", getOrDefault(obj, "id", "1.12"));
+        list.put("${assets_index_name}", girJson.assetIndex().id());
         list.put("${auth_uuid}", user.uuid());
         list.put("${auth_access_token}", user.accessToken());
         list.put("${user_type}", user.type());
 
-        String[] arguments = getOrDefault(json, "minecraftArguments", DEFAULT_ARGS_TEMPLATE).split(" ");
+        String[] arguments = girJson.minecraftArguments().split(" ");
         for (int i = 0; i < arguments.length; i++) {
             String newArg = list.get(arguments[i]);
             if (newArg != null) {
@@ -142,5 +134,4 @@ public final class AuthUtil {
         }
         return arguments;
     }
-
 }

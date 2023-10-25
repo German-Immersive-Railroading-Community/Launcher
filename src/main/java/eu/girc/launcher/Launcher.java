@@ -33,7 +33,9 @@ public class Launcher extends Application {
     private static final List<Image> backgroundImages = new ArrayList<>();
 
     private static Launcher instance = null;
+
     private final Logger LOGGER;
+
     private Stage stage;
 
     public Launcher() {
@@ -49,15 +51,25 @@ public class Launcher extends Application {
         return getInstance().stage;
     }
 
+    /**
+     * Gets the Launcher instance.
+     *
+     * @return The Launcher instance.
+     */
+    public static Launcher getInstance() {
+        return instance;
+    }
+
     public static void onError(Throwable e) {
         // Return here since we cannot show any error.
         if (e == null) {
             getInstance().LOGGER.error("Error found but was passed null!");
             return;
-        } else if (e.getMessage() == null)
+        } else if (e.getMessage() == null) {
             getInstance().LOGGER.error("", e);
-        else
+        } else {
             getInstance().LOGGER.error(e.getMessage(), e);
+        }
 
         // See if this can be made better, seems overly clunky-like to me, but any other
         // method doesn't generate a stack-trace.
@@ -73,21 +85,16 @@ public class Launcher extends Application {
         }
     }
 
-    /**
-     * Gets the Launcher instance.
-     *
-     * @return The Launcher instance.
-     */
-    public static Launcher getInstance() {
-        return instance;
-    }
-
     public static Logger getLogger() {
         return getInstance().LOGGER;
     }
 
     public static List<Image> getBackgroundImages() {
         return backgroundImages;
+    }
+
+    public static InputStream getResourceAsStream(String name) {
+        return Launcher.class.getResourceAsStream(name);
     }
 
     public static String getStyleSheet(String name) {
@@ -112,17 +119,12 @@ public class Launcher extends Application {
         return null;
     }
 
-    public static InputStream getResourceAsStream(String name) {
-        return Launcher.class.getResourceAsStream(name);
-    }
-
     @Override
     public void init() {
         LOGGER.info("GIRC-Launcher v{}", BuildConfig.VERSION);
         FileUtil.readSettings();
 
-        if (FileUtil.SETTINGS == null)
-            FileUtil.SETTINGS = new FileUtil.SettingsData();
+        if (FileUtil.SETTINGS == null) FileUtil.SETTINGS = new FileUtil.SettingsData();
 
         // boolean update = false;
 
@@ -166,7 +168,7 @@ public class Launcher extends Application {
         stage.setWidth(1280);
         stage.setHeight(720);
         stage.initStyle(StageStyle.TRANSPARENT);
-        stage.setTitle("GIR Launcher");
+        stage.setTitle("GIRC-Launcher v" + BuildConfig.VERSION);
         stage.show();
     }
 

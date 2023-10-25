@@ -4,7 +4,6 @@ import eu.girc.launcher.Launcher;
 import eu.girc.launcher.SceneManager;
 import eu.girc.launcher.View;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;

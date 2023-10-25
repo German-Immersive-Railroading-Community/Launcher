@@ -1,4 +1,3 @@
 package eu.girc.launcher.models;
 
-public record LibraryDownload(LibraryArtifact artifact) {
-}
+public record LibraryDownload(LibraryArtifact artifact) { }

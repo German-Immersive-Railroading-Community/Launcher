@@ -8,13 +8,16 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 public class CreditsScene extends StackPane {
+    private final Logger logger = LogManager.getLogger();
 
     public CreditsScene() {
         SceneManager.setupView(View.CREDITS, this);
@@ -60,12 +63,11 @@ public class CreditsScene extends StackPane {
         vbox.getChildren().addAll(graficslabel, mcjeronimo, programminglabel, mrtroblebutton, derzaubererbutton, shirosakaButton, codingbytimoButton, libarieslabel, mcauthenticatorbutton, jsonbutton, minecrafterbutton, gsonbutton);
     }
 
-    public static void openWebsiteInBrowser(String url) {
+    private void openWebsiteInBrowser(String url) {
         try {
             Desktop.getDesktop().browse(new URL(url).toURI());
-        } catch (IOException | URISyntaxException exception) {
-            exception.printStackTrace();
+        } catch (final IOException | URISyntaxException ex) {
+            logger.error("Failed to open browser.", ex);
         }
     }
-
 }

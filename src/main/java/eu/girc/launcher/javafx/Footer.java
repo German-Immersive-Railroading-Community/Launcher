@@ -32,10 +32,6 @@ public class Footer extends StackPane {
         StackPane.setAlignment(this, Pos.BOTTOM_LEFT);
     }
 
-    public static void setProgress(double progress) {
-        Platform.runLater(() -> bar.set(progress));
-    }
-
     // Returns the correct scene based on the authentication status. Not authenticated -> LoginScene; Authenticated -> HomeScene.
     // TODO: Completely refactor this.
     private static View getCorrectView(View currentView) {
@@ -46,4 +42,7 @@ public class Footer extends StackPane {
         return View.CREDITS;
     }
 
+    public static void setProgress(double progress) {
+        Platform.runLater(() -> bar.set(progress));
+    }
 }

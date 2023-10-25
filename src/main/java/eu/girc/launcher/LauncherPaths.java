@@ -1,10 +1,10 @@
 package eu.girc.launcher;
 
+import org.apache.commons.lang3.SystemUtils;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.apache.commons.lang3.SystemUtils;
 
 public final class LauncherPaths {
     private static Path userHome;
@@ -31,6 +31,8 @@ public final class LauncherPaths {
 
     // TODO: to be replaced by config.json
     private static Path settings;
+
+    private LauncherPaths() { }
 
     public static void build() {
         userHome = SystemUtils.getUserHome().toPath();
@@ -68,7 +70,6 @@ public final class LauncherPaths {
         } catch (final IOException ioe) {
             ioe.printStackTrace();
         }
-
     }
 
     public static Path getUserHome() {

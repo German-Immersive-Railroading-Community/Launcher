@@ -50,12 +50,6 @@ public class Header extends StackPane {
         initializeEvents();
     }
 
-    public static void setVisibility(boolean isVisible) {
-        for (Button btn : _buttons) {
-            btn.setVisible(isVisible);
-        }
-    }
-
     private void initializeEvents() {
         this.setOnMousePressed(event -> {
             xOffset = event.getSceneX();
@@ -67,8 +61,16 @@ public class Header extends StackPane {
         });
     }
 
+    public static void setVisibility(boolean isVisible) {
+        for (Button btn : _buttons) {
+            btn.setVisible(isVisible);
+        }
+    }
+
     private enum EnumPages {
-        HOME(() -> View.HOME), OPTIONS(() -> View.OPTIONS);
+        HOME(() -> View.HOME),
+        MODS(() -> View.MODS),
+        OPTIONS(() -> View.OPTIONS);
 
         public final Supplier<View> supplier;
 
