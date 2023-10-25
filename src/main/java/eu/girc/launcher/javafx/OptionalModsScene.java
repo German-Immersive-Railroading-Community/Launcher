@@ -4,7 +4,6 @@ import eu.girc.launcher.Launcher;
 import eu.girc.launcher.LauncherPaths;
 import eu.girc.launcher.SceneManager;
 import eu.girc.launcher.View;
-import eu.girc.launcher.util.FileUtil;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -14,7 +13,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-import java.awt.Desktop;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,7 +22,9 @@ import java.util.stream.Stream;
 public class OptionalModsScene extends StackPane {
 
     private static final ArrayList<CheckBox> optionalMods = new ArrayList<>();
+
     private static final Path modsPath = LauncherPaths.getModsDir();
+
     private static final Path optionalModsPath = LauncherPaths.getConfigDir().resolve("optional-mods");
 
     public OptionalModsScene() {
@@ -84,7 +84,7 @@ public class OptionalModsScene extends StackPane {
                 pathStream.forEach(filePath -> {
                     String fileName = filePath.getFileName().toString();
                     final CheckBox chkBox = new CheckBox();
-                    chkBox.setSelected(FileUtil.SETTINGS.optionalMods.contains(fileName));
+                    //                    chkBox.setSelected(FileUtil.SETTINGS.optionalMods.contains(fileName));
                     chkBox.setText(fileName.split("\\.jar$")[0]);
                     chkBox.setOnAction(ev -> {
                         if (chkBox.isIndeterminate()) return;
@@ -116,12 +116,10 @@ public class OptionalModsScene extends StackPane {
         try {
             if (Files.exists(modPath)) {
                 Files.delete(modPath);
-                FileUtil.SETTINGS.optionalMods.remove(modName);
             }
 
             if (state) {
                 Files.copy(optionalModPath, modPath);
-                FileUtil.SETTINGS.optionalMods.add(modName);
             }
         } catch (IOException ioe) {
             Launcher.onError(ioe);

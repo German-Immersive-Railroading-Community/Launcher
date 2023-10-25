@@ -119,26 +119,7 @@ public class Launcher extends Application {
 
     @Override
     public void init() {
-        LOGGER.info("GIRC-Launcher v{}", BuildConfig.VERSION);
-        FileUtil.readSettings();
-
-        if (FileUtil.SETTINGS == null) FileUtil.SETTINGS = new FileUtil.SettingsData();
-
-        // boolean update = false;
-
-        Parameters params = getParameters();
-
-        for (String param : params.getRaw()) {
-            LOGGER.info("Iterating over parameter: " + param);
-
-            // if ("--no-update".equals(param)) {
-            // LOGGER.info("Skipping updates!");
-            // update = false;
-            // }
-        }
-
-        // if (update)
-        // StartupUtil.update();
+        logger.info("GIRC-Launcher v{}", BuildConfig.VERSION);
 
         // loading images into list
         backgroundImages.add(getImage("background.png"));
@@ -177,6 +158,6 @@ public class Launcher extends Application {
 
     @Override
     public void stop() {
-        FileUtil.saveSettings();
+
     }
 }
