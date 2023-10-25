@@ -1,3 +1,5 @@
 package eu.girc.launcher.models;
 
-public record LibraryDownload(LibraryArtifact artifact) { }
+import java.util.Map;
+
+public record LibraryDownload(LibraryArtifact artifact, Map<String, LibraryArtifact> classifiers) { }

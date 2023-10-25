@@ -15,6 +15,6 @@ public record GirJson(AssetIndex assetIndex,
                       String inheritsFrom,
                       String minecraftArguments,
                       @SerializedName("additional") AdditionalAssets additionalAssets,
-                      @SerializedName("libraries") List<LibraryAssets> libraryAssets,
+                      @SerializedName("libraries") List<LibraryAsset> libraryAssets,
                       long wholeSize,
                       List<OptionalMod> optionalMods) { }
