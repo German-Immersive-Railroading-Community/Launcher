@@ -1,22 +1,21 @@
 package eu.girc.launcher.javafx;
 
+import eu.girc.launcher.AuthManager;
 import eu.girc.launcher.Launcher;
 import eu.girc.launcher.SceneManager;
 import eu.girc.launcher.View;
-import eu.girc.launcher.util.AuthUtil;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
-import java.util.ArrayList;
 import java.util.function.Supplier;
 
 public class Header extends StackPane {
 
-    private static final ArrayList<Button> _buttons = new ArrayList<>();
     private static double xOffset = 0;
+
     private static double yOffset = 0;
 
     public Header(View view) {
@@ -27,12 +26,12 @@ public class Header extends StackPane {
                 btn.getStyleClass().add("navbar");
                 btn.setText(page.name().toUpperCase());
                 btn.setOnAction(evt -> {
-                    if (!AuthUtil.login()) return;
+                    if (!AuthManager.isLoggedIn()) return;
                     SceneManager.switchView(page.supplier.get());
                 });
+                btn.visibleProperty().bind(AuthManager.loggedInProperty());
                 hbox.getChildren().add(btn);
                 HBox.setMargin(btn, new Insets(20, 20, 20, 20));
-                _buttons.add(btn);
             }
         }
         hbox.setAlignment(Pos.CENTER);
@@ -59,12 +58,6 @@ public class Header extends StackPane {
             Launcher.getStage().setX(event.getScreenX() - xOffset);
             Launcher.getStage().setY(event.getScreenY() - yOffset);
         });
-    }
-
-    public static void setVisibility(boolean isVisible) {
-        for (Button btn : _buttons) {
-            btn.setVisible(isVisible);
-        }
     }
 
     private enum EnumPages {

@@ -2,9 +2,6 @@ package eu.girc.launcher;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import eu.girc.launcher.javafx.Header;
-import eu.girc.launcher.util.AuthUtil;
-import eu.girc.launcher.util.FileUtil;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -13,6 +10,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import net.hycrafthd.minecraft_authenticator.login.AuthenticationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +32,7 @@ public class Launcher extends Application {
 
     private static Launcher instance = null;
 
-    private final Logger LOGGER;
+    private final Logger logger;
 
     private Stage stage;
 
@@ -44,7 +42,7 @@ public class Launcher extends Application {
         LauncherPaths.build();
         System.setProperty("config_dir", LauncherPaths.getConfigDir().toString());
 
-        LOGGER = LogManager.getLogger();
+        logger = LogManager.getLogger(Launcher.class);
     }
 
     public static Stage getStage() {
@@ -63,12 +61,12 @@ public class Launcher extends Application {
     public static void onError(Throwable e) {
         // Return here since we cannot show any error.
         if (e == null) {
-            getInstance().LOGGER.error("Error found but was passed null!");
+            getInstance().logger.error("Error found but was passed null!");
             return;
         } else if (e.getMessage() == null) {
-            getInstance().LOGGER.error("", e);
+            getInstance().logger.error("", e);
         } else {
-            getInstance().LOGGER.error(e.getMessage(), e);
+            getInstance().logger.error(e.getMessage(), e);
         }
 
         // See if this can be made better, seems overly clunky-like to me, but any other
@@ -83,10 +81,6 @@ public class Launcher extends Application {
                 getLogger().error("Failed to present error.", ioe);
             }
         }
-    }
-
-    public static Logger getLogger() {
-        return getInstance().LOGGER;
     }
 
     public static List<Image> getBackgroundImages() {
@@ -117,6 +111,10 @@ public class Launcher extends Application {
         }
 
         return null;
+    }
+
+    private static Logger getLogger() {
+        return getInstance().logger;
     }
 
     @Override
@@ -154,13 +152,18 @@ public class Launcher extends Application {
     @Override
     public void start(Stage stage) {
         this.stage = stage;
-        boolean authStatus = AuthUtil.login();
-        Header.setVisibility(authStatus);
+        try {
+            AuthManager.login();
+        } catch (final IOException | AuthenticationException ex) {
+            logger.debug("Failed to login!", ex);
+            AuthManager.logout();
+        }
+
         final Scene scene = new Scene(new Pane());
         stage.setScene(scene);
 
         SceneManager.setScene(scene);
-        SceneManager.switchView(authStatus ? View.HOME : View.LOGIN);
+        SceneManager.switchView(AuthManager.isLoggedIn() ? View.HOME : View.LOGIN);
 
         scene.setFill(Color.TRANSPARENT);
         scene.getStylesheets().add(getStyleSheet("style.css"));

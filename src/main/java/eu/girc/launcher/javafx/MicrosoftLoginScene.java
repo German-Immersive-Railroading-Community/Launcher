@@ -1,9 +1,9 @@
 package eu.girc.launcher.javafx;
 
+import eu.girc.launcher.AuthManager;
 import eu.girc.launcher.Launcher;
 import eu.girc.launcher.SceneManager;
 import eu.girc.launcher.View;
-import eu.girc.launcher.util.AuthUtil;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
@@ -18,6 +18,7 @@ import net.hycrafthd.minecraft_authenticator.login.Authenticator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -65,13 +66,10 @@ public class MicrosoftLoginScene extends StackPane {
                     final String authCode = entry.getUrl().substring(entry.getUrl().indexOf("=") + 1, entry.getUrl().indexOf("&"));
 
                     try {
-                        AuthUtil.microsoftLogin(authCode);
-                        Platform.runLater(() -> {
-                            Header.setVisibility(true);
-                            SceneManager.switchView(View.HOME);
-                        });
-                    } catch (AuthenticationException ex) {
-//						 Platform.runLater(() -> error.setText("Wrong credentials!"));
+                        AuthManager.login(authCode);
+                        Platform.runLater(() -> SceneManager.switchView(View.HOME));
+                    } catch (final IOException | AuthenticationException ex) {
+                        //						 Platform.runLater(() -> error.setText("Wrong credentials!"));
                         engine.reload();
                         Launcher.onError(ex);
                     }
@@ -79,5 +77,4 @@ public class MicrosoftLoginScene extends StackPane {
             }
         }
     }
-
 }

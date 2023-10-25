@@ -1,8 +1,8 @@
 package eu.girc.launcher.javafx;
 
+import eu.girc.launcher.AuthManager;
 import eu.girc.launcher.SceneManager;
 import eu.girc.launcher.View;
-import eu.girc.launcher.util.AuthUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Pos;
@@ -32,17 +32,17 @@ public class Footer extends StackPane {
         StackPane.setAlignment(this, Pos.BOTTOM_LEFT);
     }
 
+    public static void setProgress(double progress) {
+        Platform.runLater(() -> bar.set(progress));
+    }
+
     // Returns the correct scene based on the authentication status. Not authenticated -> LoginScene; Authenticated -> HomeScene.
     // TODO: Completely refactor this.
     private static View getCorrectView(View currentView) {
         if (currentView == View.CREDITS) {
-            return AuthUtil.login() ? View.HOME : View.LOGIN;
+            return AuthManager.isLoggedIn() ? View.HOME : View.LOGIN;
         }
 
         return View.CREDITS;
-    }
-
-    public static void setProgress(double progress) {
-        Platform.runLater(() -> bar.set(progress));
     }
 }
