@@ -2,8 +2,8 @@ package eu.girc.launcher.javafx;
 
 import eu.girc.launcher.Launcher;
 import eu.girc.launcher.SceneManager;
-import eu.girc.launcher.View;
 import eu.girc.launcher.StartupUtil;
+import eu.girc.launcher.View;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.effect.ColorAdjust;
@@ -11,7 +11,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 
-import java.io.IOException;
 import java.util.Optional;
 
 public class HomeScene extends StackPane {
@@ -47,12 +46,11 @@ public class HomeScene extends StackPane {
                 }
 
                 process.get().wait();
-            } catch (final IOException | InterruptedException e) {
+            } catch (final Exception e) {
                 Launcher.onError(e);
             } finally {
                 Platform.runLater(() -> launchButton.setDisable(false));
             }
         }, "Modded Minecraft Client").start();
     }
-
 }
