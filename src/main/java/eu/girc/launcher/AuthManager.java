@@ -112,4 +112,20 @@ public final class AuthManager {
         userSession = null;
         SceneManager.switchView(View.LOGIN);
     }
+
+    public static String getUsername() {
+        return userSession.name();
+    }
+
+    public static String getUuid() {
+        return userSession.uuid();
+    }
+
+    public static String getAccessToken() {
+        return userSession.accessToken();
+    }
+
+    public static String getUserType() {
+        return userSession.type();
+    }
 }

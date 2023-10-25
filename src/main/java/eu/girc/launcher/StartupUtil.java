@@ -2,6 +2,8 @@ package eu.girc.launcher;
 
 import eu.girc.launcher.models.AssetIndex;
 import eu.girc.launcher.models.GirJson;
+import eu.girc.launcher.models.LibraryAsset;
+import eu.girc.launcher.models.LibraryDownload;
 import eu.girc.launcher.models.MojangAsset;
 import eu.girc.launcher.models.MojangAssets;
 import org.apache.logging.log4j.LogManager;
@@ -40,14 +42,29 @@ public class StartupUtil {
             return Optional.empty();
         }
 
-        List<String> args = new ArrayList<>();
-        for (String arg : girJson.minecraftArguments().split(" ")) {
+        String[] args = make_arguments(girJson);
 
+        for (String arg : args) {
+            logger.debug("Arg: {}", arg);
         }
 
-        ProcessBuilder builder = new ProcessBuilder(args).directory(LauncherPaths.getConfigDir().toFile()).redirectError(ProcessBuilder.Redirect.INHERIT).redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        return Optional.empty();
+        //        ProcessBuilder builder = new ProcessBuilder(args).directory(LauncherPaths.getConfigDir().toFile()).redirectError(ProcessBuilder.Redirect.INHERIT).redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        //
+        //        return Optional.of(builder.start());
+    }
 
-        return Optional.of(builder.start());
+    private static String[] make_arguments(GirJson girJson) {
+        return girJson.minecraftArguments()
+                      .replace("${auth_player_name}", AuthManager.getUsername())
+                      .replace("${version_name}", girJson.id())
+                      .replace("${game_directory}", LauncherPaths.getConfigDir().toString())
+                      .replace("${assets_root}", LauncherPaths.getAssetsDir().toString())
+                      .replace("${assets_index_name}", girJson.assetIndex().id())
+                      .replace("${auth_uuid}", AuthManager.getUuid())
+                      .replace("${auth_access_token}", AuthManager.getAccessToken())
+                      .replace("${user_type}", AuthManager.getUserType())
+                      .split(" ");
     }
 
     /**
@@ -62,10 +79,11 @@ public class StartupUtil {
         // this ensures that we do not start with a missing servers.dat
         ensureServersDatExists();
 
-        final List<String> libraries = new ArrayList<>();
-        downloadMinecraftAssets(girJson);
+        // downloads the latest Eclipse Temurin JDK with Java version 8
+        downloadJava8();
 
-        return libraries;
+        downloadMinecraftAssets(girJson);
+        return downloadLibraries(girJson);
     }
 
     private static void ensureServersDatExists() throws IOException {
@@ -75,6 +93,10 @@ public class StartupUtil {
             logger.warn("Couldn't find an existing servers.dat file! Recreating.");
             Files.copy(Launcher.getResourceAsStream("servers.dat"), pth);
         }
+    }
+
+    private static void downloadJava8() {
+
     }
 
     /**
@@ -114,7 +136,7 @@ public class StartupUtil {
 
         for (String key : objects.keySet()) {
             final MojangAsset asset = objects.get(key);
-            logger.debug("Downloading assets/objects/{}/{}", asset.folder(), asset.hash());
+            logger.debug("Validating or downloading assets/objects/{}/{}", asset.folder(), asset.hash());
             final Path assetParentFolder = objectsBaseDir.resolve(asset.folder());
             Files.createDirectories(assetParentFolder);
             final URI assetUri = URI.create(minecraft_resource_base_url + asset.folder() + "/" + asset.hash());
@@ -123,5 +145,22 @@ public class StartupUtil {
                 throw new IOException("Asset " + asset.hash() + " download failed.");
             }
         }
+    }
+
+    private static List<String> downloadLibraries(GirJson girJson) throws IOException, InterruptedException {
+        final List<String> finalLibraryList = new ArrayList<>();
+        final List<LibraryAsset> libraries = girJson.libraryAssets();
+
+        for (LibraryAsset library : libraries) {
+            logger.debug("Validating or downloading library {}", library.name());
+            final LibraryDownload download = library.libraryDownload();
+            if (download.artifact() == null) continue;
+            final Path path = LauncherPaths.getLibrariesDir().resolve(download.artifact().path());
+            Files.createDirectories(path.getParent());
+            finalLibraryList.add(library.name());
+            NetUtils.validateOrDownloadSha1(URI.create(download.artifact().url()), path, download.artifact().sha1());
+        }
+
+        return finalLibraryList;
     }
 }
