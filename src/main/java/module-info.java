@@ -12,6 +12,7 @@ module eu.girc.launcher {
     requires net.hycrafthd.minecraft_authenticator;
 
     exports eu.girc.launcher.models to com.google.gson;
+    exports eu.girc.launcher.models.adoptium to com.google.gson;
 
     opens eu.girc.launcher to javafx.graphics;
 }
