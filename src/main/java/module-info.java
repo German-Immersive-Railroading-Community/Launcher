@@ -10,7 +10,6 @@ module eu.girc.launcher {
     requires java.desktop;
     requires java.net.http;
     requires net.hycrafthd.minecraft_authenticator;
-    requires NBT;
 
     exports eu.girc.launcher.models to com.google.gson;
 
