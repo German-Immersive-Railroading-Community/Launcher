@@ -45,7 +45,10 @@ public class HomeScene extends StackPane {
                     return;
                 }
 
-                process.get().wait();
+                Process localProcess = process.get();
+                synchronized (localProcess) {
+                    localProcess.wait();
+                }
             } catch (final Exception e) {
                 Launcher.onError(e);
             } finally {
