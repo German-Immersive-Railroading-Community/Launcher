@@ -6,6 +6,7 @@ module eu.girc.launcher {
     requires javafx.web;
     requires org.apache.logging.log4j;
     requires org.apache.commons.lang3;
+    requires org.apache.commons.compress;
     requires java.base;
     requires java.desktop;
     requires java.net.http;
