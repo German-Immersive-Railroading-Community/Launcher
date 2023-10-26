@@ -74,6 +74,7 @@ public final class LauncherPaths {
             Files.createDirectories(assetsDir);
             Files.createDirectories(librariesDir);
             Files.createDirectories(versionsDir);
+            Files.createDirectories(modsDir);
             Files.createDirectories(java8Dir);
         } catch (final IOException ioe) {
             ioe.printStackTrace();
