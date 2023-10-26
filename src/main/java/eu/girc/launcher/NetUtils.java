@@ -102,7 +102,7 @@ public final class NetUtils {
 
         logger.debug("Validating if {} exists and SHA-1 matches", path);
         if (!validateSha1(sha1, path)) {
-            logger.debug("Failed validation");
+            logger.debug("Failed validation, deleting old file");
             path.toFile().delete();
             return downloadFile(uri, path);
         }
@@ -114,7 +114,8 @@ public final class NetUtils {
     public static Optional<Path> validateOrDownloadSha256(final URI uri, final Path path, final String sha256) throws IOException, InterruptedException {
         logger.debug("Validating if {} exists and SHA-256 matches", path);
         if (!validateSha256(sha256, path)) {
-            logger.debug("Failed validation");
+            logger.debug("Failed validation, deleting old file");
+            path.toFile().delete();
             return downloadFile(uri, path);
         }
 
@@ -129,8 +130,7 @@ public final class NetUtils {
             return false;
         }
 
-        final HashFunction sha1 = Hashing.sha1();
-        final HashCode sha1Hc = sha1.newHasher().putBytes(Files.toByteArray(filePath.toFile())).hash();
+        final HashCode sha1Hc = Hashing.sha1().hashBytes(Files.toByteArray(filePath.toFile()));
 
         final String providedSha1 = sha1Hc.toString();
         logger.debug("Expected SHA-1: {}; Provided SHA-1: {}", expectedSha1, providedSha1);
@@ -143,8 +143,7 @@ public final class NetUtils {
             return false;
         }
 
-        final HashFunction sha256 = Hashing.sha256();
-        final HashCode sha256Hc = sha256.newHasher().putBytes(Files.toByteArray(filePath.toFile())).hash();
+        final HashCode sha256Hc = Hashing.sha256().hashBytes(Files.toByteArray(filePath.toFile()));
 
         final String providedSha256 = sha256Hc.toString();
         logger.debug("Expected SHA-256: {}; Provided SHA-256: {}", providedSha256, providedSha256);
