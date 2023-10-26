@@ -1,11 +1,15 @@
 package eu.girc.launcher;
 
+import com.google.gson.reflect.TypeToken;
 import eu.girc.launcher.models.AssetIndex;
 import eu.girc.launcher.models.GirJson;
 import eu.girc.launcher.models.LibraryAsset;
 import eu.girc.launcher.models.LibraryDownload;
 import eu.girc.launcher.models.MojangAsset;
 import eu.girc.launcher.models.MojangAssets;
+import eu.girc.launcher.models.adoptium.AdoptiumArtifact;
+import eu.girc.launcher.models.adoptium.AdoptiumAsset;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,6 +38,8 @@ public class StartupUtil {
             logger.error("Couldn't download GIR.json!");
             return Optional.empty();
         }
+        // downloads the latest Eclipse Temurin JDK with Java version 8
+        final Path javaw = downloadJava8();
 
         GirJson girJson = Launcher.GSON.fromJson(Files.readString(optGirJson.get()), GirJson.class);
         List<String> libraries = prepareStart(girJson);
@@ -79,9 +85,6 @@ public class StartupUtil {
         // this ensures that we do not start with a missing servers.dat
         ensureServersDatExists();
 
-        // downloads the latest Eclipse Temurin JDK with Java version 8
-        downloadJava8();
-
         downloadMinecraftAssets(girJson);
         return downloadLibraries(girJson);
     }
@@ -95,8 +98,82 @@ public class StartupUtil {
         }
     }
 
-    private static void downloadJava8() {
+    // TODO: delete old files if new ones were detected.
 
+    /**
+     * Downloads the Java 8 Adoptium Temurin Hotspot JRE, if it does not exist and/or is outdated.
+     *
+     * @return The path to the javaw executable (/install_path/bin/javaw.exe).
+     * @throws IOException          If an I/O error occurs.
+     * @throws InterruptedException If the web request is interrupted.
+     */
+    private static Path downloadJava8() throws IOException, InterruptedException {
+        final URI adoptiumApiJavaEndpoint = URI.create(String.format("https://api.adoptium.net/v3/assets/latest/8/hotspot?architecture=%s&image_type=jre&os=%s&vendor=eclipse", getArch(), getOSShorthand()));
+        final Path temurinBasePath = LauncherPaths.getJava8Dir();
+        logger.debug("Resolving Adoptium Temurin v8 manifest");
+        TypeToken<List<AdoptiumAsset>> adoptiumAssetTypeToken = new TypeToken<>() { };
+        final Optional<List<AdoptiumAsset>> optAssets = NetUtils.downloadJson(adoptiumApiJavaEndpoint, adoptiumAssetTypeToken);
+        List<AdoptiumAsset> assets = optAssets.orElseThrow();
+
+        if (assets.isEmpty()) {
+            throw new RuntimeException("Adoptium API request returned no assets");
+        }
+
+        logger.debug("Starting validation and/or download of Adoptium Temurin v8");
+        AdoptiumAsset asset = assets.get(0);
+        AdoptiumArtifact pkg = asset.binary().rawPackage();
+        // construct important paths here
+        // pkg.name() is the archive with the os-corresponding file extension
+        final Path temurinArchive = temurinBasePath.resolve(pkg.name());
+        final Path temurinChecksum = temurinBasePath.resolve("sha256.txt");
+        final Path temurinJavaw = temurinBasePath.resolve(asset.releaseName() + "-" + asset.binary().image_type()).resolve("bin").resolve("javaw.exe");
+
+        logger.debug("Validating or downloading temurin/sha256.txt");
+        NetUtils.downloadFileIfNotExist(URI.create(pkg.checksumLink()), temurinChecksum);
+        final String checksum = Files.readString(temurinChecksum).substring(0, 64);
+        if (!checksum.equals(pkg.checksum())) {
+            logger.debug("checksum.txt mismatch with JSON checksum, redownloading checksum.txt");
+            NetUtils.downloadFile(URI.create(pkg.checksumLink()), temurinChecksum);
+        }
+
+        if (NetUtils.validateSha256(pkg.checksum(), temurinArchive)) {
+            logger.debug("Valid local temurin instance found, skipping JRE download.");
+            return temurinJavaw;
+        }
+
+        logger.debug("Validating or downloading temurin/{}", pkg.name());
+        NetUtils.validateOrDownloadSha256(URI.create(pkg.link()), temurinArchive, checksum);
+
+        if (pkg.name().endsWith(".zip")) {
+            LauncherUtils.unzipZip(temurinArchive, temurinBasePath);
+        } else if (pkg.name().endsWith(".tar.gz")) {
+            LauncherUtils.unzipGZip(temurinArchive, temurinBasePath);
+        } else {
+            throw new RuntimeException("Unsupported archive ending: " + temurinArchive.getFileName());
+        }
+
+        return temurinJavaw;
+    }
+
+    private static String getArch() {
+        return switch (SystemUtils.OS_ARCH) {
+            case "amd64" -> "x64";
+            case "x86" -> "x86";
+            default -> throw new RuntimeException("Unsupported arch: " + SystemUtils.OS_ARCH);
+        };
+    }
+
+    private static String getOSShorthand() {
+        final String osName = SystemUtils.OS_NAME.toLowerCase();
+        if (osName.contains("windows")) {
+            return "windows";
+        } else if (osName.contains("linux") || osName.contains("unix")) {
+            return "linux";
+        } else if (osName.contains("mac") || osName.contains("osx")) {
+            return "mac";
+        } else {
+            throw new UnsupportedOperationException("Unsupported OS: " + SystemUtils.OS_NAME);
+        }
     }
 
     /**
