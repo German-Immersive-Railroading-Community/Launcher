@@ -46,13 +46,11 @@ public class HomeScene extends StackPane {
                 }
 
                 Process localProcess = process.get();
-                synchronized (localProcess) {
-                    localProcess.wait();
-                }
+                localProcess.onExit().thenRun(() -> Platform.runLater(() -> launchButton.setDisable(false))).get();
             } catch (final Exception e) {
                 Launcher.onError(e);
             } finally {
-                Platform.runLater(() -> launchButton.setDisable(false));
+                launchButton.setDisable(false);
             }
         }, "Modded Minecraft Client").start();
     }
