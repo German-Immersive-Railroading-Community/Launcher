@@ -1,8 +1,10 @@
 package eu.girc.launcher;
 
 import com.google.gson.reflect.TypeToken;
+import eu.girc.launcher.models.AdditionalObject;
 import eu.girc.launcher.models.AssetIndex;
 import eu.girc.launcher.models.GirJson;
+import eu.girc.launcher.models.LibraryArtifact;
 import eu.girc.launcher.models.LibraryAsset;
 import eu.girc.launcher.models.LibraryDownload;
 import eu.girc.launcher.models.MojangAsset;
@@ -95,6 +97,7 @@ public class StartupUtil {
         ensureServersDatExists();
         final Path clientPath = downloadMinecraft(girJson);
         downloadMinecraftAssets(girJson);
+        downloadAdditionalAssets(girJson);
         final List<String> libs = downloadLibraries(girJson);
         libs.add(clientPath.toString());
         return libs;
@@ -121,6 +124,7 @@ public class StartupUtil {
     private static Path downloadJava8() throws IOException, InterruptedException {
         final URI adoptiumApiJavaEndpoint = URI.create(String.format("https://api.adoptium.net/v3/assets/latest/8/hotspot?architecture=%s&image_type=jre&os=%s&vendor=eclipse", getArch(), getOSShorthand()));
         final Path temurinBasePath = LauncherPaths.getJava8Dir();
+        Files.createDirectories(temurinBasePath);
         logger.debug("Resolving Adoptium Temurin v8 manifest");
         TypeToken<List<AdoptiumAsset>> adoptiumAssetTypeToken = new TypeToken<>() { };
         final Optional<List<AdoptiumAsset>> optAssets = NetUtils.downloadJson(adoptiumApiJavaEndpoint, adoptiumAssetTypeToken);
@@ -220,7 +224,7 @@ public class StartupUtil {
 
         // assets/indexes/1.12.json
         logger.debug("Downloading assets/indexes/{}.json", assetIndex.id());
-        Optional<Path> maybeAssetIndexFile = NetUtils.validateOrDownloadSha1(URI.create(assetIndex.url()), indexesBaseDir.resolve(assetIndex.id() + ".json"), assetIndex.sha1());
+        final Optional<Path> maybeAssetIndexFile = NetUtils.validateOrDownloadSha1(URI.create(assetIndex.url()), indexesBaseDir.resolve(assetIndex.id() + ".json"), assetIndex.sha1());
 
         if (maybeAssetIndexFile.isEmpty()) {
             throw new IOException("AssetIndex download failed.");
@@ -230,7 +234,7 @@ public class StartupUtil {
         final MojangAssets mojAssets = Launcher.GSON.fromJson(Files.readString(assetIndexFile), MojangAssets.class);
         final Map<String, MojangAsset> objects = mojAssets.objects();
 
-        for (String key : objects.keySet()) {
+        for (final String key : objects.keySet()) {
             final MojangAsset asset = objects.get(key);
             logger.debug("Validating or downloading assets/objects/{}/{}", asset.folder(), asset.hash());
             final Path assetParentFolder = objectsBaseDir.resolve(asset.folder());
@@ -247,17 +251,91 @@ public class StartupUtil {
         final List<String> finalLibraryList = new ArrayList<>();
         final List<LibraryAsset> libraries = girJson.libraryAssets();
 
-        for (LibraryAsset library : libraries) {
+        for (final LibraryAsset library : libraries) {
             logger.debug("Validating or downloading library {}", library.name());
             final LibraryDownload download = library.libraryDownload();
-            if (download.artifact() == null) continue;
-            final Path path = LauncherPaths.getLibrariesDir().resolve(download.artifact().path());
-            Files.createDirectories(path.getParent());
-            finalLibraryList.add(path.toString());
-            NetUtils.validateOrDownloadSha1(URI.create(download.artifact().url()), path, download.artifact().sha1());
+            if (download.artifact() != null) {
+                final Path path = LauncherPaths.getLibrariesDir().resolve(download.artifact().path());
+                Files.createDirectories(path.getParent());
+                finalLibraryList.add(path.toString());
+                NetUtils.validateOrDownloadSha1(URI.create(download.artifact().url()), path, download.artifact().sha1());
+            } else if (library.natives() != null && download.classifiers() != null) {
+                final Map<String, String> natives = library.natives();
+                final String osShorthand = getOSShorthand();
+
+                if (!natives.containsKey(osShorthand)) {
+                    logger.debug("Library {} no native with OS shorthand {}, skipping", library.name(), osShorthand);
+                    continue;
+                }
+
+                final String nativeKey = natives.get(osShorthand);
+                final Map<String, LibraryArtifact> classifiers = download.classifiers();
+                if (!classifiers.containsKey(nativeKey)) {
+                    logger.debug("Classifiers do not contain key {}, skipping", nativeKey);
+                    continue;
+                }
+
+                final LibraryArtifact classifier = classifiers.get(nativeKey);
+                final Path path = LauncherPaths.getLibrariesDir().resolve(classifier.path());
+                Files.createDirectories(path.getParent());
+                finalLibraryList.add(path.toString());
+                NetUtils.validateOrDownloadSha1(URI.create(classifier.url()), path, classifier.sha1());
+
+                // Extract natives
+                LauncherUtils.unzipJar(path, LauncherPaths.getLibrariesDir());
+            } else {
+                logger.debug("Library {} has no natives, artifacts, or classifiers inside of the library download, skipping", library.name());
+            }
         }
 
         return finalLibraryList;
+    }
+
+    private static void downloadAdditionalAssets(GirJson girJson) throws IOException, InterruptedException {
+        final Path modsDir = LauncherPaths.getModsDir();
+        Files.createDirectories(modsDir);
+        final List<AdditionalObject> mods = girJson.additionalAssets().mods();
+        for (final AdditionalObject mod : mods) {
+            logger.debug("Validating or downloading mod {}", mod.name());
+            final Path path = modsDir.resolve(mod.name());
+            NetUtils.validateOrDownloadSha256(URI.create(mod.url()), path, mod.sha256());
+        }
+
+        final Path modConfigsDir = LauncherPaths.getModConfigsDir();
+        Files.createDirectories(modConfigsDir);
+        final List<AdditionalObject> configs = girJson.additionalAssets().config();
+        for (final AdditionalObject config : configs) {
+            logger.debug("Validating or downloading config {}", config.name());
+            final Path path = modConfigsDir.resolve(config.name());
+            NetUtils.validateOrDownloadSha256(URI.create(config.url()), path, config.sha256());
+        }
+
+        final Path irConfigsDir = modConfigsDir.resolve("immersiverailroading");
+        Files.createDirectories(irConfigsDir);
+        final List<AdditionalObject> irConfigs = girJson.additionalAssets().irConfig();
+        for (final AdditionalObject irConfig : irConfigs) {
+            logger.debug("Validating or downloading IR-config {}", irConfig.name());
+            final Path path = irConfigsDir.resolve(irConfig.name());
+            NetUtils.validateOrDownloadSha256(URI.create(irConfig.url()), path, irConfig.sha256());
+        }
+
+        final Path resourcePacksDir = LauncherPaths.getResourcePacksDir();
+        Files.createDirectories(resourcePacksDir);
+        final List<AdditionalObject> resourcePacks = girJson.additionalAssets().resourcePacks();
+        for (final AdditionalObject resourcePack : resourcePacks) {
+            logger.debug("Validating or downloading resource pack {}", resourcePack.name());
+            final Path path = resourcePacksDir.resolve(resourcePack.name());
+            NetUtils.validateOrDownloadSha256(URI.create(resourcePack.url()), path, resourcePack.sha256());
+        }
+
+        final Path contentPacksDir = LauncherPaths.getContentPacksDir().resolve("opensignals");
+        Files.createDirectories(contentPacksDir);
+        final List<AdditionalObject> contentPacks = girJson.additionalAssets().contentPacks();
+        for (final AdditionalObject contentPack : contentPacks) {
+            logger.debug("Validating or downloading OpenSignals-ContentPack {}", contentPack.name());
+            final Path path = contentPacksDir.resolve(contentPack.name());
+            NetUtils.validateOrDownloadSha256(URI.create(contentPack.url()), path, contentPack.sha256());
+        }
     }
 
     private static String[] make_minecraft_args(GirJson girJson) {
