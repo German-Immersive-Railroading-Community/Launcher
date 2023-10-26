@@ -4,6 +4,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
+import com.google.gson.reflect.TypeToken;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,7 +38,7 @@ public final class NetUtils {
      */
     public static Optional<String> downloadString(final URI uri) throws IOException, InterruptedException {
         logger.debug("Downloading String resource from {}", uri);
-        HttpRequest req = HttpRequest.newBuilder(uri).GET().timeout(Duration.ofSeconds(3)).build();
+        HttpRequest req = HttpRequest.newBuilder(uri).GET().build();
 
         HttpResponse<String> res = client.send(req, BodyHandlers.ofString());
         if (res.statusCode() != 200) {
@@ -49,7 +50,7 @@ public final class NetUtils {
 
     public static <T> Optional<T> downloadJson(final URI uri, Class<T> clazz) throws IOException, InterruptedException {
         logger.debug("Downloading JSON resource from {}", uri);
-        HttpRequest req = HttpRequest.newBuilder(uri).GET().timeout(Duration.ofSeconds(3)).header("Content-Type", "application/json").build();
+        HttpRequest req = HttpRequest.newBuilder(uri).GET().header("Content-Type", "application/json").build();
 
         HttpResponse<String> res = client.send(req, BodyHandlers.ofString());
 
@@ -58,6 +59,43 @@ public final class NetUtils {
         }
 
         return Optional.of(Launcher.GSON.fromJson(res.body(), clazz));
+    }
+
+    public static <T> Optional<T> downloadJson(final URI uri, TypeToken<T> clazz) throws IOException, InterruptedException {
+        logger.debug("Downloading JSON resource from {}", uri);
+        HttpRequest req = HttpRequest.newBuilder(uri).GET().header("Content-Type", "application/json").build();
+
+        HttpResponse<String> res = client.send(req, BodyHandlers.ofString());
+
+        if (res.statusCode() != 200) {
+            return Optional.empty();
+        }
+
+        return Optional.of(Launcher.GSON.fromJson(res.body(), clazz));
+    }
+
+    public static Optional<Path> downloadFile(final URI uri, final Path path) throws IOException, InterruptedException {
+        logger.debug("Downloading file resource from {}", uri);
+        HttpRequest req = HttpRequest.newBuilder(uri).GET().build();
+
+        HttpResponse<Path> res = client.send(req, BodyHandlers.ofFile(path));
+
+        if (res.statusCode() != 200) {
+            return Optional.empty();
+        }
+
+        return Optional.of(res.body());
+    }
+
+    public static Optional<Path> downloadFileIfNotExist(final URI uri, final Path path) throws IOException, InterruptedException {
+        logger.debug("Checking if {} exists", path.getFileName());
+        if (path.toFile().exists()) {
+            logger.debug("File exists, returning");
+            return Optional.of(path);
+        }
+
+        logger.debug("File does not exist, downloading");
+        return downloadFile(uri, path);
     }
 
     public static Optional<Path> validateOrDownloadSha1(final URI uri, final Path path, final String sha1) throws IOException, InterruptedException {
@@ -73,19 +111,6 @@ public final class NetUtils {
         return Optional.of(path);
     }
 
-    public static Optional<Path> downloadFile(final URI uri, final Path path) throws IOException, InterruptedException {
-        logger.debug("Downloading file resource from {}", uri);
-        HttpRequest req = HttpRequest.newBuilder(uri).GET().timeout(Duration.ofSeconds(3)).build();
-
-        HttpResponse<Path> res = client.send(req, BodyHandlers.ofFile(path));
-
-        if (res.statusCode() != 200) {
-            return Optional.empty();
-        }
-
-        return Optional.of(res.body());
-    }
-
     public static Optional<Path> validateOrDownloadSha256(final URI uri, final Path path, final String sha256) throws IOException, InterruptedException {
         logger.debug("Validating if {} exists and SHA-256 matches", path);
         if (!validateSha256(sha256, path)) {
@@ -98,7 +123,7 @@ public final class NetUtils {
     }
 
     @SuppressWarnings("deprecation")
-    private static boolean validateSha1(String expectedSha1, Path filePath) throws IOException {
+    public static boolean validateSha1(String expectedSha1, Path filePath) throws IOException {
         final File file = filePath.toFile();
         if (!file.exists()) {
             return false;
@@ -112,7 +137,7 @@ public final class NetUtils {
         return expectedSha1.equals(providedSha1);
     }
 
-    private static boolean validateSha256(String expectedSha256, Path filePath) throws IOException {
+    public static boolean validateSha256(String expectedSha256, Path filePath) throws IOException {
         final File file = filePath.toFile();
         if (!file.exists()) {
             return false;
