@@ -7,6 +7,7 @@ import eu.girc.launcher.models.LibraryAsset;
 import eu.girc.launcher.models.LibraryDownload;
 import eu.girc.launcher.models.MojangAsset;
 import eu.girc.launcher.models.MojangAssets;
+import eu.girc.launcher.models.MojangDownload;
 import eu.girc.launcher.models.adoptium.AdoptiumArtifact;
 import eu.girc.launcher.models.adoptium.AdoptiumAsset;
 import org.apache.commons.lang3.SystemUtils;
@@ -18,9 +19,11 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class StartupUtil {
     private static final Logger logger = LogManager.getLogger();
@@ -48,29 +51,35 @@ public class StartupUtil {
             return Optional.empty();
         }
 
-        String[] args = make_arguments(girJson);
+        final String[] javaArgs = new String[] {
+                javaw.toString(),
+                "-Xmx8G",
+                "-Xms8G",
+                "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
+                "-Djava.library.path=" + LauncherPaths.getLibrariesDir(),
+                "-cp",
+                String.join(";", libraries),
+                girJson.mainClass(),
+                "-width",
+                "1280",
+                "-height",
+                "720"
+        };
 
-        for (String arg : args) {
-            logger.debug("Arg: {}", arg);
+        final String[] minecraftArgs = make_minecraft_args(girJson);
+
+        for (final String arg : javaArgs) {
+            logger.debug("Java arg: {}", arg);
         }
 
-        return Optional.empty();
-        //        ProcessBuilder builder = new ProcessBuilder(args).directory(LauncherPaths.getConfigDir().toFile()).redirectError(ProcessBuilder.Redirect.INHERIT).redirectOutput(ProcessBuilder.Redirect.INHERIT);
-        //
-        //        return Optional.of(builder.start());
-    }
+        for (final String arg : minecraftArgs) {
+            logger.debug("Minecraft arg: {}", arg);
+        }
 
-    private static String[] make_arguments(GirJson girJson) {
-        return girJson.minecraftArguments()
-                      .replace("${auth_player_name}", AuthManager.getUsername())
-                      .replace("${version_name}", girJson.id())
-                      .replace("${game_directory}", LauncherPaths.getConfigDir().toString())
-                      .replace("${assets_root}", LauncherPaths.getAssetsDir().toString())
-                      .replace("${assets_index_name}", girJson.assetIndex().id())
-                      .replace("${auth_uuid}", AuthManager.getUuid())
-                      .replace("${auth_access_token}", AuthManager.getAccessToken())
-                      .replace("${user_type}", AuthManager.getUserType())
-                      .split(" ");
+        final String[] finalArgs = Stream.concat(Arrays.stream(javaArgs), Arrays.stream(minecraftArgs)).toArray(String[]::new);
+
+        ProcessBuilder builder = new ProcessBuilder(finalArgs).directory(LauncherPaths.getConfigDir().toFile()).redirectError(ProcessBuilder.Redirect.INHERIT).redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        return Optional.of(builder.start());
     }
 
     /**
@@ -84,9 +93,11 @@ public class StartupUtil {
     private static List<String> prepareStart(GirJson girJson) throws IOException, InterruptedException {
         // this ensures that we do not start with a missing servers.dat
         ensureServersDatExists();
-
+        final Path clientPath = downloadMinecraft(girJson);
         downloadMinecraftAssets(girJson);
-        return downloadLibraries(girJson);
+        final List<String> libs = downloadLibraries(girJson);
+        libs.add(clientPath.toString());
+        return libs;
     }
 
     private static void ensureServersDatExists() throws IOException {
@@ -176,6 +187,14 @@ public class StartupUtil {
         }
     }
 
+    private static Path downloadMinecraft(GirJson girJson) throws IOException, InterruptedException {
+        final Path minecraftPath = LauncherPaths.getVersionsDir().resolve(girJson.inheritsFrom()).resolve(girJson.inheritsFrom() + ".jar");
+        Files.createDirectories(minecraftPath.getParent());
+        final MojangDownload clientDl = girJson.downloads().client();
+        NetUtils.validateOrDownloadSha1(URI.create(clientDl.url()), minecraftPath, clientDl.sha1());
+        return minecraftPath;
+    }
+
     /**
      * Downloads all assets required by the Minecraft client.
      *
@@ -234,10 +253,23 @@ public class StartupUtil {
             if (download.artifact() == null) continue;
             final Path path = LauncherPaths.getLibrariesDir().resolve(download.artifact().path());
             Files.createDirectories(path.getParent());
-            finalLibraryList.add(library.name());
+            finalLibraryList.add(path.toString());
             NetUtils.validateOrDownloadSha1(URI.create(download.artifact().url()), path, download.artifact().sha1());
         }
 
         return finalLibraryList;
+    }
+
+    private static String[] make_minecraft_args(GirJson girJson) {
+        return girJson.minecraftArguments()
+                      .replace("${auth_player_name}", AuthManager.getUsername())
+                      .replace("${version_name}", girJson.id())
+                      .replace("${game_directory}", LauncherPaths.getConfigDir().toString())
+                      .replace("${assets_root}", LauncherPaths.getAssetsDir().toString())
+                      .replace("${assets_index_name}", girJson.assetIndex().id())
+                      .replace("${auth_uuid}", AuthManager.getUuid())
+                      .replace("${auth_access_token}", AuthManager.getAccessToken())
+                      .replace("${user_type}", AuthManager.getUserType())
+                      .split(" ");
     }
 }
