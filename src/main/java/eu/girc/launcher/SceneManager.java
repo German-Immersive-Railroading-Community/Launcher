@@ -104,6 +104,7 @@ public final class SceneManager {
             viewCache.put(view, root);
         }
 
+        currentView = view;
         currentScene.setRoot(root);
     }
 
@@ -113,7 +114,7 @@ public final class SceneManager {
             return;
         }
 
-        logger.debug("Switching view to ERROR");
+        logger.debug("Switching to error view");
         Parent root = new ErrorScene(error, currentView);
         currentView = View.ERROR;
         currentScene.setRoot(root);
