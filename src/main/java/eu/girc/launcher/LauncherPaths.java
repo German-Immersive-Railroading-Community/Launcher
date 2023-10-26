@@ -29,6 +29,12 @@ public final class LauncherPaths {
 
     private static Path modsDir;
 
+    private static Path modConfigsDir;
+
+    private static Path resourcePacksDir;
+
+    private static Path contentPacksDir;
+
     private static Path authFile;
 
     private static Path java8Dir;
@@ -65,6 +71,9 @@ public final class LauncherPaths {
         librariesDir = configDir.resolve("libraries");
         versionsDir = configDir.resolve("versions");
         modsDir = configDir.resolve("mods");
+        modConfigsDir = configDir.resolve("config");
+        resourcePacksDir = configDir.resolve("resourcepacks");
+        contentPacksDir = configDir.resolve("contentpacks");
         authFile = configDir.resolve("ac.ce");
         java8Dir = configDir.resolve("temurin");
         settings = userHome.resolve(".launcher").resolve("settings.json");
@@ -74,7 +83,6 @@ public final class LauncherPaths {
             Files.createDirectories(assetsDir);
             Files.createDirectories(librariesDir);
             Files.createDirectories(versionsDir);
-            Files.createDirectories(modsDir);
             Files.createDirectories(java8Dir);
         } catch (final IOException ioe) {
             ioe.printStackTrace();
@@ -121,6 +129,18 @@ public final class LauncherPaths {
 
     public static Path getModsDir() {
         return modsDir;
+    }
+
+    public static Path getModConfigsDir() {
+        return modConfigsDir;
+    }
+
+    public static Path getResourcePacksDir() {
+        return resourcePacksDir;
+    }
+
+    public static Path getContentPacksDir() {
+        return contentPacksDir;
     }
 
     public static Path getAuthFile() {
