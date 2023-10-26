@@ -8,5 +8,4 @@ public record AdditionalAssets(List<AdditionalObject> mods,
                                List<AdditionalObject> config,
                                @SerializedName("config/immersiverailroading") List<AdditionalObject> irConfig,
                                @SerializedName("resourcepacks") List<AdditionalObject> resourcePacks,
-                               @SerializedName("contentpacks/opensignals/") List<AdditionalObject> contentPacks) {
-}
+                               @SerializedName("contentpacks/opensignals") List<AdditionalObject> contentPacks) { }
