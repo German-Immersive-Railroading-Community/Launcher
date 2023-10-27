@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration>
+<Configuration status="info">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
-        <RollingRandomAccessFile name="File" fileName="./logs/latest.log" filePattern="./logs/%d{yyyy-MM-dd}-%i.log.gz">
+        <RollingRandomAccessFile name="File" fileName="${sys:config_dir}/logs/latest.log" filePattern="${sys:config_dir}/logs/%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
                 <OnStartupTriggeringPolicy/>
             </Policies>
         </RollingRandomAccessFile>
+        <Sentry name="Sentry" dsn="https://718e75aba2cc4d92a8ed8b5641fe5b1d@sentry.girc.eu/2"/>
     </Appenders>
     <Loggers>
         <Root level="all">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="File"/>
+            <AppenderRef ref="Sentry"/>
         </Root>
     </Loggers>
 </Configuration>

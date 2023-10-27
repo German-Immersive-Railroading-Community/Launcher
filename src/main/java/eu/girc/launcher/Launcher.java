@@ -1,9 +1,18 @@
 package eu.girc.launcher;
 
-import eu.girc.launcher.javafx.*;
-import eu.girc.launcher.util.AuthUtil;
-import eu.girc.launcher.util.FileUtil;
-import eu.girc.launcher.util.StartupUtil;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import net.hycrafthd.minecraft_authenticator.login.AuthenticationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,182 +22,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javafx.animation.Transition;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.util.Duration;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class Launcher extends Application {
-    private static Logger logger;
+    /**
+     * Global GSON instance.
+     */
+    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    private static final List<Image> backgroundImages = new ArrayList<>();
+
     private static Launcher instance = null;
-    private static boolean beta_mode = false;
 
-    private static final List<Image> images = new ArrayList<>();
-
-    public static HomeScene HOMESCENE;
-    public static OptionsScene OPTIONSSCENE;
-    public static LoginScene LOGINSCENE;
-    public static MicrosoftLoginScene MICROSOFTLOGINSCENE;
-    public static CreditsScene CREDITSSCENE;
-    public static OptionalModsScene OPTIONALMODSSCENE;
+    private final Logger logger;
 
     private Stage stage;
 
     public Launcher() {
         instance = this;
-    }
 
-    @Override
-    public void init() {
-        FileUtil.init();
-        FileUtil.readSettings();
+        LauncherPaths.build();
+        System.setProperty("config_dir", LauncherPaths.getConfigDir().toString());
 
-        if (FileUtil.SETTINGS == null)
-            FileUtil.SETTINGS = new FileUtil.SettingsData();
-
-        System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
-        logger = LogManager.getLogger("GIRC");
-        logger.info("Initializing...");
-
-        boolean update = true;
-
-        Parameters params = getParameters();
-
-        for (String param : params.getRaw()) {
-            logger.info("Iterating over parameter: " + param);
-
-            if ("--no-update".equals(param)) {
-                logger.info("Skipping updates!");
-                update = false;
-            } else if ("-eb".equals(param) || "--enable-beta".equals(param)) {
-                logger.info("Enabling access to beta versions.");
-                beta_mode = true;
-                StartupUtil.refreshBetaJson();
-            }
-        }
-
-        if (update)
-            StartupUtil.update();
-
-        // loading images into list
-        images.add(getImage("background.png"));
-        images.add(getImage("background_2.png"));
-        images.add(getImage("background_3.png"));
-        images.add(getImage("background_4.png"));
-        images.add(getImage("background_5.png"));
-        images.add(images.get(0));
-
-        OPTIONSSCENE = new OptionsScene();
-        HOMESCENE = new HomeScene();
-        LOGINSCENE = new LoginScene();
-        MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
-        CREDITSSCENE = new CreditsScene();
-        OPTIONALMODSSCENE = new OptionalModsScene();
-    }
-
-    @Override
-    public void start(Stage stage) {
-        this.stage = stage;
-
-        boolean authStatus = AuthUtil.login();
-        stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
-
-        stage.getIcons().add(getImage("icon.png"));
-
-        Header.setVisibility(authStatus);
-
-        stage.setWidth(1280);
-        stage.setHeight(720);
-        stage.initStyle(StageStyle.TRANSPARENT);
-        stage.setTitle("GIR Launcher");
-        stage.show();
-    }
-
-    @Override
-    public void stop() {
-        FileUtil.saveSettings();
-    }
-
-    public static void setupScene(Scene scene, StackPane stackpane) {
-        final ImageView backgroundImg = new ImageView();
-
-        Transition animation = new Transition() {
-            {
-                setCycleDuration(Duration.seconds(20)); // total time for animation
-                setRate(0.5);
-                setCycleCount(INDEFINITE);
-            }
-
-            @Override
-            protected void interpolate(double fraction) {
-                int index = (int) (fraction * (images.size() - 1));
-                backgroundImg.setImage(images.get(index));
-            }
-        };
-
-        animation.play();
-
-        stackpane.getChildren().add(backgroundImg);
-        stackpane.getChildren().add(new Header(scene));
-        stackpane.getChildren().add(new Footer(scene));
-        scene.setFill(Color.TRANSPARENT);
-        scene.getStylesheets().add(getStyleSheet("style.css"));
-    }
-
-    public static boolean getBetaMode() {
-        return beta_mode;
-    }
-
-    public static Scene getScene() {
-        return getInstance().stage.getScene();
-    }
-
-    public static void setScene(Scene scene) {
-        getInstance().stage.setScene(scene);
+        logger = LogManager.getLogger(Launcher.class);
     }
 
     public static Stage getStage() {
         return getInstance().stage;
-    }
-
-    public static void onError(Throwable e) {
-        // Return here since we cannot show any error.
-        if (e == null) {
-            logger.error("Error found but was passed null!");
-            return;
-        } else if (e.getMessage() == null)
-            logger.trace("", e);
-        else
-            logger.trace(e.getMessage(), e);
-
-        // See if this can be made better, seems overly clunky-like to me, but any other method doesn't generate a stack-trace.
-        // toString and getMessage only return the String representation of what the exception actually is.
-        if (getInstance().stage != null && getInstance().stage.isShowing()) {
-            try {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-
-                e.printStackTrace(pw);
-
-                ErrorScene errorScene = new ErrorScene(sw.toString(), getInstance().stage.getScene());
-
-                Platform.runLater(() -> Launcher.setScene(errorScene));
-
-                sw.close();
-                pw.close();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -200,8 +58,37 @@ public class Launcher extends Application {
         return instance;
     }
 
-    public static Logger getLogger() {
-        return logger;
+    public static void onError(Throwable e) {
+        // Return here since we cannot show any error.
+        if (e == null) {
+            getInstance().logger.error("Error found but was passed null!");
+            return;
+        } else if (e.getMessage() == null) {
+            getInstance().logger.error("", e);
+        } else {
+            getInstance().logger.error(e.getMessage(), e);
+        }
+
+        // See if this can be made better, seems overly clunky-like to me, but any other
+        // method doesn't generate a stack-trace.
+        // toString and getMessage only return the String representation of what the
+        // exception actually is.
+        if (getInstance().stage != null && getInstance().stage.isShowing()) {
+            try (final StringWriter sw = new StringWriter(); final PrintWriter pw = new PrintWriter(sw)) {
+                e.printStackTrace(pw);
+                Platform.runLater(() -> SceneManager.switchError(sw.toString()));
+            } catch (final IOException ioe) {
+                getLogger().error("Failed to present error.", ioe);
+            }
+        }
+    }
+
+    public static List<Image> getBackgroundImages() {
+        return backgroundImages;
+    }
+
+    public static InputStream getResourceAsStream(String name) {
+        return Launcher.class.getResourceAsStream(name);
     }
 
     public static String getStyleSheet(String name) {
@@ -209,7 +96,6 @@ public class Launcher extends Application {
     }
 
     /**
-     *
      * @param name The name of the image to retrieve.
      * @return The image, or null if not found or an exception occurs.
      */
@@ -221,13 +107,57 @@ public class Launcher extends Application {
 
             return new Image(imageStream);
         } catch (final IOException ioe) {
-            ioe.printStackTrace();
+            getLogger().error("Failed resolving image {}", name, ioe);
         }
 
         return null;
     }
 
-    public static InputStream getResourceAsStream(String name) {
-        return Launcher.class.getResourceAsStream(name);
+    private static Logger getLogger() {
+        return getInstance().logger;
+    }
+
+    @Override
+    public void init() {
+        logger.info("GIRC-Launcher v{}", BuildConfig.VERSION);
+
+        // loading images into list
+        backgroundImages.add(getImage("background.png"));
+        backgroundImages.add(getImage("background_2.png"));
+        backgroundImages.add(getImage("background_3.png"));
+        backgroundImages.add(getImage("background_4.png"));
+        backgroundImages.add(getImage("background_5.png"));
+        backgroundImages.add(backgroundImages.get(0));
+    }
+
+    @Override
+    public void start(Stage stage) {
+        this.stage = stage;
+        try {
+            AuthManager.login();
+        } catch (final IOException | AuthenticationException ex) {
+            logger.debug("Failed to login!", ex);
+            AuthManager.logout();
+        }
+
+        final Scene scene = new Scene(new Pane());
+        stage.setScene(scene);
+
+        SceneManager.setScene(scene);
+        SceneManager.switchView(AuthManager.isLoggedIn() ? View.HOME : View.LOGIN);
+
+        scene.setFill(Color.TRANSPARENT);
+        scene.getStylesheets().add(getStyleSheet("style.css"));
+        stage.getIcons().add(getImage("icon.png"));
+        stage.setWidth(1280);
+        stage.setHeight(720);
+        stage.initStyle(StageStyle.TRANSPARENT);
+        stage.setTitle("GIRC-Launcher v" + BuildConfig.VERSION);
+        stage.show();
+    }
+
+    @Override
+    public void stop() {
+
     }
 }

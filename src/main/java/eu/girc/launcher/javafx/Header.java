@@ -1,89 +1,74 @@
 package eu.girc.launcher.javafx;
 
-import java.util.ArrayList;
-import java.util.function.Supplier;
-
+import eu.girc.launcher.AuthManager;
 import eu.girc.launcher.Launcher;
-
-import eu.girc.launcher.util.AuthUtil;
-import javafx.event.EventHandler;
+import eu.girc.launcher.SceneManager;
+import eu.girc.launcher.View;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
+import java.util.function.Supplier;
+
 public class Header extends StackPane {
 
-	private static double xOffset = 0;
-	private static double yOffset = 0;
+    private static double xOffset = 0;
 
-	private static enum EnumPages {
-		HOME(() -> Launcher.HOMESCENE), OPTIONS(() -> Launcher.OPTIONSSCENE);
+    private static double yOffset = 0;
 
-		public final Supplier<Scene> supplier;
+    public Header(View view) {
+        HBox hbox = new HBox();
+        if (view != View.LOGIN) {
+            for (EnumPages page : EnumPages.values()) {
+                Button btn = new Button();
+                btn.getStyleClass().add("navbar");
+                btn.setText(page.name().toUpperCase());
+                btn.setOnAction(evt -> {
+                    if (!AuthManager.isLoggedIn()) return;
+                    SceneManager.switchView(page.supplier.get());
+                });
+                btn.visibleProperty().bind(AuthManager.loggedInProperty());
+                hbox.getChildren().add(btn);
+                HBox.setMargin(btn, new Insets(20, 20, 20, 20));
+            }
+        }
+        hbox.setAlignment(Pos.CENTER);
 
-		private EnumPages(Supplier<Scene> run) {
-			this.supplier = run;
-		}
-	}
+        Button closebutton = new Button();
+        closebutton.getStyleClass().add("closebutton");
+        closebutton.setOnAction(event -> System.exit(0));
+        closebutton.setTranslateX(-20);
+        closebutton.setTranslateY(20);
+        StackPane.setAlignment(closebutton, Pos.TOP_RIGHT);
 
-	private static final ArrayList<Button> _buttons = new ArrayList<>();
+        this.getChildren().addAll(hbox, closebutton);
+        this.setMaxHeight(85);
+        StackPane.setAlignment(this, Pos.TOP_CENTER);
+        initializeEvents();
+    }
 
-	public Header(Scene scene) {
-		HBox hbox = new HBox();
-		if (!(scene instanceof LoginScene)) {
-			for (EnumPages page : EnumPages.values()) {
-				Button btn = new Button();
-				btn.getStyleClass().add("navbar");
-				btn.setText(page.name().toUpperCase());
-				btn.setOnAction(evt -> {
-					if(!AuthUtil.login()) return;
-					Launcher.setScene(page.supplier.get());
-				});
-				hbox.getChildren().add(btn);
-				HBox.setMargin(btn, new Insets(20, 20, 20, 20));
-				_buttons.add(btn);
-			}
-		}
-		hbox.setAlignment(Pos.CENTER);
+    private void initializeEvents() {
+        this.setOnMousePressed(event -> {
+            xOffset = event.getSceneX();
+            yOffset = event.getSceneY();
+        });
+        this.setOnMouseDragged(event -> {
+            Launcher.getStage().setX(event.getScreenX() - xOffset);
+            Launcher.getStage().setY(event.getScreenY() - yOffset);
+        });
+    }
 
-		Button closebutton = new Button();
-		closebutton.getStyleClass().add("closebutton");
-		closebutton.setOnAction(event -> System.exit(0));
-		closebutton.setTranslateX(-20);
-		closebutton.setTranslateY(20);
-		StackPane.setAlignment(closebutton, Pos.TOP_RIGHT);
+    private enum EnumPages {
+        HOME(() -> View.HOME),
+        MODS(() -> View.MODS),
+        OPTIONS(() -> View.OPTIONS);
 
-		this.getChildren().addAll(hbox, closebutton);
-		this.setMaxHeight(85);
-		StackPane.setAlignment(this, Pos.TOP_CENTER);
-		initializeEvents();
-	}
+        public final Supplier<View> supplier;
 
-	private void initializeEvents() {
-		this.setOnMousePressed(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				xOffset = event.getSceneX();
-				yOffset = event.getSceneY();
-			}
-		});
-		this.setOnMouseDragged(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				Launcher.getStage().setX(event.getScreenX() - xOffset);
-				Launcher.getStage().setY(event.getScreenY() - yOffset);
-			}
-		});
-	}
-
-	public static void setVisibility(boolean isVisible) {
-		for(Button btn : _buttons) {
-			btn.setVisible(isVisible);
-		}
-	}
-
+        EnumPages(Supplier<View> run) {
+            this.supplier = run;
+        }
+    }
 }
