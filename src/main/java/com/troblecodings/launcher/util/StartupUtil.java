@@ -76,7 +76,7 @@ public class StartupUtil {
 			if (refreshBetaData || !Files.exists(betaJsonPath))
 				refreshBetaJson();
 
-			JSONObject root = new JSONObject(Files.readString(betaJsonPath));
+			JSONObject root = new JSONObject(new String(Files.readAllBytes(betaJsonPath)));
 
 			root.keySet().forEach(key -> {
 				JSONObject mod = root.getJSONObject(key);
