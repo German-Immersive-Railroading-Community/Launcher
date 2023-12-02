@@ -89,7 +89,6 @@ public class Launcher extends Application {
         HOMESCENE = new HomeScene();
         LOGINSCENE = new LoginScene();
         MOJANGLOGINSCENE = new MojangLoginScene();
-        MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
         CREDITSSCENE = new CreditsScene();
         OPTIONALMODSSCENE = new OptionalModsScene();
     }
@@ -97,6 +96,7 @@ public class Launcher extends Application {
     @Override
     public void start(Stage stage) {
         this.stage = stage;
+        MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
 
         boolean authStatus = AuthUtil.checkSession();
         stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);

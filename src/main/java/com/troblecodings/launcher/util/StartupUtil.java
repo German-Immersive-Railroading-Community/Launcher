@@ -226,6 +226,7 @@ public class StartupUtil {
 	@SuppressWarnings("unchecked")
 	private static String[] prestart() {
 		try {
+			addServerToData();
 			String clientJson = FileUtil.SETTINGS.baseDir + "/GIR.json";
 			ConnectionUtil.download("https://girc.eu/Launcher/GIR.json", clientJson);
 
