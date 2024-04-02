@@ -2,6 +2,8 @@ package eu.girc.launcher;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import io.sentry.Sentry;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -38,6 +40,16 @@ public class Launcher extends Application {
 
     public Launcher() {
         instance = this;
+
+        Sentry.init(options -> {
+            options.setDsn("https://486fb1568dc21f00a6653dc9abc214b2@sentry.girc.eu/6");
+            options.setRelease("eu.girc.launcher@" + BuildConfig.VERSION);
+
+            // Warning suppressed, because BuildConfig.VERSION can change between version changes
+            @SuppressWarnings("ConstantValue") final String env = BuildConfig.VERSION.endsWith("-dev") ? "development" : "production";
+
+            options.setEnvironment(env);
+        });
 
         LauncherPaths.build();
         System.setProperty("config_dir", LauncherPaths.getConfigDir().toString());

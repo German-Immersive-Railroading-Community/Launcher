@@ -11,6 +11,7 @@ module eu.girc.launcher {
     requires java.desktop;
     requires java.net.http;
     requires net.hycrafthd.minecraft_authenticator;
+    requires sentry;
 
     exports eu.girc.launcher.models to com.google.gson;
     exports eu.girc.launcher.models.adoptium to com.google.gson;
