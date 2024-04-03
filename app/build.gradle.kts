@@ -11,18 +11,6 @@ plugins {
     id("org.beryx.jlink") version "3.0.1"
 }
 
-group = "eu.girc.launcher"
-version = "1.1.0-dev"
-
-sentry {
-    debug = true
-    telemetry = false
-    includeSourceContext = true
-    org = "girc"
-    projectName = "gir-launcher-java"
-    authToken = System.getenv("SENTRY_AUTH_TOKEN")
-}
-
 repositories {
     mavenCentral()
 
