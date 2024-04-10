@@ -4,9 +4,17 @@ plugins {
     id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
-repositories {
-    mavenCentral()
+modularity.moduleVersion(project.version.toString().split("+")[0].replace("-dev", ""))
 
+buildConfig {
+    className("BuildConfig")
+    packageName("eu.girc.launcher")
+    useJavaOutput()
+
+    buildConfigField<String>("VERSION", "${project.version}")
+}
+
+repositories {
     maven {
         url = uri("https://repo.u-team.info")
     }
