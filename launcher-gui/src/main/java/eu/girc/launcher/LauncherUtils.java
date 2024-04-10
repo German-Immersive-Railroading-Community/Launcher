@@ -55,7 +55,7 @@ public final class LauncherUtils {
     public static void unzipZip(Path archive, Path baseLocation) throws IOException {
         logger.debug("Starting unzipZip of {} to {}", archive, baseLocation);
         Files.createDirectories(baseLocation);
-        try (final ZipFile zipFile = new ZipFile(archive)) {
+        try (final ZipFile zipFile = ZipFile.builder().setFile(archive.toFile()).get()) {
             logger.debug("Zip file opened");
             final Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
             final byte[] buffer = new byte[1024];
@@ -79,7 +79,7 @@ public final class LauncherUtils {
                 }
             }
         }
-        logger.debug("Unzip finished", archive, baseLocation);
+        logger.debug("Unzip finished: {} -> {}", archive, baseLocation);
     }
 
     public static void unzipGZip(Path archive, Path baseLocation) throws IOException {
