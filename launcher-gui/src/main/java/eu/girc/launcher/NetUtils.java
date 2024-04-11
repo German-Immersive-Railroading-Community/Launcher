@@ -1,7 +1,6 @@
 package eu.girc.launcher;
 
 import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.google.gson.reflect.TypeToken;
@@ -103,7 +102,7 @@ public final class NetUtils {
         logger.debug("Validating if {} exists and SHA-1 matches", path);
         if (!validateSha1(sha1, path)) {
             logger.debug("Failed validation, deleting old file");
-            path.toFile().delete();
+            java.nio.file.Files.delete(path);
             return downloadFile(uri, path);
         }
 
@@ -115,7 +114,7 @@ public final class NetUtils {
         logger.debug("Validating if {} exists and SHA-256 matches", path);
         if (!validateSha256(sha256, path)) {
             logger.debug("Failed validation, deleting old file");
-            path.toFile().delete();
+            java.nio.file.Files.delete(path);
             return downloadFile(uri, path);
         }
 

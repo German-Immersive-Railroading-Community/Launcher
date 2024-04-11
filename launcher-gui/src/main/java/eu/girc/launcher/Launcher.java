@@ -46,7 +46,7 @@ public class Launcher extends Application {
             options.setRelease("eu.girc.launcher@" + BuildConfig.VERSION);
 
             // Warning suppressed, because BuildConfig.VERSION can change between version changes
-            @SuppressWarnings("ConstantValue") final String env = BuildConfig.VERSION.endsWith("-dev") ? "development" : "production";
+            @SuppressWarnings({ "ConstantValue", "UnreachableCode" }) final String env = BuildConfig.VERSION.endsWith("-dev") ? "development" : "production";
 
             options.setEnvironment(env);
         });
@@ -131,7 +131,7 @@ public class Launcher extends Application {
 
     @Override
     public void init() {
-        logger.info("GIRC-Launcher v{}", BuildConfig.VERSION);
+        logger.info("GIR-Launcher v{}", BuildConfig.VERSION);
 
         // loading images into list
         backgroundImages.add(getImage("background.png"));
@@ -139,7 +139,7 @@ public class Launcher extends Application {
         backgroundImages.add(getImage("background_3.png"));
         backgroundImages.add(getImage("background_4.png"));
         backgroundImages.add(getImage("background_5.png"));
-        backgroundImages.add(backgroundImages.get(0));
+        backgroundImages.add(backgroundImages.getFirst());
     }
 
     @Override

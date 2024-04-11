@@ -53,6 +53,7 @@ public class StartupUtil {
             return Optional.empty();
         }
 
+        // TODO: Add jvm args customisation to settings
         final String[] javaArgs = new String[] {
                 javaw.toString(),
                 "-Xmx8G",
@@ -135,7 +136,7 @@ public class StartupUtil {
         }
 
         logger.debug("Starting validation and/or download of Adoptium Temurin v8");
-        AdoptiumAsset asset = assets.get(0);
+        AdoptiumAsset asset = assets.getFirst();
         AdoptiumArtifact pkg = asset.binary().rawPackage();
         // construct important paths here
         // pkg.name() is the archive with the os-corresponding file extension
