@@ -1,4 +1,4 @@
-package eu.girc.launcher.models;
+package eu.girc.launcher.core.models;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -1,4 +1,4 @@
-package eu.girc.launcher.models.adoptium;
+package eu.girc.launcher.core.models.adoptium;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -32,6 +32,7 @@ application {
 }
 
 dependencies {
+    implementation(project(":launcher-core"))
     implementation("org.apache.logging.log4j:log4j-core:2.17.2")
     implementation("org.apache.commons:commons-lang3:3.13.0")
     implementation("org.apache.commons:commons-compress:1.26.1")
