@@ -1,10 +1,7 @@
 plugins {
-    java
-    application
+    id("gir-launcher.java-application-conventions")
     id("org.openjfx.javafxplugin") version "0.1.0"
 }
-
-modularity.moduleVersion(project.version.toString().split("+")[0].replace("-dev", ""))
 
 buildConfig {
     className("BuildConfig")

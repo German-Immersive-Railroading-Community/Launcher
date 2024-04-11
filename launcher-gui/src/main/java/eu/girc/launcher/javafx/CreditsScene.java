@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -65,8 +66,8 @@ public class CreditsScene extends StackPane {
 
     private void openWebsiteInBrowser(String url) {
         try {
-            Desktop.getDesktop().browse(new URL(url).toURI());
-        } catch (final IOException | URISyntaxException ex) {
+            Desktop.getDesktop().browse(URI.create(url));
+        } catch (final IOException ex) {
             logger.error("Failed to open browser.", ex);
         }
     }
