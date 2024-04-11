@@ -1,2 +1,2 @@
 rootProject.name = "gir-launcher"
-include("launcher-gui")
+include("launcher-gui", "launcher-core")

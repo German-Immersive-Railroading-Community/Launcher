@@ -33,6 +33,6 @@ sentry {
 
     includeDependenciesReport = true
     includeSourceContext = sentryToken.isNotBlank()
-    additionalSourceDirsForSourceContext = listOf("launcher-gui/src/main/java")
+    additionalSourceDirsForSourceContext = listOf("launcher-gui/src/main/java", "launcher-core/src/main/java")
     authToken = sentryToken
 }
