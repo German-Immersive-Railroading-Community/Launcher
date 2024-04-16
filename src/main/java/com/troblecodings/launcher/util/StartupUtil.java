@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import javax.swing.JButton;
 import javax.swing.ProgressMonitor;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 
 import net.querz.nbt.io.NamedTag;
@@ -121,7 +122,16 @@ public class StartupUtil {
 	}
 
 	public static boolean isJavaAnd8(Path pathToDictionary) {
-		final Path pathtoJava = pathToDictionary.resolve("java.exe");
+        final Path pathtoJava;
+		// TODO: MacOS requires a test here.
+        if (SystemUtils.IS_OS_WINDOWS) {
+            pathtoJava = pathToDictionary.resolve("java.exe");
+        } else if (SystemUtils.IS_OS_UNIX) {
+            pathtoJava = pathToDictionary.resolve("java");
+        } else {
+            throw new UnsupportedOperationException("This Operating System is not supported");
+        }
+
 		if (Files.notExists(pathtoJava))
 			return false;
 		try {
