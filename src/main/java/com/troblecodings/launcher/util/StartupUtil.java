@@ -56,7 +56,7 @@ public class StartupUtil {
 		if(activeBeta == info)
 			return;
 
-		Launcher.getLogger().info("Changed active beta to " + info);
+        Launcher.getLogger().info("Changed active beta to {}", info);
 		activeBeta = info;
 	}
 
@@ -177,7 +177,7 @@ public class StartupUtil {
 		}
 		return Optional.empty();
 	}
-	
+
 	private static void addServerToData() {
 		Path pth = Paths.get(FileUtil.SETTINGS.baseDir, "servers.dat");
 		if(!Files.exists(pth)) {
@@ -214,12 +214,12 @@ public class StartupUtil {
 			Launcher.getLogger().info("Updating Launcher!");
 			ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
 			Path pth = Paths.get(location.toURI());
-			Files.copy(pth, Paths.get(pth.toString() + ".tmp"), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(pth, Paths.get(pth + ".tmp"), StandardCopyOption.REPLACE_EXISTING);
 			OutputStream stream = Files.newOutputStream(pth);
 			if (!ConnectionUtil.openConnection(downloadURL, stream,
 					bytesize -> progress.setProgress(bytesize.intValue()))) {
 				stream.close();
-				Files.copy(Paths.get(pth.toString() + ".tmp"), pth, StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(Paths.get(pth + ".tmp"), pth, StandardCopyOption.REPLACE_EXISTING);
 				return;
 			}
 			stream.close();
@@ -379,7 +379,7 @@ public class StartupUtil {
 						String filename = incom.getFileName().toString();
 						return Files.isRegularFile(incom) && array.stream().noneMatch(job -> job.toString().contains(filename));
 					}).forEach(t -> {
-						Launcher.getLogger().debug("Deleted file " + t);
+                        Launcher.getLogger().debug("Deleted file {}", t);
 						try { // I hate this language
 							Files.deleteIfExists(t);
 						} catch (IOException e) {
@@ -447,15 +447,15 @@ public class StartupUtil {
 		JarFile file = new JarFile(str);
 		Enumeration<JarEntry> enumerator = file.entries();
 		while (enumerator.hasMoreElements()) {
-			JarEntry entry = (JarEntry) enumerator.nextElement();
+			JarEntry entry = enumerator.nextElement();
 			File outfile = new File(base + "/" + entry.getName());
 
 			if (entry.isDirectory()) {
-				outfile.mkdirs();
+				Files.createDirectories(outfile.toPath());
 				continue;
 			}
 
-			outfile.getParentFile().mkdirs();
+			Files.createDirectories(outfile.getParentFile().toPath());
 
 			ReadableByteChannel readchannel = Channels.newChannel(file.getInputStream(entry));
 			FileOutputStream fos = new FileOutputStream(outfile);
