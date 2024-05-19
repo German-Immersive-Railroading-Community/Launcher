@@ -11,7 +11,7 @@
                 <OnStartupTriggeringPolicy/>
             </Policies>
         </RollingRandomAccessFile>
-        <Sentry name="Sentry" dsn="https://718e75aba2cc4d92a8ed8b5641fe5b1d@sentry.girc.eu/2"/>
+        <Sentry name="Sentry" dsn="https://486fb1568dc21f00a6653dc9abc214b2@sentry.girc.eu/6"/>
     </Appenders>
     <Loggers>
         <Root level="all">
