@@ -94,23 +94,12 @@ public class StartupUtil {
      * @throws IOException
      */
     private static List<String> prepareStart(GirJson girJson) throws IOException, InterruptedException {
-        // this ensures that we do not start with a missing servers.dat
-        ensureServersDatExists();
         final Path clientPath = downloadMinecraft(girJson);
         downloadMinecraftAssets(girJson);
         downloadAdditionalAssets(girJson);
         final List<String> libs = downloadLibraries(girJson);
         libs.add(clientPath.toString());
         return libs;
-    }
-
-    private static void ensureServersDatExists() throws IOException {
-        logger.debug("Verifying valid servers.dat");
-        Path pth = LauncherPaths.getConfigDir().resolve("servers.dat");
-        if (!Files.exists(pth)) {
-            logger.warn("Couldn't find an existing servers.dat file! Recreating.");
-            Files.copy(Launcher.getResourceAsStream("servers.dat"), pth);
-        }
     }
 
     // TODO: delete old files if new ones were detected.
