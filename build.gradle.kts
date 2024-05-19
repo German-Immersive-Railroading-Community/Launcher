@@ -74,7 +74,7 @@ dependencies {
     implementation("org.apache.commons:commons-compress:1.26.1")
     implementation("net.hycrafthd:minecraft_authenticator:3.0.6")
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.google.guava:guava:32.2.0-jre")
+    implementation("com.google.guava:guava:33.2.0-jre")
 
     testImplementation(platform("org.junit:junit-bom:${junitVersion}"))
     testImplementation("org.junit.jupiter:junit-jupiter")
