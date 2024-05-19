@@ -3,11 +3,16 @@ plugins {
     id("application")
     id("io.sentry.jvm.gradle") version "4.4.0"
     id("com.github.gmazzo.buildconfig") version "5.3.5"
-    id("org.javamodularity.moduleplugin") version "1.8.12"
+//    id("org.javamodularity.moduleplugin") version "1.8.12"
     id("org.openjfx.javafxplugin") version "0.1.0"
     id("eclipse")
     id("idea")
 }
+
+group = "eu.girc"
+
+val versionName: String by properties
+version = versionName
 
 val sentryToken = System.getenv("SENTRY_AUTH_TOKEN") ?: ""
 sentry {
@@ -21,7 +26,6 @@ sentry {
 
     includeDependenciesReport = true
     includeSourceContext = sentryToken.isNotBlank()
-    additionalSourceDirsForSourceContext = listOf("launcher-gui/src/main/java", "launcher-core/src/main/java")
     authToken = sentryToken
 }
 
@@ -30,8 +34,8 @@ buildConfig {
     packageName("eu.girc.launcher")
     useJavaOutput()
 
-    buildConfigField<String>("VERSION", "${project.version}")
-    buildConfigField<String>("GROUP", "${project.group}")
+    buildConfigField<String>("VERSION", "$version")
+    buildConfigField<String>("GROUP", "$group")
 }
 
 javafx {
@@ -46,7 +50,7 @@ java {
 }
 
 application {
-    mainModule = "eu.girc.launcher"
+   // mainModule = "eu.girc.launcher"
     mainClass = "eu.girc.launcher.Launcher"
 }
 
@@ -78,6 +82,7 @@ dependencies {
 
 tasks {
     compileJava {
+        options.encoding = Charsets.UTF_8.name()
         options.compilerArgs.add("-Xlint:deprecation")
     }
 
