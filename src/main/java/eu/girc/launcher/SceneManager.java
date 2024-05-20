@@ -5,8 +5,6 @@ import eu.girc.launcher.javafx.ErrorScene;
 import eu.girc.launcher.javafx.Footer;
 import eu.girc.launcher.javafx.Header;
 import eu.girc.launcher.javafx.HomeScene;
-import eu.girc.launcher.javafx.LoginScene;
-import eu.girc.launcher.javafx.MicrosoftLoginScene;
 import eu.girc.launcher.javafx.OptionalModsScene;
 import eu.girc.launcher.javafx.OptionsScene;
 import javafx.animation.Transition;
@@ -83,12 +81,6 @@ public final class SceneManager {
                     break;
                 case OPTIONS:
                     root = new OptionsScene();
-                    break;
-                case LOGIN:
-                    root = new LoginScene();
-                    break;
-                case MSLOGIN:
-                    root = new MicrosoftLoginScene();
                     break;
                 case CREDITS:
                     root = new CreditsScene();

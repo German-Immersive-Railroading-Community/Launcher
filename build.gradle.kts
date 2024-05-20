@@ -72,7 +72,6 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.23.1")
     implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("org.apache.commons:commons-compress:1.26.1")
-    implementation("net.hycrafthd:minecraft_authenticator:3.0.6")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.google.guava:guava:33.2.0-jre")
 

@@ -330,14 +330,14 @@ public class StartupUtil {
 
     private static String[] make_minecraft_args(GirJson girJson) {
         return girJson.minecraftArguments()
-                      .replace("${auth_player_name}", AuthManager.getUsername())
+                      .replace("${auth_player_name}", "")
                       .replace("${version_name}", girJson.id())
                       .replace("${game_directory}", LauncherPaths.getConfigDir().toString())
                       .replace("${assets_root}", LauncherPaths.getAssetsDir().toString())
                       .replace("${assets_index_name}", girJson.assetIndex().id())
-                      .replace("${auth_uuid}", AuthManager.getUuid())
-                      .replace("${auth_access_token}", AuthManager.getAccessToken())
-                      .replace("${user_type}", AuthManager.getUserType())
+                      .replace("${auth_uuid}", "")
+                      .replace("${auth_access_token}", "")
+                      .replace("${user_type}", "")
                       .split(" ");
     }
 }

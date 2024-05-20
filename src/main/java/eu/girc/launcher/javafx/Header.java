@@ -1,6 +1,5 @@
 package eu.girc.launcher.javafx;
 
-import eu.girc.launcher.AuthManager;
 import eu.girc.launcher.Launcher;
 import eu.girc.launcher.SceneManager;
 import eu.girc.launcher.View;
@@ -25,11 +24,7 @@ public class Header extends StackPane {
                 Button btn = new Button();
                 btn.getStyleClass().add("navbar");
                 btn.setText(page.name().toUpperCase());
-                btn.setOnAction(evt -> {
-                    if (!AuthManager.isLoggedIn()) return;
-                    SceneManager.switchView(page.supplier.get());
-                });
-                btn.visibleProperty().bind(AuthManager.loggedInProperty());
+                btn.setOnAction(evt -> SceneManager.switchView(page.supplier.get()));
                 hbox.getChildren().add(btn);
                 HBox.setMargin(btn, new Insets(20, 20, 20, 20));
             }

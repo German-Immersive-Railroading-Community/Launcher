@@ -1,6 +1,5 @@
 package eu.girc.launcher.javafx;
 
-import eu.girc.launcher.AuthManager;
 import eu.girc.launcher.SceneManager;
 import eu.girc.launcher.View;
 import javafx.application.Platform;
@@ -13,6 +12,7 @@ import javafx.scene.layout.StackPane;
 public class Footer extends StackPane {
 
     private static final SimpleDoubleProperty bar = new SimpleDoubleProperty();
+
 
     public Footer(View view) {
         ProgressBar progressbar = new ProgressBar();

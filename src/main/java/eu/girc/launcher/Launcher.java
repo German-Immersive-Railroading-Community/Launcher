@@ -154,7 +154,7 @@ public class Launcher extends Application {
         stage.setScene(scene);
 
         SceneManager.setScene(scene);
-        SceneManager.switchView(AuthManager.isLoggedIn() ? View.HOME : View.LOGIN);
+        SceneManager.switchView(View.HOME);
 
         stage.show();
     }
