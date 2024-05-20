@@ -31,14 +31,7 @@ public class Header extends StackPane {
         }
         hbox.setAlignment(Pos.CENTER);
 
-        Button closebutton = new Button();
-        closebutton.getStyleClass().add("closebutton");
-        closebutton.setOnAction(event -> System.exit(0));
-        closebutton.setTranslateX(-20);
-        closebutton.setTranslateY(20);
-        StackPane.setAlignment(closebutton, Pos.TOP_RIGHT);
-
-        this.getChildren().addAll(hbox, closebutton);
+        this.getChildren().add(hbox);
         this.setMaxHeight(85);
         StackPane.setAlignment(this, Pos.TOP_CENTER);
         initializeEvents();
