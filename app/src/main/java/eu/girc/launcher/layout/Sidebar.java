@@ -1,3 +1,3 @@
 package eu.girc.launcher.layout;
 
-public class MainLayout { }
+public class Sidebar { }

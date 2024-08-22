@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import atlantafx.base.controls.ModalPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.StackPane?>
-<AnchorPane xmlns="http://javafx.com/javafx"
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="eu.girc.launcher.layout.MainLayout"
-            prefHeight="400.0" prefWidth="600.0">
-    <StackPane fx:id="body" styleClass="body">
-        <ModalPane id="main-layout-modal-pane" fx:id="modalPane">
-
-        </ModalPane>
-    </StackPane>
-</AnchorPane>
+            fx:controller="eu.girc.launcher.layout.MainLayout">
+    
+    <Sidebar></Sidebar>
+</BorderPane>

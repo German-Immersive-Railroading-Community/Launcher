@@ -7,6 +7,8 @@ plugins {
 
     // The javafx configuration plugin, allows for the javafx {} code-block below.
     alias(libs.plugins.javafxplugin)
+
+    id("org.beryx.jlink").version("3.0.1")
 }
 
 repositories {
@@ -16,15 +18,15 @@ repositories {
 
 dependencies {
     implementation(project(":lib"))
-    
+
     implementation(libs.gson)
     implementation(libs.guava)
-    
+
     implementation(libs.atlantafx)
 
     implementation(libs.log4japi)
     implementation(libs.log4jcore)
-    
+
     implementation(libs.commonslang)
 }
 
@@ -37,7 +39,6 @@ application {
     mainModule = "eu.girc.launcher"
     mainClass = "eu.girc.launcher.Launcher"
 }
-
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
@@ -56,13 +57,41 @@ java {
     }
 }
 
-configurations.matching { it.name.contains("downloadSources") }
-        .configureEach {
-            attributes {
-                val os = DefaultNativePlatform.getCurrentOperatingSystem().toFamilyName()
-                val arch = DefaultNativePlatform.getCurrentArchitecture().name
-                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class, Usage.JAVA_RUNTIME))
-                attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily::class, os))
-                attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture::class, arch))
-            }
+configurations.matching {
+    it.name.contains("downloadSources")
+}.configureEach {
+    attributes {
+        val os = DefaultNativePlatform.getCurrentOperatingSystem().toFamilyName()
+        val arch = DefaultNativePlatform.getCurrentArchitecture().name
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class, Usage.JAVA_RUNTIME))
+        attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily::class, os))
+        attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture::class, arch))
+    }
+}
+
+jlink {
+    // https://github.com/beryx/badass-jlink-plugin/issues/217#issuecomment-1776917698
+//    forceMerge("log4j-api")
+//
+//    mergedModule {
+//        additive = true
+//        uses("org.apache.logging.log4j.util.PropertySource")
+//        uses("org.apache.logging.log4j.spi.Provider")
+//        uses("org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory")
+//    }
+
+    options.addAll("--strip-debug", "--no-header-files", "--no-man-pages")
+    //options.addAll("--compress", "2",)
+    
+    launcher {
+        name = "girc-launcher"
+        //jvmArgs = listOf("-Dlog4j.debug=true")
+    }
+
+    jpackage {
+        if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
+            installerOptions.addAll(listOf("--win-per-user-install", "--win-dir-chooser", "--win-menu", "--win-shortcut"))
+            imageOptions.addAll(listOf("--win-console"))
         }
+    }
+}

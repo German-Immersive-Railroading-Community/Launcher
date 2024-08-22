@@ -2,7 +2,6 @@ module eu.girc.launcher {
     requires java.desktop;
     requires java.prefs;
     requires java.base;
-    requires java.compiler;
     requires jdk.zipfs;
     
     requires javafx.controls;
@@ -15,6 +14,12 @@ module eu.girc.launcher {
     
     requires atlantafx.base;
     
+    // https://github.com/beryx/badass-jlink-plugin/issues/217#issuecomment-1776917698
+    requires java.compiler;
+    requires java.naming;
+    requires org.apache.logging.log4j;
+    requires org.apache.logging.log4j.core;
+
     opens eu.girc.launcher;
     opens eu.girc.launcher.layout;
     //opens eu.girc.launcher.page;
