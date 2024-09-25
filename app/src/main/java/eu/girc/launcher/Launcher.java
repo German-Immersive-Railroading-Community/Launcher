@@ -41,6 +41,7 @@ public class Launcher extends Application {
             logger.error("Failed to load application settings:", e);
             logger.error("Falling back to default settings.");
             this.settings = new AppSettings();
+            logger.warn("Trying to write default settings.");
             Files.writeString(LPaths.getSettingsPath(), GSON.toJson(this.settings));
         }
         
