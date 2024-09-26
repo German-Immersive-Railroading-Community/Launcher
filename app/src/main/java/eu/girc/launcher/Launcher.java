@@ -24,7 +24,6 @@ public class Launcher extends Application {
 
     @Override
     public void init() throws Exception {
-        LPaths.initialise();
         LPaths.ensureDirsCreated();
         
         System.setProperty("girc.logsPath", LPaths.getLogsPath().toString());
@@ -60,6 +59,7 @@ public class Launcher extends Application {
         
         stage.setScene(scene);
         stage.setResizable(true);
+
         stage.setTitle("GIRC-Launcher v2.0.0");
 
 

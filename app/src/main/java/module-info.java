@@ -19,6 +19,7 @@ module eu.girc.launcher {
     requires java.naming;
     requires org.apache.logging.log4j;
     requires org.apache.logging.log4j.core;
+    requires eu.girc.launcher.lib;
 
     opens eu.girc.launcher;
     opens eu.girc.launcher.layout;
