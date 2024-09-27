@@ -10,25 +10,22 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 
 public class Launcher extends Application {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    private Logger logger;
+    private final Logger logger = LoggerFactory.getLogger(Launcher.class);
 
     private AppSettings settings;
 
     @Override
     public void init() throws Exception {
         LPaths.ensureDirsCreated();
-        
         System.setProperty("girc.logsPath", LPaths.getLogsPath().toString());
-
-        logger = LogManager.getLogger(Launcher.class);
 
         logger.info("GIRC-Launcher v2.0.0");
         logger.debug("Loading settings...");
@@ -43,7 +40,7 @@ public class Launcher extends Application {
             logger.warn("Trying to write default settings.");
             Files.writeString(LPaths.getSettingsPath(), GSON.toJson(this.settings));
         }
-        
+
         logger.debug("Settings loaded.");
     }
 
@@ -54,14 +51,12 @@ public class Launcher extends Application {
         // needs to be called on the JavaFX Application Thread.
         Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
         Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
-        
+
         var scene = new Scene(new AnchorPane());
-        
+
         stage.setScene(scene);
         stage.setResizable(true);
-
         stage.setTitle("GIRC-Launcher v2.0.0");
-
 
         stage.show();
     }

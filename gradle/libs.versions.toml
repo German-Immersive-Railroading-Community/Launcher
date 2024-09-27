@@ -7,16 +7,12 @@ guava = "33.2.1-jre"
 javafxplugin = "0.1.0"
 javafx = "22"
 atlantafx = "2.0.1"
-log4j2 = "2.23.1"
 commonslang = "3.16.0"
 
 [libraries]
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 atlantafx = { module = "io.github.mkpaz:atlantafx-base", version.ref = "atlantafx" }
-
-log4japi = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j2" }
-log4jcore = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j2" }
 
 commonslang = { module = "org.apache.commons:commons-lang3", version.ref = "commonslang" }
 

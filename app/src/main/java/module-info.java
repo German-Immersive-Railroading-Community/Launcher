@@ -17,9 +17,9 @@ module eu.girc.launcher {
     // https://github.com/beryx/badass-jlink-plugin/issues/217#issuecomment-1776917698
     requires java.compiler;
     requires java.naming;
-    requires org.apache.logging.log4j;
-    requires org.apache.logging.log4j.core;
     requires eu.girc.launcher.lib;
+
+    requires org.slf4j;
 
     opens eu.girc.launcher;
     opens eu.girc.launcher.layout;

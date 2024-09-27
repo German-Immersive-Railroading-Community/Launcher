@@ -24,8 +24,7 @@ dependencies {
 
     implementation(libs.atlantafx)
 
-    implementation(libs.log4japi)
-    implementation(libs.log4jcore)
+    implementation("ch.qos.logback:logback-classic:1.5.6")
 
     implementation(libs.commonslang)
 }
