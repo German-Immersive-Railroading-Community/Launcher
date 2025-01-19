@@ -4,7 +4,7 @@
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <!-- <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}%d{"yyyy-MM-dd'T'HH:mm:ss,SSSXXX", Europe/Paris} [%thread] %p %c{1} [%t] %m%n</pattern>-->
-            <pattern>%d{"yyyy-MM-dd HH:mm:ss.SSS XXX"} %5p --- [%t] %-25.25logger{20} : %m%n</pattern>
+            <pattern>%d{"HH:mm:ss XXX"} %5p --- [%t] %-25.25logger{20} : %m%n</pattern>
         </encoder>
     </appender>
 

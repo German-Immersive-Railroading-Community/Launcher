@@ -17,7 +17,8 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":lib"))
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     implementation(libs.gson)
     implementation(libs.guava)
@@ -42,11 +43,11 @@ application {
 tasks.named<Test>("test") {
     useJUnitPlatform()
 
-    maxHeapSize = "1G"
-
-    testLogging {
-        events("passed")
-    }
+//    maxHeapSize = "1G"
+//
+//    testLogging {
+//        events("passed")
+//    }
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -81,7 +82,7 @@ jlink {
 
     options.addAll("--strip-debug", "--no-header-files", "--no-man-pages")
     //options.addAll("--compress", "2",)
-    
+
     launcher {
         name = "girc-launcher"
         //jvmArgs = listOf("-Dlog4j.debug=true")

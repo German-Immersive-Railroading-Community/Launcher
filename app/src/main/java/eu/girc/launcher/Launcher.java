@@ -7,9 +7,12 @@ import com.google.gson.GsonBuilder;
 import eu.girc.launcher.models.AppSettings;
 import eu.girc.launcher.utils.LPaths;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +21,7 @@ import java.nio.file.Files;
 public class Launcher extends Application {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    private final Logger logger = LoggerFactory.getLogger(Launcher.class);
+    private Logger logger;
 
     private AppSettings settings;
 
@@ -27,6 +30,7 @@ public class Launcher extends Application {
         LPaths.ensureDirsCreated();
         System.setProperty("girc.logsPath", LPaths.getLogsPath().toString());
 
+        logger = LoggerFactory.getLogger(Launcher.class);
         logger.info("GIRC-Launcher v2.0.0");
         logger.debug("Loading settings...");
 
@@ -52,12 +56,13 @@ public class Launcher extends Application {
         Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
         Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
 
-        var scene = new Scene(new AnchorPane());
-
+        Parent parent = FXMLLoader.load(Resources.getResource("ui/MainWindow.fxml").toURL());
+        var scene = new Scene(parent);
         stage.setScene(scene);
         stage.setResizable(true);
         stage.setTitle("GIRC-Launcher v2.0.0");
-
+        stage.setWidth(1280);
+        stage.setHeight(720);
         stage.show();
     }
 
@@ -65,5 +70,9 @@ public class Launcher extends Application {
     public void stop() throws Exception {
         // Save settings on program exit.
         Files.writeString(LPaths.getSettingsPath(), GSON.toJson(this.settings));
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

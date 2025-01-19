@@ -1,6 +1,6 @@
 package eu.girc.launcher.utils;
 
-import eu.girc.launcher.lib.Directories;
+import eu.girc.launcher.utils.Directories;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;

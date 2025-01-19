@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Text?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="eu.girc.launcher.ui.MainWindow">
+    <GridPane hgap="4" vgap="0" prefWidth="Infinity" fx:id="contentGridPane">
+        <rowConstraints>
+            <RowConstraints percentHeight="0.05"/>
+            <RowConstraints percentHeight="0.95"/>
+        </rowConstraints>
+        <columnConstraints>
+            <ColumnConstraints/>
+        </columnConstraints>
+
+        <BorderPane GridPane.rowIndex="0" maxWidth="Infinity">
+            <left>
+                <Label>GIRC Logo</Label>
+            </left>
+            <center>
+                <Button>1</Button>
+                <Button>2</Button>
+                <Button>3</Button>
+                <Button>4</Button>
+            </center>
+            <right>
+                <HBox>
+                    <Rectangle width="32" height="32"/>
+                    <Text>Username</Text>
+                </HBox>
+            </right>
+        </BorderPane>
+        <HBox GridPane.rowIndex="1" alignment="CENTER">
+            <Label fx:id="lbl">Hi</Label>
+            <Button fx:id="btn">Hi</Button>
+        </HBox>
+    </GridPane>
+</AnchorPane>

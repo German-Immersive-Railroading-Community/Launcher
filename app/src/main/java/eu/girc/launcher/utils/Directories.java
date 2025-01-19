@@ -1,9 +1,11 @@
-package eu.girc.launcher.lib;
+package eu.girc.launcher.utils;
 
 import java.nio.file.Path;
 
-public class Directories {
+public final class Directories {
     private static final String os = System.getProperty("os.name").toLowerCase();
+
+    private Directories() { }
 
     private static final Path homeDir = switch (os) {
         case "windows" -> Path.of(System.getProperty("USERPROFILE"));
