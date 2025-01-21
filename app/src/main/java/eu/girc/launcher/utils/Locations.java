@@ -1,13 +1,10 @@
 package eu.girc.launcher.utils;
 
-import eu.girc.launcher.utils.Directories;
-import org.apache.commons.lang3.SystemUtils;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public final class LPaths {
+public final class Locations {
     private static final String packageName = "eu.girc.launcher";
 
     private static final Path configDir = Directories.getConfigDir().resolve(packageName);

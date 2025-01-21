@@ -8,6 +8,7 @@ atlantafx = "2.0.1"
 commonslang = "3.16.0"
 guava = "33.3.1-jre"
 junit-jupiter = "5.11.1"
+test-logger = "4.0.0"
 
 [libraries]
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
@@ -20,3 +21,4 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jun
 
 [plugins]
 javafxplugin = { id = "org.openjfx.javafxplugin", version.ref = "javafxplugin" }
+test_logger = { id = "com.adarshr.test-logger", version.ref = "test-logger" }

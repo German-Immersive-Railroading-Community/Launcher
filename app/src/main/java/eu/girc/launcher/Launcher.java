@@ -5,14 +5,12 @@ import atlantafx.base.theme.PrimerLight;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import eu.girc.launcher.models.AppSettings;
-import eu.girc.launcher.utils.LPaths;
+import eu.girc.launcher.utils.Locations;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,22 +25,22 @@ public class Launcher extends Application {
 
     @Override
     public void init() throws Exception {
-        LPaths.ensureDirsCreated();
-        System.setProperty("girc.logsPath", LPaths.getLogsPath().toString());
+        Locations.ensureDirsCreated();
+        System.setProperty("girc.logsPath", Locations.getLogsPath().toString());
 
         logger = LoggerFactory.getLogger(Launcher.class);
         logger.info("GIRC-Launcher v2.0.0");
         logger.debug("Loading settings...");
 
         try {
-            var settings = Files.readString(LPaths.getSettingsPath());
+            var settings = Files.readString(Locations.getSettingsPath());
             this.settings = GSON.fromJson(settings, AppSettings.class);
         } catch (final Exception e) {
             logger.error("Failed to load application settings:", e);
             logger.error("Falling back to default settings.");
             this.settings = new AppSettings();
             logger.warn("Trying to write default settings.");
-            Files.writeString(LPaths.getSettingsPath(), GSON.toJson(this.settings));
+            Files.writeString(Locations.getSettingsPath(), GSON.toJson(this.settings));
         }
 
         logger.debug("Settings loaded.");
@@ -69,7 +67,7 @@ public class Launcher extends Application {
     @Override
     public void stop() throws Exception {
         // Save settings on program exit.
-        Files.writeString(LPaths.getSettingsPath(), GSON.toJson(this.settings));
+        Files.writeString(Locations.getSettingsPath(), GSON.toJson(this.settings));
     }
 
     public static void main(String[] args) {

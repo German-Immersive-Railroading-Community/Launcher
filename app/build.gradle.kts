@@ -1,3 +1,4 @@
+import com.adarshr.gradle.testlogger.theme.ThemeType
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
@@ -7,6 +8,8 @@ plugins {
 
     // The javafx configuration plugin, allows for the javafx {} code-block below.
     alias(libs.plugins.javafxplugin)
+
+    alias(libs.plugins.test.logger)
 
     id("org.beryx.jlink").version("3.0.1")
 }
@@ -38,6 +41,19 @@ javafx {
 application {
     mainModule = "eu.girc.launcher"
     mainClass = "eu.girc.launcher.Launcher"
+}
+
+testlogger {
+    theme = ThemeType.MOCHA
+    showExceptions = true
+    showStackTraces = true
+    showFullStackTraces = true
+    showCauses = true
+    showStandardStreams = true
+    showSimpleNames = false
+    showSummary = true
+    showOnlySlow = false
+    logLevel = LogLevel.LIFECYCLE
 }
 
 tasks.named<Test>("test") {
