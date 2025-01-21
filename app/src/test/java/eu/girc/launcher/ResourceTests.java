@@ -22,9 +22,4 @@ public class ResourceTests {
         Assertions.assertThrows(NullPointerException.class, () -> Resources.getResource(null));
         Assertions.assertNotNull(Resources.getResource("TestResource.txt"));
     }
-
-    @Test
-    public void failingTest() {
-        Assertions.assertNotNull(null);
-    }
 }
