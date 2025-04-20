@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.image.ImageView?>
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="eu.girc.launcher.ui.HeaderController"
+      alignment="CENTER">
+
+    <!-- Top Left: Logo -->
+    <ImageView fx:id="logoImage"/>
+    <!-- Top Center: Navbar -->
+
+    <!-- Top Right: Login/User Info -->
+
+</HBox>

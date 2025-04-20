@@ -7,9 +7,9 @@ import java.nio.file.Path;
 public final class Locations {
     private static final String packageName = "eu.girc.launcher";
 
-    private static final Path configDir = Directories.getConfigDir().resolve(packageName);
+    private static final Path configDir = Directories.getUserCfgDir().resolve(packageName);
 
-    private static final Path dataDir = Directories.getDataDir().resolve(packageName);
+    private static final Path dataDir = Directories.getUserDataDir().resolve(packageName);
 
     private static final Path logsPath = configDir.resolve("logs");
 
@@ -18,6 +18,8 @@ public final class Locations {
     // The path where minecraft and all the mods are downloaded to.
     // This directory will also contain the resourcepacks, shaderpacks, etc. folders.
     private static final Path minecraftPath = dataDir.resolve("minecraft");
+
+    private static final Path mcJavaPath = dataDir.resolve("java");
 
     public static void ensureDirsCreated() throws IOException {
         Files.createDirectories(configDir);

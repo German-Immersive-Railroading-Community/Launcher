@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false">
-    <shutdownHook/>
+    <property name="LOG_DIR" value="${girc.logsPath}"/>
+
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <!-- <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}%d{"yyyy-MM-dd'T'HH:mm:ss,SSSXXX", Europe/Paris} [%thread] %p %c{1} [%t] %m%n</pattern>-->
@@ -8,7 +9,20 @@
         </encoder>
     </appender>
 
+    <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/girc-launcher.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/girc-launcher.%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{"HH:mm:ss XXX"} %5p --- [%t] %-25.25logger{20} : %m%n</pattern>
+        </encoder>
+    </appender>
+
     <root level="all">
         <appender-ref ref="Console"/>
+        <appender-ref ref="File"/>
     </root>
 </configuration>
