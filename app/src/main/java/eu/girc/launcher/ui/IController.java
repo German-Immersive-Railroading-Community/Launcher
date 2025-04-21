@@ -14,5 +14,5 @@ public interface IController {
      * Sets the scene manager managing application scenes.
      * @param manager the SceneManager.
      */
-    void setSceneManager(SceneManager manager);
+//    void setSceneManager(SceneManager manager);
 }

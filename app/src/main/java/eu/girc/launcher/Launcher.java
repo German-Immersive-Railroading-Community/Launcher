@@ -20,8 +20,6 @@ public class Launcher extends Application {
 
     private AppSettings settings;
 
-    private SceneManager sceneManager;
-
     @Override
     public void init() throws Exception {
         Locations.ensureDirsCreated();
@@ -61,8 +59,9 @@ public class Launcher extends Application {
         stage.setMinHeight(720);
 
         logger.debug("Ready!");
-        sceneManager = new SceneManager(stage);
-        sceneManager.switchScene(LauncherScene.HOME);
+
+        SceneManager.init(stage);
+        SceneManager.switchScene(LauncherScene.HOME);
 
         stage.show();
     }

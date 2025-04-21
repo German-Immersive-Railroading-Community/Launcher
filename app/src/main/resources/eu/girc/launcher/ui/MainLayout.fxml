@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="eu.girc.launcher.ui.MainLayoutController">
@@ -8,5 +9,9 @@
     <top>
         <fx:include source="Header.fxml"/>
     </top>
+
+    <center>
+        <StackPane fx:id="contentArea"/>
+    </center>
 
 </BorderPane>

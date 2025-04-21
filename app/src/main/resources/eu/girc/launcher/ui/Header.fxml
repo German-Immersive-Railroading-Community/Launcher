@@ -2,14 +2,20 @@
 
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.Button?>
 <HBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="eu.girc.launcher.ui.HeaderController"
       alignment="CENTER">
 
     <!-- Top Left: Logo -->
-    <ImageView fx:id="logoImage"/>
+    <ImageView HBox.hgrow="NEVER" fx:id="logoImage"/>
+
     <!-- Top Center: Navbar -->
+    <HBox HBox.hgrow="NEVER" alignment="CENTER">
+        <Button fx:id="homeButton" />
+        <Button fx:id="settingsButton"/>
+    </HBox>
 
     <!-- Top Right: Login/User Info -->
 

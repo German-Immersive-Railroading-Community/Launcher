@@ -32,6 +32,8 @@ dependencies {
     implementation("commons-cli:commons-cli:1.9.0")
     implementation("org.apache.commons:commons-lang3:3.17.0")
 
+    implementation("com.google.inject:guice:7.0.0")
+
     // Logging
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("ch.qos.logback:logback-classic:1.5.18")

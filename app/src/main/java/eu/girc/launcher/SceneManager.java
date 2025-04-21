@@ -11,28 +11,30 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SceneManager {
-    private LauncherScene currentScene;
+public final class SceneManager {
+    private static LauncherScene currentScene;
 
-    private final Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger(SceneManager.class);
 
-    private final Stage stage;
+    private static Stage stage;
 
-    private final Map<LauncherScene, Scene> sceneCache;
+    private static final Map<LauncherScene, Scene> sceneCache = new HashMap<>();
 
-    public SceneManager(Stage stage) {
-        this.logger = LoggerFactory.getLogger(SceneManager.class);
-        this.stage = stage;
-        this.sceneCache = new HashMap<>();
+    private SceneManager() { }
+
+    public static void init(Stage primaryStage) {
+        logger.debug("Initializing SceneManager");
+        stage = primaryStage;
     }
 
-    public void switchScene(LauncherScene launcherScene) {
+    public static void switchScene(LauncherScene launcherScene) {
         if (currentScene == launcherScene) {
             logger.debug("Already on this scene!");
             return;
         }
 
         logger.debug("Switching scene: {} -> {}", currentScene, launcherScene);
+        currentScene = launcherScene;
 
         if (sceneCache.containsKey(launcherScene)) {
             logger.debug("Cache hit");
@@ -42,16 +44,8 @@ public class SceneManager {
 
         try {
             logger.debug("Cache miss");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("ui/" + launcherScene.getPath()));
+            FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource("ui/" + launcherScene.getPath()));
             Parent root = loader.load();
-
-            Object controller = loader.getController();
-            if (controller instanceof IController ctr) {
-                logger.debug("Able to set scene manager");
-                ctr.setSceneManager(this);
-            } else {
-                logger.debug("Unable to set scene manager");
-            }
 
             Scene scene = new Scene(root);
             stage.setScene(scene);

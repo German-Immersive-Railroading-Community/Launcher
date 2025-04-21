@@ -37,8 +37,8 @@ public class HomeController extends VBox implements IController {
         });
     }
 
-    @Override
-    public void setSceneManager(SceneManager manager) {
-        this.manager = manager;
-    }
+//    @Override
+//    public void setSceneManager(SceneManager manager) {
+//        this.manager = manager;
+//    }
 }

@@ -8,11 +8,12 @@ module eu.girc.launcher {
     requires javafx.fxml;
 
     requires org.apache.commons.cli;
-
     requires org.apache.commons.lang3;
 
     requires com.google.gson;
     opens eu.girc.launcher.models to com.google.gson;
+
+    requires com.google.guice;
 
     // https://github.com/beryx/badass-jlink-plugin/issues/217#issuecomment-1776917698
     requires java.compiler;

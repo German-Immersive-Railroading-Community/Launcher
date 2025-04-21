@@ -1,7 +1,7 @@
 package eu.girc.launcher;
 
 public enum LauncherScene {
-    HOME("Home.fxml");
+    HOME("Home.fxml"), SETTINGS("Settings.fxml");
 
     private String path;
 
