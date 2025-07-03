@@ -1,15 +1,12 @@
 package com.troblecodings.launcher;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.*;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 import com.troblecodings.launcher.util.StartupUtil;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -24,7 +21,15 @@ import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Launcher extends Application {
+    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
     private static Logger logger;
     private static Launcher instance = null;
     private static boolean beta_mode = false;
@@ -62,7 +67,7 @@ public class Launcher extends Application {
         Parameters params = getParameters();
 
         for (String param : params.getRaw()) {
-            logger.info("Iterating over parameter: " + param);
+            logger.info("Iterating over parameter: {}", param);
 
             if ("--no-update".equals(param)) {
                 logger.info("Skipping updates!");
@@ -74,8 +79,8 @@ public class Launcher extends Application {
             }
         }
 
-        if (update)
-            StartupUtil.update();
+//        if (update)
+//            StartupUtil.update();
 
         // loading images into list
         images.add(Assets.getImage("background.png"));
@@ -84,7 +89,7 @@ public class Launcher extends Application {
         images.add(Assets.getImage("background_4.png"));
         images.add(Assets.getImage("background_5.png"));
         images.add(images.get(0));
-        
+
         OPTIONSSCENE = new OptionsScene();
         HOMESCENE = new HomeScene();
         LOGINSCENE = new LoginScene();

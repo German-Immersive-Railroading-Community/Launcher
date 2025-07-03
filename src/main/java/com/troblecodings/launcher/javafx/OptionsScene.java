@@ -176,7 +176,7 @@ public class OptionsScene extends Scene {
 				StartupUtil.setActiveBeta(null);
 				betaComboBox.getSelectionModel().clearSelection();
 				betaComboBox.getItems().clear();
-				betaComboBox.getItems().addAll(StartupUtil.getBetaVersions(true));
+//				betaComboBox.getItems().addAll(StartupUtil.getBetaVersions(true));
 			});
 
 			final Button betaClearButton = new Button("Clear");
@@ -189,7 +189,7 @@ public class OptionsScene extends Scene {
 
 			betaComboBox.setEditable(true);
 			betaComboBox.setPrefWidth(vbox.getPrefWidth());
-			betaComboBox.getItems().addAll(StartupUtil.getBetaVersions(false));
+//			betaComboBox.getItems().addAll(StartupUtil.getBetaVersions(false));
 			betaComboBox.setOnAction(ev -> {
 				int index = betaComboBox.getSelectionModel().selectedIndexProperty().get();
 
