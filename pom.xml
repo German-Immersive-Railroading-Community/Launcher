@@ -112,6 +112,13 @@
             <version>3.14.0</version>
         </dependency>
 
+        <!-- For directory management support -->
+        <dependency>
+            <groupId>dev.dirs</groupId>
+            <artifactId>directories</artifactId>
+            <version>26</version>
+        </dependency>
+
         <dependency>
             <groupId>com.github.Querz</groupId>
             <artifactId>NBT</artifactId>
