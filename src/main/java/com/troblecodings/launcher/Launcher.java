@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.*;
+import com.troblecodings.launcher.services.UserService;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
+import com.troblecodings.launcher.util.LauncherPaths;
 import com.troblecodings.launcher.util.StartupUtil;
 import javafx.animation.Transition;
 import javafx.application.Application;
@@ -18,8 +20,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,7 +33,6 @@ import java.util.List;
 public class Launcher extends Application {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    private static Logger logger;
     private static Launcher instance = null;
     private static boolean beta_mode = false;
 
@@ -44,23 +46,38 @@ public class Launcher extends Application {
     public static CreditsScene CREDITSSCENE;
     public static OptionalModsScene OPTIONALMODSSCENE;
 
+    private final UserService userService;
+
+    private Logger logger;
     private Stage stage;
 
     public Launcher() {
         instance = this;
+
+        userService = new UserService();
     }
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         FileUtil.init();
         FileUtil.readSettings();
 
         if (FileUtil.SETTINGS == null)
             FileUtil.SETTINGS = new FileUtil.SettingsData();
 
+        LauncherPaths.init();
+        System.setProperty("girc.logsPath", LauncherPaths.getLogsDir().toString());
         System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
-        logger = LogManager.getLogger("GIRC");
-        logger.info("Initializing...");
+
+        logger = LoggerFactory.getLogger(Launcher.class);
+
+        // Log some very basic system info, can help in debugging
+        logger.info("GIRC-Launcher v1.1.0");
+        logger.info("OS: {} ({}), OS Version: {}", SystemUtils.OS_NAME, SystemUtils.OS_ARCH, SystemUtils.OS_VERSION);
+
+        logger.info("Checking for updates...");
+
+        logger.debug("Loading settings...");
 
         boolean update = true;
 
@@ -122,6 +139,10 @@ public class Launcher extends Application {
         FileUtil.saveSettings();
     }
 
+    public UserService getUserService() {
+        return userService;
+    }
+
     public static void setupScene(Scene scene, StackPane stackpane) {
         final ImageView backgroundImg = new ImageView();
 
@@ -167,12 +188,12 @@ public class Launcher extends Application {
     public static void onError(Throwable e) {
         // Return here since we cannot show any error.
         if (e == null) {
-            logger.error("Error found but was passed null!");
+            instance.logger.error("Error found but was passed null!");
             return;
         } else if (e.getMessage() == null)
-            logger.trace("", e);
+            instance.logger.trace("", e);
         else
-            logger.trace(e.getMessage(), e);
+            instance.logger.trace(e.getMessage(), e);
 
         // See if this can be made better, seems overly clunky-like to me, but any other method doesn't generate a stack-trace.
         // toString and getMessage only return the String representation of what the exception actually is.
@@ -204,7 +225,8 @@ public class Launcher extends Application {
         return instance;
     }
 
+    @Deprecated
     public static Logger getLogger() {
-        return logger;
+        return instance.logger;
     }
 }

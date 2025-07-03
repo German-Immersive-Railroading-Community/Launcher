@@ -5,8 +5,8 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.google.gson.reflect.TypeToken;
 import com.troblecodings.launcher.Launcher;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.time.Duration;
 import java.util.Optional;
 
 public final class NetUtils {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger(NetUtils.class);
 
     private static final HttpClient client = HttpClient.newBuilder().version(Version.HTTP_2).followRedirects(Redirect.ALWAYS).connectTimeout(Duration.ofSeconds(5)).build();
 
