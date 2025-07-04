@@ -37,7 +37,7 @@ public final class NetUtils {
      * @throws InterruptedException If the web request is interrupted.
      */
     public static Optional<String> downloadString(final URI uri) throws IOException, InterruptedException {
-        logger.debug("Downloading String resource from {}", uri);
+        //logger.debug("Downloading String resource from {}", uri);
         HttpRequest req = HttpRequest.newBuilder(uri).GET().build();
 
         HttpResponse<String> res = client.send(req, BodyHandlers.ofString());
@@ -49,7 +49,7 @@ public final class NetUtils {
     }
 
     public static <T> Optional<T> downloadJson(final URI uri, Class<T> clazz) throws IOException, InterruptedException {
-        logger.debug("Downloading JSON resource from {}", uri);
+        //logger.debug("Downloading JSON resource from {}", uri);
         HttpRequest req = HttpRequest.newBuilder(uri).GET().header("Content-Type", "application/json").build();
 
         HttpResponse<String> res = client.send(req, BodyHandlers.ofString());
@@ -62,7 +62,7 @@ public final class NetUtils {
     }
 
     public static <T> Optional<T> downloadJson(final URI uri, TypeToken<T> clazz) throws IOException, InterruptedException {
-        logger.debug("Downloading JSON resource from {}", uri);
+        //logger.debug("Downloading JSON resource from {}", uri);
         HttpRequest req = HttpRequest.newBuilder(uri).GET().header("Content-Type", "application/json").build();
 
         HttpResponse<String> res = client.send(req, BodyHandlers.ofString());
@@ -75,7 +75,7 @@ public final class NetUtils {
     }
 
     public static Optional<Path> downloadFile(final URI uri, final Path path) throws IOException, InterruptedException {
-        logger.debug("Downloading file resource from {}", uri);
+        //logger.debug("Downloading file resource from {}", uri);
         HttpRequest req = HttpRequest.newBuilder(uri).GET().build();
 
         HttpResponse<Path> res = client.send(req, BodyHandlers.ofFile(path));
@@ -88,40 +88,31 @@ public final class NetUtils {
     }
 
     public static Optional<Path> downloadFileIfNotExist(final URI uri, final Path path) throws IOException, InterruptedException {
-        logger.debug("Checking if {} exists", path.getFileName());
+        //logger.debug("Checking if {} exists", path.getFileName());
         if (path.toFile().exists()) {
-            logger.debug("File exists, returning");
+            //logger.debug("File exists, returning");
             return Optional.of(path);
         }
 
-        logger.debug("File does not exist, downloading");
+        //logger.debug("File does not exist, downloading");
         return downloadFile(uri, path);
     }
 
     public static Optional<Path> validateOrDownloadSha1(final URI uri, final Path path, final String sha1) throws IOException, InterruptedException {
-
-        logger.debug("Validating if {} exists and SHA-1 matches", path);
         if (!validateSha1(sha1, path)) {
-            logger.debug("Failed validation, deleting old file");
-            path.toFile().delete();
+            //logger.debug("Failed SHA-1 validation of {}", path);
             return downloadFile(uri, path);
         }
 
-        logger.debug("Succeeded validation");
         return Optional.of(path);
     }
 
     public static Optional<Path> validateOrDownloadSha256(final URI uri, final Path path, final String sha256) throws IOException, InterruptedException {
-        logger.debug("Validating if {} exists and SHA-256 matches", path);
         if (!validateSha256(sha256, path)) {
-            logger.debug("Failed validation, deleting old file");
-            if(!path.toFile().delete()) {
-                logger.warn("Failed to delete '{}'!", path);
-            }
+            //logger.debug("Failed SHA-256 validation of {}", path);
             return downloadFile(uri, path);
         }
 
-        logger.debug("Succeeded validation");
         return Optional.of(path);
     }
 
@@ -135,7 +126,7 @@ public final class NetUtils {
         final HashCode sha1Hc = Hashing.sha1().hashBytes(Files.toByteArray(filePath.toFile()));
 
         final String providedSha1 = sha1Hc.toString();
-        logger.debug("Expected SHA-1: {}; Provided SHA-1: {}", expectedSha1, providedSha1);
+        //logger.debug("Expected SHA-1: {}; Provided SHA-1: {}", expectedSha1, providedSha1);
         return expectedSha1.equals(providedSha1);
     }
 
@@ -148,7 +139,7 @@ public final class NetUtils {
         final HashCode sha256Hc = Hashing.sha256().hashBytes(Files.toByteArray(filePath.toFile()));
 
         final String providedSha256 = sha256Hc.toString();
-        logger.debug("Expected SHA-256: {}; Provided SHA-256: {}", providedSha256, providedSha256);
+        //logger.debug("Expected SHA-256: {}; Provided SHA-256: {}", providedSha256, providedSha256);
         return expectedSha256.equals(providedSha256);
     }
 }

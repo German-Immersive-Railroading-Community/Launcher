@@ -259,6 +259,8 @@ public class StartupUtil {
                 if (downloadInfo.artifactDownload() != null) {
                     final LibraryArtifactDownload artifactDownload = downloadInfo.artifactDownload();
                     Path artifactPath = LauncherPaths.getLibrariesDir().resolve(artifactDownload.path());
+                    Files.createDirectories(artifactPath.getParent());
+
                     NetUtils.validateOrDownloadSha1(URI.create(artifactDownload.url()), artifactPath, artifactDownload.sha1());
                     LIBPATHS += artifactPath + ";";
                 } else if (lib.natives() != null && downloadInfo.classifiers() != null) {
@@ -279,6 +281,7 @@ public class StartupUtil {
 
                     final LibraryArtifactDownload artifact = classifiers.get(nativeKey);
                     Path artifactPath = LauncherPaths.getLibrariesDir().resolve(artifact.path());
+                    Files.createDirectories(artifactPath.getParent());
                     NetUtils.validateOrDownloadSha1(URI.create(artifact.url()), artifactPath, artifact.sha1());
 
                     // Extract the natives
@@ -291,7 +294,7 @@ public class StartupUtil {
             }
 
             // Asset lockup and download
-            final URI baseMcUri = URI.create("https://resources.download.minecraft.net/");
+            final String baseMcUri = "https://resources.download.minecraft.net/";
 
             mcObjects.forEach((key, obj) -> {
                 try {
@@ -303,7 +306,7 @@ public class StartupUtil {
                         Files.createDirectories(folderPath);
                     }
 
-                    NetUtils.validateOrDownloadSha1(baseMcUri.resolve(folder).resolve(hash), folderPath.resolve(hash), hash);
+                    NetUtils.validateOrDownloadSha1(URI.create(baseMcUri + folder + "/" + hash), folderPath.resolve(hash), hash);
                 } catch (Throwable e) {
                     Launcher.onError(e);
                 }
@@ -314,12 +317,11 @@ public class StartupUtil {
             final double max = json.totalSize();
             additional.forEach((key, artifacts) -> {
                 artifacts.forEach(artifact -> {
-                    Path path;
                     String name = artifact.name();
-
-                    path = LauncherPaths.getGameDataDir().resolve(key).resolve(name);
+                    Path path = LauncherPaths.getGameDataDir().resolve(key).resolve(name);
 
                     try {
+                        Files.createDirectories(path.getParent());
                         NetUtils.validateOrDownloadSha256(URI.create(artifact.url()), path, artifact.sha256());
                         Footer.setProgress((counter.getAndAdd(artifact.size())) / max);
                     } catch (final Exception e) {
@@ -374,6 +376,7 @@ public class StartupUtil {
 
             for (final OptionalMod optionalMod : optionalMods) {
                 Path optionalFilesPath = optionalModsPath.resolve(optionalMod.name());
+                Files.createDirectories(optionalFilesPath.getParent());
                 NetUtils.validateOrDownloadSha1(URI.create(optionalMod.url()), optionalFilesPath, optionalMod.sha1());
             }
 

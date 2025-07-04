@@ -56,7 +56,6 @@
     </build>
 
     <repositories>
-
         <repository>
             <id>central</id>
             <url>https://repo.maven.apache.org/maven2/</url>
@@ -108,12 +107,6 @@
             <groupId>net.raphimc</groupId>
             <artifactId>MinecraftAuth</artifactId>
             <version>4.1.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>net.hycrafthd</groupId>
-            <artifactId>minecraft_authenticator</artifactId>
-            <version>1.0.1</version>
         </dependency>
 
         <dependency>
