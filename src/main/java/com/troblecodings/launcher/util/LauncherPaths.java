@@ -50,8 +50,7 @@ public final class LauncherPaths {
         jreDir = dataDir.resolve("jre");
 
         settingsFile = configDir.resolve("settings.json");
-        // TODO: change to session.json
-        sessionFile = dataDir.resolve("ac.ce");
+        sessionFile = dataDir.resolve("session.json");
         girJsonFile = dataDir.resolve("GIR.json");
 
         Files.createDirectories(configDir);

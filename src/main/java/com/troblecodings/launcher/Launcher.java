@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Launcher extends Application {
-    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
     private static Launcher instance = null;
     private static boolean beta_mode = false;
@@ -48,8 +48,6 @@ public class Launcher extends Application {
     public static CreditsScene CREDITSSCENE;
     public static OptionalModsScene OPTIONALMODSSCENE;
 
-    private final UserService userService;
-
     private Logger logger;
     private Stage stage;
     private AppSettings appSettings;
@@ -57,8 +55,6 @@ public class Launcher extends Application {
 
     public Launcher() {
         instance = this;
-
-        userService = new UserService();
     }
 
     @Override
@@ -126,6 +122,9 @@ public class Launcher extends Application {
         MOJANGLOGINSCENE = new MojangLoginScene();
         CREDITSSCENE = new CreditsScene();
         OPTIONALMODSSCENE = new OptionalModsScene();
+
+        userService = new UserService();
+        userService.loadSession();
     }
 
     @Override

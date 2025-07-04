@@ -137,6 +137,13 @@
             <version>1.5.18</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/net.raphimc/MinecraftAuth -->
+        <dependency>
+            <groupId>net.raphimc</groupId>
+            <artifactId>MinecraftAuth</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+
         <dependency>
             <groupId>net.hycrafthd</groupId>
             <artifactId>minecraft_authenticator</artifactId>

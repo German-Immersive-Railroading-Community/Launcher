@@ -115,7 +115,9 @@ public final class NetUtils {
         logger.debug("Validating if {} exists and SHA-256 matches", path);
         if (!validateSha256(sha256, path)) {
             logger.debug("Failed validation, deleting old file");
-            path.toFile().delete();
+            if(!path.toFile().delete()) {
+                logger.warn("Failed to delete '{}'!", path);
+            }
             return downloadFile(uri, path);
         }
 
