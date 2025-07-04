@@ -4,9 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.*;
+import com.troblecodings.launcher.models.AppSettings;
 import com.troblecodings.launcher.services.UserService;
 import com.troblecodings.launcher.util.AuthUtil;
-import com.troblecodings.launcher.util.FileUtil;
 import com.troblecodings.launcher.util.LauncherPaths;
 import com.troblecodings.launcher.util.StartupUtil;
 import javafx.animation.Transition;
@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +52,8 @@ public class Launcher extends Application {
 
     private Logger logger;
     private Stage stage;
+    private AppSettings appSettings;
+    private UserService userService;
 
     public Launcher() {
         instance = this;
@@ -59,15 +63,9 @@ public class Launcher extends Application {
 
     @Override
     public void init() throws Exception {
-        FileUtil.init();
-        FileUtil.readSettings();
-
-        if (FileUtil.SETTINGS == null)
-            FileUtil.SETTINGS = new FileUtil.SettingsData();
-
         LauncherPaths.init();
         System.setProperty("girc.logsPath", LauncherPaths.getLogsDir().toString());
-        System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
+        System.out.println(System.getProperty("girc.logsPath"));
 
         logger = LoggerFactory.getLogger(Launcher.class);
 
@@ -75,19 +73,30 @@ public class Launcher extends Application {
         logger.info("GIRC-Launcher v1.1.0");
         logger.info("OS: {} ({}), OS Version: {}", SystemUtils.OS_NAME, SystemUtils.OS_ARCH, SystemUtils.OS_VERSION);
 
-        logger.info("Checking for updates...");
-
         logger.debug("Loading settings...");
 
-        boolean update = true;
+        try {
+            this.appSettings = GSON.fromJson(Files.newBufferedReader(LauncherPaths.getSettingsFile()), AppSettings.class);
+        } catch (final NoSuchFileException ignored) {
+            logger.warn("Could not find settings, creating default.");
+            appSettings = new AppSettings();
+            logger.warn("Writing default settings to disk.");
+            Files.writeString(LauncherPaths.getSettingsFile(), GSON.toJson(appSettings));
+        } catch (final Exception e) {
+            logger.error("Failed to load application settings:", e);
+            System.exit(1);
+        }
+
+        logger.debug("Settings loaded.");
+
+        boolean update = appSettings.isAppUpdatesEnabled();
 
         Parameters params = getParameters();
 
         for (String param : params.getRaw()) {
-            logger.info("Iterating over parameter: {}", param);
+            logger.debug("Iterating over parameter: {}", param);
 
             if ("--no-update".equals(param)) {
-                logger.info("Skipping updates!");
                 update = false;
             } else if ("-eb".equals(param) || "--enable-beta".equals(param)) {
                 logger.info("Enabling access to beta versions.");
@@ -96,8 +105,12 @@ public class Launcher extends Application {
             }
         }
 
-//        if (update)
-//            StartupUtil.update();
+        if (update) {
+            logger.info("Checking for updates...");
+            // StartupUitl.update();
+        } else {
+            logger.info("Updates are disabled.");
+        }
 
         // loading images into list
         images.add(Assets.getImage("background.png"));
@@ -135,12 +148,18 @@ public class Launcher extends Application {
     }
 
     @Override
-    public void stop() {
-        FileUtil.saveSettings();
+    public void stop() throws IOException, InterruptedException {
+        logger.info("Exiting application, saving settings to disk.");
+        Files.writeString(LauncherPaths.getSettingsFile(), GSON.toJson(appSettings));
+        logger.info("Goodbye!");
     }
 
     public UserService getUserService() {
         return userService;
+    }
+
+    public AppSettings getAppSettings() {
+        return appSettings;
     }
 
     public static void setupScene(Scene scene, StackPane stackpane) {

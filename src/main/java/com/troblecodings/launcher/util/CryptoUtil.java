@@ -19,7 +19,7 @@ public class CryptoUtil {
 	public static void saveEncrypted(Path file, Object session) {
 		Key key = CryptoUtil.getKey(TRANSFORM);
 		
-		String sessionstring = FileUtil.GSON.toJson(session);
+		String sessionstring = Launcher.GSON.toJson(session);
 		try {
 			Cipher cipher = Cipher.getInstance(TRANSFORM);
 			cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -43,7 +43,7 @@ public class CryptoUtil {
 
 					byte[] encrypted = cipher.doFinal(content);
 					String session = new String(encrypted);
-					return FileUtil.GSON.fromJson(session, t);
+					return Launcher.GSON.fromJson(session, t);
 				}
 			}
 		} catch(JsonParseException ex) {

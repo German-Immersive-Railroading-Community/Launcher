@@ -11,6 +11,8 @@ import net.querz.nbt.io.NamedTag;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,6 +31,8 @@ import java.util.stream.Stream;
 
 public class StartupUtil {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StartupUtil.class);
+
     private static final String RELEASE_API = "https://api.github.com/repos/German-Immersive-Railroading-Community/Launcher/releases";
     private static final String BETA_API = "https://girc.eu/Launcher/Beta/beta.json";
 
@@ -43,7 +47,7 @@ public class StartupUtil {
         if (activeBeta == info)
             return;
 
-        Launcher.getLogger().info("Changed active beta to {}", info);
+        LOGGER.info("Changed active beta to {}", info);
         activeBeta = info;
     }
 
@@ -79,7 +83,7 @@ public class StartupUtil {
 //				});
 //			});
 //		} catch (Exception e) {
-//			Launcher.getLogger().trace("Could not parse beta.json!", e);
+//			LOGGER.trace("Could not parse beta.json!", e);
 //			return new BetaInfo[0];
 //		}
 //
@@ -90,10 +94,10 @@ public class StartupUtil {
         if (!Launcher.getBetaMode())
             return;
 
-        if (!ConnectionUtil.download(BETA_API, FileUtil.SETTINGS.baseDir + "/beta.json")) {
-            Launcher.getLogger().warn("Could not download beta.json!");
+        if (!ConnectionUtil.download(BETA_API, LauncherPaths.getDataDir().resolve("/beta.json").toString())) {
+            LOGGER.warn("Could not download beta.json!");
         } else {
-            Launcher.getLogger().info("Refreshed beta.json!");
+            LOGGER.info("Refreshed beta.json!");
         }
     }
 
@@ -167,7 +171,7 @@ public class StartupUtil {
     }
 
     private static void addServerToData() {
-        Path pth = Paths.get(FileUtil.SETTINGS.baseDir, "servers.dat");
+        Path pth = LauncherPaths.getGameDataDir().resolve("servers.dat");
         if (!Files.exists(pth)) {
             try {
                 Files.copy(Assets.getResourceAsStream("servers.dat"), pth);
@@ -182,7 +186,7 @@ public class StartupUtil {
 //			addServerToData();
 //			String str = ConnectionUtil.getStringFromURL(RELEASE_API);
 //			if (str == null) {
-//				Launcher.getLogger().info("Couldn't read updater information!");
+//				LOGGER.info("Couldn't read updater information!");
 //				return;
 //			}
 //			JSONArray obj = new JSONArray(str);
@@ -190,16 +194,16 @@ public class StartupUtil {
 //			String downloadURL = newversion.getString("browser_download_url");
 //			File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 //			if (!location.isFile()) {
-//				Launcher.getLogger().debug("Dev version no update!");
+//				LOGGER.debug("Dev version no update!");
 //				return;
 //			}
 //			long size = Files.size(Paths.get(location.toURI()));
 //			long newsize = newversion.getNumber("size").longValue();
 //			if (newsize == size) {
-//				Launcher.getLogger().info("The new version ({}) is equal to the old ({})", newsize, size);
+//				LOGGER.info("The new version ({}) is equal to the old ({})", newsize, size);
 //				return;
 //			}
-//			Launcher.getLogger().info("Updating Launcher!");
+//			LOGGER.info("Updating Launcher!");
 //			ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
 //			Path pth = Paths.get(location.toURI());
 //			Files.copy(pth, Paths.get(pth + ".tmp"), StandardCopyOption.REPLACE_EXISTING);
@@ -225,7 +229,7 @@ public class StartupUtil {
     private static String[] prestart() {
         try {
             addServerToData();
-            String clientJson = FileUtil.SETTINGS.baseDir + "/GIR.json";
+            String clientJson = LauncherPaths.getGirJsonFile().toString();
             ConnectionUtil.download("https://girc.eu/Launcher/GIR.json", clientJson);
 
             String content = new String(Files.readAllBytes(Paths.get(clientJson)));
@@ -234,7 +238,7 @@ public class StartupUtil {
             MAINCLASS = json.mainClass();
 
             // Step 1: Download texture indices
-            Path indices = Paths.get(FileUtil.ASSET_DIR + "/indexes");
+            Path indices = LauncherPaths.getAssetsDir().resolve("indexes");
             if (!Files.exists(indices))
                 Files.createDirectories(indices);
 
@@ -242,7 +246,7 @@ public class StartupUtil {
             String indexpath = indices + "/" + assetIndex.id() + ".json";
             ConnectionUtil.validateDownloadRetry(assetIndex.url(), indexpath, assetIndex.sha1());
 
-            Path ogMC = Paths.get(FileUtil.SETTINGS.baseDir + "/versions/" + json.inheritsFrom() + "/" + json.inheritsFrom() + ".jar");
+            Path ogMC = LauncherPaths.getGameDataDir().resolve("versions").resolve(json.inheritsFrom()).resolve(json.inheritsFrom() + ".jar");
             Files.createDirectories(ogMC.getParent());
 
             final DownloadInfo clientDl = json.downloads().get("client");
@@ -254,7 +258,7 @@ public class StartupUtil {
             final var libraries = json.libraries();
             final var optionalMods = json.optionalMods();
 
-            Path objectsPath = Paths.get(FileUtil.ASSET_DIR + "/objects");
+            Path objectsPath = LauncherPaths.getAssetsDir().resolve("objects");
             if (!Files.exists(objectsPath))
                 Files.createDirectories(objectsPath);
 
@@ -271,7 +275,7 @@ public class StartupUtil {
                 if (downloadInfo.artifactDownload() != null) {
                     final LibraryArtifactDownload artifactDownload = downloadInfo.artifactDownload();
                     String url = artifactDownload.url();
-                    String name = FileUtil.LIB_DIR + "/" + artifactDownload.path();
+                    String name = LauncherPaths.getLibrariesDir().resolve(artifactDownload.path()).toString();
                     String sha1 = artifactDownload.sha1();
 
                     LIBPATHS += name + ";";
@@ -281,25 +285,25 @@ public class StartupUtil {
                     final String osShorthand = getOSShortName();
 
                     if (!natives.containsKey(osShorthand)) {
-                        //logger.debug("Library {} no native with OS shorthand {}, skipping", library.name(), osShorthand);
+                        LOGGER.debug("Library {} no native with OS shorthand {}, skipping", lib.name(), osShorthand);
                         continue;
                     }
 
                     final String nativeKey = natives.get(osShorthand);
                     final Map<String, LibraryArtifactDownload> classifiers = downloadInfo.classifiers();
                     if (!classifiers.containsKey(nativeKey)) {
-                        //logger.debug("Classifiers do not contain key {}, skipping", nativeKey);
+                        LOGGER.debug("Classifiers do not contain key {}, skipping", nativeKey);
                         continue;
                     }
 
                     final LibraryArtifactDownload artifact = classifiers.get(nativeKey);
-                    String name = FileUtil.LIB_DIR + "/" + artifact.path();
+                    String name = LauncherPaths.getLibrariesDir().resolve(artifact.path()).toString();
                     ConnectionUtil.validateDownloadRetry(artifact.url(), name, artifact.sha1());
 
                     // Extract the natives
-                    unzip(name, FileUtil.LIB_DIR);
+                    unzip(name, LauncherPaths.getLibrariesDir().toString());
                 } else {
-                    //logger.debug("Library {} has no natives, artifacts, or classifiers inside of the library download, skipping", library.name());
+                    LOGGER.debug("Library {} has no natives, artifacts, or classifiers inside of the library download, skipping", lib.name());
                 }
 
                 Footer.setProgress(counter.addAndGet(1) / maxItems);
@@ -334,16 +338,16 @@ public class StartupUtil {
 
                     if (activeBeta != null && name.toLowerCase().contains(activeBeta.getModName())) {
                         try {
-                            if (Files.deleteIfExists(Paths.get(FileUtil.SETTINGS.baseDir, key, name)))
-                                Launcher.getLogger().info("Deleted {} in favour of {}!", name, activeBeta.getJarFileName());
+                            if (Files.deleteIfExists(LauncherPaths.getGameDataDir().resolve(key).resolve(name)))
+                                LOGGER.info("Deleted {} in favour of {}!", name, activeBeta.getJarFileName());
                         } catch (IOException e) {
-                            Launcher.getLogger().trace("Failed to delete normal mod file for beta mod: {}!", activeBeta.toString(), e);
+                            LOGGER.trace("Failed to delete normal mod file for beta mod: {}!", activeBeta.toString(), e);
                         }
 
-                        path = Paths.get(FileUtil.SETTINGS.baseDir, key, activeBeta.getJarFileName());
+                        path = LauncherPaths.getGameDataDir().resolve(key).resolve(activeBeta.getJarFileName());
                         ConnectionUtil.download(activeBeta.getPrDownload(), path.toString(), in -> Footer.setProgress((counter.get() + in) / max));
                     } else {
-                        path = Paths.get(FileUtil.SETTINGS.baseDir, key, name);
+                        path = LauncherPaths.getGameDataDir().resolve(key).resolve(name);
                         ConnectionUtil.validateDownloadRetry(artifact.url(), path.toString(), artifact.sha1(), in -> Footer.setProgress((counter.get() + in) / max));
                     }
 
@@ -351,7 +355,7 @@ public class StartupUtil {
                 });
             });
 
-            Path optionalModsPath = Paths.get(FileUtil.SETTINGS.baseDir, "optional-mods");
+            Path optionalModsPath = LauncherPaths.getGameDataDir().resolve("optional-mods");
             Files.createDirectories(optionalModsPath);
 
             additional.forEach((key, artifacts) -> {
@@ -364,15 +368,15 @@ public class StartupUtil {
                     }
 
                     Files.list(optionalModsPath).filter(file -> file.toString().endsWith(".jar")).forEach(file -> {
-                        Path filePath = Paths.get(FileUtil.SETTINGS.baseDir, "mods", file.getFileName().toString());
+                        Path filePath = LauncherPaths.getGameDataDir().resolve("mods").resolve(file.getFileName().toString());
                         validFiles.add(filePath.toString());
                     });
 
-                    Files.list(Paths.get(FileUtil.SETTINGS.baseDir, key)).filter(incom -> {
+                    Files.list(LauncherPaths.getGameDataDir().resolve(key)).filter(incom -> {
                         String filename = incom.getFileName().toString();
                         return Files.isRegularFile(incom) && validFiles.stream().noneMatch(job -> job.toString().contains(filename));
                     }).forEach(t -> {
-                        Launcher.getLogger().debug("Deleted file {}", t);
+                        LOGGER.debug("Deleted file {}", t);
                         try { // I hate this language
                             Files.deleteIfExists(t);
                         } catch (IOException e) {
@@ -384,7 +388,7 @@ public class StartupUtil {
                 }
             });
 
-            Path additionalMods = Paths.get(FileUtil.SETTINGS.baseDir, "additional-mods");
+            Path additionalMods = LauncherPaths.getGameDataDir().resolve("additional-mods");
             Files.createDirectories(additionalMods);
             Files.list(additionalMods).filter(pth -> !pth.toString().endsWith(".dis")).forEach(pth -> {
                 try {
@@ -401,11 +405,11 @@ public class StartupUtil {
 
 
             for (final OptionalMod optionalMod : optionalMods) {
-                Path optionalFilesPath = Paths.get(optionalMods.toString(), optionalMod.name());
+                Path optionalFilesPath = optionalModsPath.resolve(optionalMod.name());
                 ConnectionUtil.validateDownloadRetry(optionalMod.url(), optionalFilesPath.toString(), optionalMod.sha1());
             }
 
-            Path serverDatPath = Paths.get(FileUtil.SETTINGS.baseDir, "servers.dat");
+            Path serverDatPath = LauncherPaths.getGameDataDir().resolve("servers.dat");
             NamedTag rootTag = NBTUtil.read(serverDatPath.toString());
             CompoundTag rootCt = (CompoundTag) rootTag.getTag();
             ListTag<CompoundTag> serverListTag = (ListTag<CompoundTag>) rootCt.get("servers");
@@ -449,12 +453,12 @@ public class StartupUtil {
     }
 
     public static Process start() {
-        String javaVersionPath = FileUtil.SETTINGS.javaPath;
+        String javaVersionPath = Launcher.getInstance().getAppSettings().getCustomJrePath();
         if (javaVersionPath.isEmpty()) {
             Optional<String> javaVers = findJavaVersion();
             if (javaVers.isEmpty()) {
                 javaVersionPath = "java";
-                Launcher.getLogger().warn("Java version not found! Falling back!");
+                LOGGER.warn("Java version not found! Falling back!");
             } else {
                 javaVersionPath = javaVers.get() + "/";
             }
@@ -467,16 +471,16 @@ public class StartupUtil {
         if (parameter == null)
             return null;
 
-        String width = String.valueOf(FileUtil.SETTINGS.width);
-        String height = String.valueOf(FileUtil.SETTINGS.height);
-        String ram = String.valueOf(FileUtil.SETTINGS.ram);
+        String width = String.valueOf(Launcher.getInstance().getAppSettings().getWidth());
+        String height = String.valueOf(Launcher.getInstance().getAppSettings().getHeight());
+        String ram = String.valueOf(Launcher.getInstance().getAppSettings().getMemory());
         String[] preparameter = new String[]{javaVersionPath, "-Xmx" + ram + "M", "-Xms" + ram + "M",
                 "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
-                "-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", width, "-height",
+                "-Djava.library.path=" + LauncherPaths.getLibrariesDir(), "-cp", LIBPATHS, MAINCLASS, "-width", width, "-height",
                 height};
         ProcessBuilder builder = new ProcessBuilder(
                 Stream.concat(Arrays.stream(preparameter), Arrays.stream(parameter)).toArray(String[]::new));
-        builder.directory(new File(FileUtil.SETTINGS.baseDir));
+        builder.directory(LauncherPaths.getGameDataDir().toFile());
         builder.redirectError(Redirect.INHERIT);
         builder.redirectOutput(Redirect.INHERIT);
         try {

@@ -15,12 +15,23 @@ public final class LauncherPaths {
 
     private static Path cacheDir;
 
-    private static Path settingsFile;
-
     private static Path logsDir;
 
-    private LauncherPaths() {
+    private static Path gameDataDir;
 
+    private static Path assetsDir;
+
+    private static Path librariesDir;
+
+    private static Path jreDir;
+
+    private static Path settingsFile;
+
+    private static Path sessionFile;
+
+    private static Path girJsonFile;
+
+    private LauncherPaths() {
     }
 
     public static void init() throws IOException {
@@ -32,12 +43,23 @@ public final class LauncherPaths {
         configDir = Path.of(projectDirs.configDir);
         dataDir = Path.of(projectDirs.dataDir);
         cacheDir = Path.of(projectDirs.cacheDir);
+        logsDir = dataDir.resolve("logs");
+        gameDataDir = dataDir.resolve("game");
+        assetsDir = gameDataDir.resolve("assets");
+        librariesDir = gameDataDir.resolve("libraries");
+        jreDir = dataDir.resolve("jre");
 
         settingsFile = configDir.resolve("settings.json");
-        logsDir = dataDir.resolve("logs");
+        // TODO: change to session.json
+        sessionFile = dataDir.resolve("ac.ce");
+        girJsonFile = dataDir.resolve("GIR.json");
 
         Files.createDirectories(configDir);
         Files.createDirectories(logsDir);
+        Files.createDirectories(gameDataDir);
+        Files.createDirectories(assetsDir);
+        Files.createDirectories(librariesDir);
+        Files.createDirectories(jreDir);
     }
 
     public static ProjectDirectories getProjectDirs() {
@@ -57,18 +79,44 @@ public final class LauncherPaths {
     }
 
     /**
+     * Points to the directory where launcher logs are stored.
+     *
+     * @return The path to the launcher logs inside the project data dir.
+     */
+    public static Path getLogsDir() {
+        return logsDir;
+    }
+
+    public static Path getGameDataDir() {
+        return gameDataDir;
+    }
+
+    public static Path getAssetsDir() {
+        return assetsDir;
+    }
+
+    public static Path getLibrariesDir() {
+        return librariesDir;
+    }
+
+    public static Path getJreDir() {
+        return jreDir;
+    }
+
+    /**
      * Points to where the application settings in JSON format are stored.
+     *
      * @return The path to the settings.json file.
      */
     public static Path getSettingsFile() {
         return settingsFile;
     }
 
-    /**
-     * Points to the directory where launcher logs are stored.
-     * @return The path to the launcher logs inside the project data dir.
-     */
-    public static Path getLogsDir() {
-        return logsDir;
+    public static Path getSessionFile() {
+        return sessionFile;
+    }
+
+    public static Path getGirJsonFile() {
+        return girJsonFile;
     }
 }

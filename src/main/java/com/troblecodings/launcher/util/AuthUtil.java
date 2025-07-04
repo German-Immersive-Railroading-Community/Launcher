@@ -26,7 +26,7 @@ public class AuthUtil {
         final AuthenticationFile file;
 
         try {
-            file = CryptoUtil.readEncrypted(FileUtil.REMEMBERFILE, AuthenticationFile.class);
+            file = CryptoUtil.readEncrypted(LauncherPaths.getSessionFile(), AuthenticationFile.class);
         } catch (JsonParseException ex) {
             return false;
         }
@@ -64,12 +64,12 @@ public class AuthUtil {
     }
 
     public static void refreshAuthFile(AuthenticationFile file) {
-        CryptoUtil.saveEncrypted(FileUtil.REMEMBERFILE, file);
+        CryptoUtil.saveEncrypted(LauncherPaths.getSessionFile(), file);
     }
 
     public static void logout() {
         try {
-            Files.deleteIfExists(FileUtil.REMEMBERFILE);
+            Files.deleteIfExists(LauncherPaths.getSessionFile());
         } catch (IOException ex) {
             Launcher.onError(ex);
         }
@@ -84,8 +84,8 @@ public class AuthUtil {
         Map<String, String> list = new HashMap<>();
         list.put("${auth_player_name}", user.getName());
         list.put("${version_name}", json.id());
-        list.put("${game_directory}", FileUtil.SETTINGS.baseDir);
-        list.put("${assets_root}", FileUtil.ASSET_DIR);
+        list.put("${game_directory}", LauncherPaths.getGameDataDir().toString());
+        list.put("${assets_root}", LauncherPaths.getAssetsDir().toString());
         list.put("${assets_index_name}", json.assetIndex().id());
         list.put("${auth_uuid}", user.getUuid());
         list.put("${auth_access_token}", user.getAccessToken());
