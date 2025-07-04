@@ -113,7 +113,7 @@
         <dependency>
             <groupId>net.hycrafthd</groupId>
             <artifactId>minecraft_authenticator</artifactId>
-            <version>1.0.1</version>
+            <version>3.0.6</version>
         </dependency>
 
         <dependency>
