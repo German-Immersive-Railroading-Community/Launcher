@@ -2,11 +2,8 @@ package com.troblecodings.launcher.javafx;
 
 import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
-import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.BetaInfo;
-import com.troblecodings.launcher.util.StartupUtil;
 import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -23,6 +20,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 
 public class OptionsScene extends Scene {
 
@@ -137,8 +135,13 @@ public class OptionsScene extends Scene {
         final Button logout = new Button("Logout");
         logout.getStyleClass().add("optionButton");
         logout.setOnAction(evt -> {
-            AuthUtil.logout();
+            try {
+                Launcher.getInstance().getUserService().logout();
+            } catch (final IOException ignored) {
+            }
+
             Header.setVisibility(false);
+            Launcher.setScene(Launcher.LOGINSCENE);
         });
 
 //        final Button resetconfigs = new Button("Reset");

@@ -6,7 +6,6 @@ import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.*;
 import com.troblecodings.launcher.models.AppSettings;
 import com.troblecodings.launcher.services.UserService;
-import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.LauncherPaths;
 import javafx.animation.Transition;
 import javafx.application.Application;
@@ -17,6 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
@@ -57,7 +57,6 @@ public class Launcher extends Application {
     public void init() throws Exception {
         LauncherPaths.init();
         System.setProperty("girc.logsPath", LauncherPaths.getLogsDir().toString());
-        System.out.println(System.getProperty("girc.logsPath"));
 
         logger = LoggerFactory.getLogger(Launcher.class);
 
@@ -123,7 +122,7 @@ public class Launcher extends Application {
         this.stage = stage;
         MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
 
-        boolean authStatus = AuthUtil.checkSession();
+        boolean authStatus = userService.isValidSession();
         stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
 
         stage.getIcons().add(Assets.getImage("icon.png"));
@@ -133,7 +132,7 @@ public class Launcher extends Application {
         stage.setWidth(1280);
         stage.setHeight(720);
         stage.initStyle(StageStyle.TRANSPARENT);
-        stage.setTitle("GIR Launcher");
+        stage.setTitle("GIRC-Launcher");
         stage.show();
     }
 

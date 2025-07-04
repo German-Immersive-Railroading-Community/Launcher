@@ -31,6 +31,7 @@ public class LoginScene extends Scene {
 		VBox.setMargin(microsoftLoginButton, new Insets(20, 0, 20, 0));
 		microsoftLoginButton.setOnAction(event -> {
 			Launcher.setScene(Launcher.MICROSOFTLOGINSCENE);
+			Launcher.MICROSOFTLOGINSCENE.run();
 		});
 
 		vbox.getChildren().addAll(microsoftLoginButton);

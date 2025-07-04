@@ -411,7 +411,7 @@ public class StartupUtil {
             NBTUtil.write(rootTag, serverDatPath.toString(), false);
 
             Footer.setProgress(0.001);
-            return AuthUtil.make(json);
+            return Launcher.getInstance().getUserService().makeArguments(json);
         } catch (Throwable e) {
             Launcher.onError(e);
             return null;
