@@ -25,12 +25,6 @@ public class LoginScene extends Scene {
 		vbox.setAlignment(Pos.CENTER);
 		stackpane.getChildren().add(vbox);
 
-		final Button mojangLoginButton = new Button();
-		mojangLoginButton.getStyleClass().add("mojangLoginButton");
-		VBox.setMargin(mojangLoginButton, new Insets(20, 0, 20, 0));
-		mojangLoginButton.setOnAction(handler -> {
-			Launcher.setScene(Launcher.MOJANGLOGINSCENE);
-		});
 
 		final Button microsoftLoginButton = new Button();
 		microsoftLoginButton.getStyleClass().add("microsoftLoginButton");
@@ -39,7 +33,7 @@ public class LoginScene extends Scene {
 			Launcher.setScene(Launcher.MICROSOFTLOGINSCENE);
 		});
 
-		vbox.getChildren().addAll(mojangLoginButton, microsoftLoginButton);
+		vbox.getChildren().addAll(microsoftLoginButton);
 		
 		final ImageView trainImageView = new ImageView(Assets.getImage("train2.png"));
 		trainImageView.setTranslateX(760 - trainImageView.getImage().getWidth());
