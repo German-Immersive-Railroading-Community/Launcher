@@ -52,7 +52,7 @@ public class Header extends StackPane {
 
 		Button closebutton = new Button();
 		closebutton.getStyleClass().add("closebutton");
-		closebutton.setOnAction(event -> System.exit(0));
+		closebutton.setOnAction(event -> Launcher.getStage().close());
 		closebutton.setTranslateX(-20);
 		closebutton.setTranslateY(20);
 		StackPane.setAlignment(closebutton, Pos.TOP_RIGHT);
