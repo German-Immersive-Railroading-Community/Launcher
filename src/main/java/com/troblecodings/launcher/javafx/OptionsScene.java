@@ -2,7 +2,6 @@ package com.troblecodings.launcher.javafx;
 
 import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
-import com.troblecodings.launcher.util.BetaInfo;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -25,7 +24,6 @@ import java.io.IOException;
 public class OptionsScene extends Scene {
 
     private static final StackPane stackpane = new StackPane();
-    private static final ComboBox<BetaInfo> betaComboBox = new ComboBox<>();
 
     public OptionsScene() {
         super(stackpane);

@@ -5,7 +5,6 @@ import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.models.girjson.GirJson;
 import com.troblecodings.launcher.util.LauncherPaths;
 import javafx.application.Platform;
-import net.hycrafthd.minecraft_authenticator.login.User;
 import net.lenni0451.commons.httpclient.HttpClient;
 import net.raphimc.minecraftauth.MinecraftAuth;
 import net.raphimc.minecraftauth.step.java.session.StepFullJavaSession;

@@ -41,16 +41,6 @@ public class StartupUtil {
 
     public static final String OSSHORTNAME = getOSShortName();
 
-    private static BetaInfo activeBeta = null;
-
-    public static void setActiveBeta(BetaInfo info) {
-        if (activeBeta == info)
-            return;
-
-        LOGGER.info("Changed active beta to {}", info);
-        activeBeta = info;
-    }
-
     // TODO: re-add
 //	/**
 //	 * Gets all currently available pull-request artifacts for GIRC-related mods.
@@ -325,20 +315,8 @@ public class StartupUtil {
                     Path path;
                     String name = artifact.name();
 
-                    if (activeBeta != null && name.toLowerCase().contains(activeBeta.getModName())) {
-                        try {
-                            if (Files.deleteIfExists(LauncherPaths.getGameDataDir().resolve(key).resolve(name)))
-                                LOGGER.info("Deleted {} in favour of {}!", name, activeBeta.getJarFileName());
-                        } catch (IOException e) {
-                            LOGGER.trace("Failed to delete normal mod file for beta mod: {}!", activeBeta.toString(), e);
-                        }
-
-                        path = LauncherPaths.getGameDataDir().resolve(key).resolve(activeBeta.getJarFileName());
-                        ConnectionUtil.download(activeBeta.getPrDownload(), path.toString(), in -> Footer.setProgress((counter.get() + in) / max));
-                    } else {
-                        path = LauncherPaths.getGameDataDir().resolve(key).resolve(name);
-                        ConnectionUtil.validateDownloadRetry(artifact.url(), path.toString(), artifact.sha1(), in -> Footer.setProgress((counter.get() + in) / max));
-                    }
+                    path = LauncherPaths.getGameDataDir().resolve(key).resolve(name);
+                    ConnectionUtil.validateDownloadRetry(artifact.url(), path.toString(), artifact.sha1(), in -> Footer.setProgress((counter.get() + in) / max));
 
                     counter.getAndAdd(artifact.size());
                 });
@@ -349,12 +327,7 @@ public class StartupUtil {
 
             additional.forEach((key, artifacts) -> {
                 try {
-
                     List<String> validFiles = new ArrayList<>(artifacts.stream().map(AdditionalArtifact::name).toList());
-
-                    if (activeBeta != null) {
-                        validFiles.add(activeBeta.getJarFileName());
-                    }
 
                     Files.list(optionalModsPath).filter(file -> file.toString().endsWith(".jar")).forEach(file -> {
                         Path filePath = LauncherPaths.getGameDataDir().resolve("mods").resolve(file.getFileName().toString());
