@@ -8,7 +8,6 @@ import com.troblecodings.launcher.models.AppSettings;
 import com.troblecodings.launcher.services.UserService;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.LauncherPaths;
-import com.troblecodings.launcher.util.StartupUtil;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -18,7 +17,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
@@ -36,7 +34,6 @@ public class Launcher extends Application {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
     private static Launcher instance = null;
-    private static boolean beta_mode = false;
 
     private static final List<Image> images = new ArrayList<>();
 
@@ -93,10 +90,6 @@ public class Launcher extends Application {
 
             if ("--no-update".equals(param)) {
                 update = false;
-            } else if ("-eb".equals(param) || "--enable-beta".equals(param)) {
-                logger.info("Enabling access to beta versions.");
-                beta_mode = true;
-                StartupUtil.refreshBetaJson();
             }
         }
 
@@ -183,10 +176,6 @@ public class Launcher extends Application {
         stackpane.getChildren().add(new Footer(scene));
         scene.setFill(Color.TRANSPARENT);
         scene.getStylesheets().add(Assets.getStyleSheet("style.css"));
-    }
-
-    public static boolean getBetaMode() {
-        return beta_mode;
     }
 
     public static Scene getScene() {

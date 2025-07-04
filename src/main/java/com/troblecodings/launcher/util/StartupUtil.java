@@ -90,17 +90,6 @@ public class StartupUtil {
 //		return betaInfo.toArray(new BetaInfo[0]);
 //	}
 
-    public static void refreshBetaJson() {
-        if (!Launcher.getBetaMode())
-            return;
-
-        if (!ConnectionUtil.download(BETA_API, LauncherPaths.getDataDir().resolve("/beta.json").toString())) {
-            LOGGER.warn("Could not download beta.json!");
-        } else {
-            LOGGER.info("Refreshed beta.json!");
-        }
-    }
-
     private static String getOSShortName() {
         String longname = System.getProperty("os.name").toLowerCase();
         if (longname.startsWith("win")) {
