@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
+import java.net.URI;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
@@ -208,11 +209,15 @@ public class StartupUtil {
     private static String[] prestart() {
         try {
             addServerToData();
-            String clientJson = LauncherPaths.getGirJsonFile().toString();
-            ConnectionUtil.download("https://girc.eu/Launcher/GIR.json", clientJson);
+            Path clientJson = LauncherPaths.getGirJsonFile();
 
-            String content = new String(Files.readAllBytes(Paths.get(clientJson)));
-            final GirJson json = Launcher.GSON.fromJson(content, GirJson.class);
+            final Optional<GirJson> optJson = NetUtils.downloadJson(URI.create("https://girc.eu/Launcher/GIR.json"), GirJson.class);
+            if (optJson.isEmpty()) {
+                LOGGER.error("Could not retrieve GIR.json!");
+                return null;
+            }
+
+            final GirJson json = optJson.get();
 
             MAINCLASS = json.mainClass();
 
@@ -222,14 +227,14 @@ public class StartupUtil {
                 Files.createDirectories(indices);
 
             final var assetIndex = json.assetIndex();
-            String indexpath = indices + "/" + assetIndex.id() + ".json";
-            ConnectionUtil.validateDownloadRetry(assetIndex.url(), indexpath, assetIndex.sha1());
+            Path indexPath = indices.resolve(assetIndex.id() + ".json");
+            NetUtils.validateOrDownloadSha1(URI.create(assetIndex.url()), indexPath, assetIndex.sha1());
 
             Path ogMC = LauncherPaths.getGameDataDir().resolve("versions").resolve(json.inheritsFrom()).resolve(json.inheritsFrom() + ".jar");
             Files.createDirectories(ogMC.getParent());
 
             final DownloadInfo clientDl = json.downloads().get("client");
-            ConnectionUtil.validateDownloadRetry(clientDl.url(), ogMC.toString(), clientDl.sha1());
+            NetUtils.validateOrDownloadSha1(URI.create(clientDl.url()), ogMC, clientDl.sha1());
 
             LIBPATHS = ogMC + ";";
 
@@ -241,7 +246,7 @@ public class StartupUtil {
             if (!Files.exists(objectsPath))
                 Files.createDirectories(objectsPath);
 
-            final MinecraftInfo mcInfo = Launcher.GSON.fromJson(Files.newBufferedReader(Paths.get(indexpath)), MinecraftInfo.class);
+            final MinecraftInfo mcInfo = Launcher.GSON.fromJson(Files.newBufferedReader(indexPath), MinecraftInfo.class);
             final Map<String, MinecraftObject> mcObjects = mcInfo.mcObjects();
 
             final double maxItems = mcObjects.size() + libraries.size();
@@ -253,12 +258,9 @@ public class StartupUtil {
 
                 if (downloadInfo.artifactDownload() != null) {
                     final LibraryArtifactDownload artifactDownload = downloadInfo.artifactDownload();
-                    String url = artifactDownload.url();
-                    String name = LauncherPaths.getLibrariesDir().resolve(artifactDownload.path()).toString();
-                    String sha1 = artifactDownload.sha1();
-
-                    LIBPATHS += name + ";";
-                    ConnectionUtil.validateDownloadRetry(url, name, sha1);
+                    Path artifactPath = LauncherPaths.getLibrariesDir().resolve(artifactDownload.path());
+                    NetUtils.validateOrDownloadSha1(URI.create(artifactDownload.url()), artifactPath, artifactDownload.sha1());
+                    LIBPATHS += artifactPath + ";";
                 } else if (lib.natives() != null && downloadInfo.classifiers() != null) {
                     final Map<String, String> natives = lib.natives();
                     final String osShorthand = getOSShortName();
@@ -276,11 +278,11 @@ public class StartupUtil {
                     }
 
                     final LibraryArtifactDownload artifact = classifiers.get(nativeKey);
-                    String name = LauncherPaths.getLibrariesDir().resolve(artifact.path()).toString();
-                    ConnectionUtil.validateDownloadRetry(artifact.url(), name, artifact.sha1());
+                    Path artifactPath = LauncherPaths.getLibrariesDir().resolve(artifact.path());
+                    NetUtils.validateOrDownloadSha1(URI.create(artifact.url()), artifactPath, artifact.sha1());
 
                     // Extract the natives
-                    unzip(name, LauncherPaths.getLibrariesDir().toString());
+                    unzip(artifactPath.toString(), LauncherPaths.getLibrariesDir().toString());
                 } else {
                     LOGGER.debug("Library {} has no natives, artifacts, or classifiers inside of the library download, skipping", lib.name());
                 }
@@ -289,19 +291,19 @@ public class StartupUtil {
             }
 
             // Asset lockup and download
-            final String baseurl = "https://resources.download.minecraft.net/";
+            final URI baseMcUri = URI.create("https://resources.download.minecraft.net/");
 
             mcObjects.forEach((key, obj) -> {
                 try {
                     String hash = obj.hash();
                     String folder = obj.folder();
-                    Path folderpath = Paths.get(objectsPath + "/" + folder);
+                    Path folderPath = Paths.get(objectsPath + "/" + folder);
 
-                    if (!Files.exists(folderpath)) {
-                        Files.createDirectories(folderpath);
+                    if (!Files.exists(folderPath)) {
+                        Files.createDirectories(folderPath);
                     }
 
-                    ConnectionUtil.validateDownloadRetry(baseurl + folder + "/" + hash, folderpath + "/" + hash, hash);
+                    NetUtils.validateOrDownloadSha1(baseMcUri.resolve(folder).resolve(hash), folderPath.resolve(hash), hash);
                 } catch (Throwable e) {
                     Launcher.onError(e);
                 }
@@ -316,9 +318,13 @@ public class StartupUtil {
                     String name = artifact.name();
 
                     path = LauncherPaths.getGameDataDir().resolve(key).resolve(name);
-                    ConnectionUtil.validateDownloadRetry(artifact.url(), path.toString(), artifact.sha1(), in -> Footer.setProgress((counter.get() + in) / max));
 
-                    counter.getAndAdd(artifact.size());
+                    try {
+                        NetUtils.validateOrDownloadSha256(URI.create(artifact.url()), path, artifact.sha256());
+                        Footer.setProgress((counter.getAndAdd(artifact.size())) / max);
+                    } catch (final Exception e) {
+                        Launcher.onError(e);
+                    }
                 });
             });
 
@@ -368,7 +374,7 @@ public class StartupUtil {
 
             for (final OptionalMod optionalMod : optionalMods) {
                 Path optionalFilesPath = optionalModsPath.resolve(optionalMod.name());
-                ConnectionUtil.validateDownloadRetry(optionalMod.url(), optionalFilesPath.toString(), optionalMod.sha1());
+                NetUtils.validateOrDownloadSha1(URI.create(optionalMod.url()), optionalFilesPath, optionalMod.sha1());
             }
 
             Path serverDatPath = LauncherPaths.getGameDataDir().resolve("servers.dat");
