@@ -31,6 +31,8 @@ public final class LauncherPaths {
 
     private static Path girJsonFile;
 
+    private static Path windowStateFile;
+
     private LauncherPaths() {
     }
 
@@ -52,8 +54,10 @@ public final class LauncherPaths {
         settingsFile = configDir.resolve("settings.json");
         sessionFile = dataDir.resolve("session.json");
         girJsonFile = dataDir.resolve("GIR.json");
+        windowStateFile = cacheDir.resolve("state.json");
 
         Files.createDirectories(configDir);
+        Files.createDirectories(cacheDir);
         Files.createDirectories(logsDir);
         Files.createDirectories(gameDataDir);
         Files.createDirectories(assetsDir);
@@ -117,5 +121,9 @@ public final class LauncherPaths {
 
     public static Path getGirJsonFile() {
         return girJsonFile;
+    }
+
+    public static Path getWindowStateFile() {
+        return windowStateFile;
     }
 }

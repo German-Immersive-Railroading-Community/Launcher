@@ -3,6 +3,7 @@ package com.troblecodings.launcher;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.troblecodings.launcher.assets.Assets;
+import com.troblecodings.launcher.assets.LauncherState;
 import com.troblecodings.launcher.javafx.*;
 import com.troblecodings.launcher.models.AppSettings;
 import com.troblecodings.launcher.services.UserService;
@@ -75,7 +76,6 @@ public class Launcher extends Application {
             Files.writeString(LauncherPaths.getSettingsFile(), GSON.toJson(appSettings));
         } catch (final Exception e) {
             logger.error("Failed to load application settings:", e);
-            System.exit(1);
         }
 
         logger.debug("Settings loaded.");
@@ -118,7 +118,7 @@ public class Launcher extends Application {
     }
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws IOException {
         this.stage = stage;
         MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
 
@@ -129,15 +129,30 @@ public class Launcher extends Application {
 
         Header.setVisibility(authStatus);
 
-        stage.setWidth(1280);
-        stage.setHeight(720);
-        stage.initStyle(StageStyle.TRANSPARENT);
+        if (Files.exists(LauncherPaths.getWindowStateFile())) {
+            logger.debug("Loading previous window state");
+            final LauncherState state = GSON.fromJson(Files.newBufferedReader(LauncherPaths.getWindowStateFile()), LauncherState.class);
+            stage.setX(state.x());
+            stage.setY(state.y());
+            stage.setWidth(state.width());
+            stage.setHeight(state.height());
+        } else {
+            logger.debug("No previous window state found");
+            stage.setWidth(1280);
+            stage.setHeight(720);
+        }
+
+        stage.initStyle(StageStyle.DECORATED);
         stage.setTitle("GIRC-Launcher");
         stage.show();
     }
 
     @Override
     public void stop() throws IOException, InterruptedException {
+        logger.debug("Persisting window state");
+        final LauncherState state = new LauncherState(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+        Files.writeString(LauncherPaths.getWindowStateFile(), GSON.toJson(state));
+
         logger.info("Exiting application, saving settings to disk.");
         Files.writeString(LauncherPaths.getSettingsFile(), GSON.toJson(appSettings));
         logger.info("Goodbye!");
