@@ -42,45 +42,6 @@ public class StartupUtil {
 
     public static final String OSSHORTNAME = getOSShortName();
 
-    // TODO: re-add
-//	/**
-//	 * Gets all currently available pull-request artifacts for GIRC-related mods.
-//	 * @param refreshBetaData Indicates whether to re-download the beta.json.
-//	 * @return An array of Strings containing the beta versions of the mod; or null in case of the mod not having any.
-//	 */
-//	public static BetaInfo[] getBetaVersions(boolean refreshBetaData) {
-//		if (!Launcher.getBetaMode())
-//			return new BetaInfo[0];
-//
-//		List<BetaInfo> betaInfo = new ArrayList<>();
-//
-//		try {
-//			Path betaJsonPath = Paths.get(FileUtil.SETTINGS.baseDir + "/beta.json");
-//
-//			if (refreshBetaData || !Files.exists(betaJsonPath))
-//				refreshBetaJson();
-//
-//			JSONObject root = new JSONObject(new String(Files.readAllBytes(betaJsonPath)));
-//
-//			root.keySet().forEach(key -> {
-//				JSONObject mod = root.getJSONObject(key);
-//				mod.keySet().forEach(pr -> {
-//					try {
-//						JSONObject prObj = mod.getJSONObject(pr);
-//						BetaInfo info = new BetaInfo(key, Integer.parseInt(pr), prObj.getString("name"), prObj.getString("download"), prObj.getInt("port"));
-//						betaInfo.add(info);
-//					} catch (Exception ignored) {
-//					}
-//				});
-//			});
-//		} catch (Exception e) {
-//			LOGGER.trace("Could not parse beta.json!", e);
-//			return new BetaInfo[0];
-//		}
-//
-//		return betaInfo.toArray(new BetaInfo[0]);
-//	}
-
     private static String getOSShortName() {
         String longname = System.getProperty("os.name").toLowerCase();
         if (longname.startsWith("win")) {
