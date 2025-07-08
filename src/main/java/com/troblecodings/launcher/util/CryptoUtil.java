@@ -10,6 +10,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.google.gson.JsonParseException;
 import com.troblecodings.launcher.Launcher;
+import org.slf4j.LoggerFactory;
 
 public class CryptoUtil {
 	
@@ -47,7 +48,7 @@ public class CryptoUtil {
 				}
 			}
 		} catch(JsonParseException ex) {
-			Launcher.getLogger().warn("Could not parse encrypted file");
+			LoggerFactory.getLogger(CryptoUtil.class).warn("Could not parse encrypted file");
 		} catch (Throwable e) {
 			Launcher.onError(e);
 		}

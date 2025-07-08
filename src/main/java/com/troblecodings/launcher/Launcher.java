@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.assets.LauncherState;
 import com.troblecodings.launcher.javafx.*;
+import com.troblecodings.launcher.javafx.controllers.MainController;
 import com.troblecodings.launcher.models.AppSettings;
 import com.troblecodings.launcher.services.UserService;
 import com.troblecodings.launcher.util.LauncherPaths;
@@ -30,18 +31,19 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Launcher extends Application {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
     private static Launcher instance = null;
+    private static boolean experiments = false;
 
     private static final List<Image> images = new ArrayList<>();
 
     public static HomeScene HOMESCENE;
     public static OptionsScene OPTIONSSCENE;
     public static LoginScene LOGINSCENE;
-    public static MicrosoftLoginScene MICROSOFTLOGINSCENE;
     public static CreditsScene CREDITSSCENE;
     public static OptionalModsScene OPTIONALMODSSCENE;
 
@@ -90,6 +92,10 @@ public class Launcher extends Application {
             if ("--no-update".equals(param)) {
                 update = false;
             }
+
+            if ("-ex".equalsIgnoreCase(param)) {
+                experiments = true;
+            }
         }
 
         if (update) {
@@ -120,14 +126,19 @@ public class Launcher extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         this.stage = stage;
-        MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
 
-        boolean authStatus = userService.isValidSession();
-        stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
+        if(!experiments) {
+            boolean authStatus = userService.isValidSession();
+            stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
+            Header.setVisibility(authStatus);
+        } else {
+            final MainController mainController = new MainController();
+            final Scene scene = new Scene(mainController.getView());
+            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
+            stage.setScene(scene);
+        }
 
         stage.getIcons().add(Assets.getImage("icon.png"));
-
-        Header.setVisibility(authStatus);
 
         if (Files.exists(LauncherPaths.getWindowStateFile())) {
             logger.debug("Loading previous window state");
@@ -142,17 +153,23 @@ public class Launcher extends Application {
             stage.setHeight(720);
         }
 
+        stage.setOnCloseRequest(ev -> {
+            try {
+                logger.debug("Persisting window state");
+                final LauncherState state = new LauncherState(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+                Files.writeString(LauncherPaths.getWindowStateFile(), GSON.toJson(state));
+            } catch (final Exception e) {
+                logger.warn("Failed to persist window state.", e);
+            }
+        });
+
         stage.initStyle(StageStyle.DECORATED);
         stage.setTitle("GIRC-Launcher");
         stage.show();
     }
 
     @Override
-    public void stop() throws IOException, InterruptedException {
-        logger.debug("Persisting window state");
-        final LauncherState state = new LauncherState(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-        Files.writeString(LauncherPaths.getWindowStateFile(), GSON.toJson(state));
-
+    public void stop() throws IOException {
         logger.info("Exiting application, saving settings to disk.");
         Files.writeString(LauncherPaths.getSettingsFile(), GSON.toJson(appSettings));
         logger.info("Goodbye!");
@@ -242,10 +259,5 @@ public class Launcher extends Application {
      */
     public static Launcher getInstance() {
         return instance;
-    }
-
-    @Deprecated
-    public static Logger getLogger() {
-        return instance.logger;
     }
 }

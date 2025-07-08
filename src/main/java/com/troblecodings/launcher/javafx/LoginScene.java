@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Builder;
 
 public class LoginScene extends Scene {
 
@@ -29,10 +30,10 @@ public class LoginScene extends Scene {
 		final Button microsoftLoginButton = new Button();
 		microsoftLoginButton.getStyleClass().add("microsoftLoginButton");
 		VBox.setMargin(microsoftLoginButton, new Insets(20, 0, 20, 0));
-		microsoftLoginButton.setOnAction(event -> {
-			Launcher.setScene(Launcher.MICROSOFTLOGINSCENE);
-			Launcher.MICROSOFTLOGINSCENE.run();
-		});
+//		microsoftLoginButton.setOnAction(event -> {
+//			Launcher.setScene(Launcher.MICROSOFTLOGINSCENE);
+//			Launcher.MICROSOFTLOGINSCENE.run();
+//		});
 
 		vbox.getChildren().addAll(microsoftLoginButton);
 		

@@ -1,4 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+.root {
+	-fx-font-family: "Roboto Light";
+	-fx-font-weight: 400;
+	-fx-font-scale: 1;
+	-fx-font-style: normal;
+}
 
 .navbar {
 	-fx-font-family: 'VT323', monospace;
@@ -234,7 +242,7 @@ CheckBox {
 }
 
 .launchbutton{
-	-fx-background-image: url(launchbutton.png);
+	-fx-background-image: url(assets/launchbutton.png);
 	-fx-pref-height: 100px;
 	-fx-pref-width: 350px;
 }
@@ -246,27 +254,21 @@ CheckBox {
 }
 
 .loginbutton{
-	-fx-background-image: url(loginbutton.png);
+	-fx-background-image: url(assets/loginbutton.png);
 	-fx-pref-height: 42px;
 	-fx-pref-width: 164px;
 }
 
 .mojangLoginButton{
-	-fx-background-image: url(mojang-login-button.png);
+	-fx-background-image: url(assets/mojang-login-button.png);
 	-fx-pref-height: 62px;
 	-fx-pref-width: 310px;
 }
 
 .microsoftLoginButton{
-	-fx-background-image: url(microsoft-login-button.png);
+	-fx-background-image: url(assets/microsoft-login-button.png);
 	-fx-pref-height: 62px;
 	-fx-pref-width: 310px;
-}
-
-.closebutton {
-	-fx-background-image: url(closebutton.png);
-	-fx-pref-height: 67px;
-	-fx-pref-width: 52px;
 }
 
 .launchbutton:hover {
@@ -280,7 +282,7 @@ CheckBox {
 }
 
 .backbutton {
-	-fx-background-image: url(backbutton.png);
+	-fx-background-image: url(assets/backbutton.png);
 	-fx-pref-height: 50px;
 	-fx-pref-width: 175px;
 }
