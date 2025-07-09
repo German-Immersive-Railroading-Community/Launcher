@@ -71,6 +71,15 @@ public final class UserService {
         saveSession();
     }
 
+    public synchronized void refresh() throws Exception{
+        if (javaSession == null || !javaSession.isExpired()) return;
+
+        logger.debug("Trying to refresh session.");
+        javaSession = MinecraftAuth.JAVA_DEVICE_CODE_LOGIN.refresh(client, javaSession);
+        logger.info("Successfully refreshed session.");
+        saveSession();
+    }
+
     public synchronized void logout() throws IOException {
         javaSession = null;
         Files.deleteIfExists(LauncherPaths.getSessionFile());

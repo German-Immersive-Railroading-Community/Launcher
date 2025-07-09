@@ -1,6 +1,7 @@
 package com.troblecodings.launcher.javafx;
 
 import com.troblecodings.launcher.Launcher;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

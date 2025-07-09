@@ -56,6 +56,7 @@
                 <version>${javafx.maven.plugin.version}</version>
                 <configuration>
                     <mainClass>com.troblecodings.launcher.Launcher</mainClass>
+                    <commandlineArgs>-ex</commandlineArgs>
                 </configuration>
             </plugin>
 

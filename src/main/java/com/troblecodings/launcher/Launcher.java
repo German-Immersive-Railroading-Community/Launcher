@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.assets.LauncherState;
 import com.troblecodings.launcher.javafx.*;
-import com.troblecodings.launcher.javafx.controllers.MainController;
+import com.troblecodings.launcher.javafx.views.MainView;
 import com.troblecodings.launcher.models.AppSettings;
 import com.troblecodings.launcher.services.UserService;
 import com.troblecodings.launcher.util.LauncherPaths;
@@ -97,6 +97,7 @@ public class Launcher extends Application {
                 experiments = true;
             }
         }
+        experiments = false;
 
         if (update) {
             logger.info("Checking for updates...");
@@ -127,31 +128,40 @@ public class Launcher extends Application {
     public void start(Stage stage) throws IOException {
         this.stage = stage;
 
-        if(!experiments) {
+        if (!experiments) {
+            if (!userService.isValidSession()) {
+                try {
+                    userService.refresh();
+                } catch (Exception e) {
+                    logger.error("Failed to refresh session!", e);
+                }
+            }
+
             boolean authStatus = userService.isValidSession();
             stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
             Header.setVisibility(authStatus);
         } else {
-            final MainController mainController = new MainController();
-            final Scene scene = new Scene(mainController.getView());
+            final ViewManager viewManager = new ViewManager();
+            final MainView mainView = new MainView(viewManager);
+            final Scene scene = new Scene(mainView.build());
             scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
             stage.setScene(scene);
         }
 
         stage.getIcons().add(Assets.getImage("icon.png"));
 
-        if (Files.exists(LauncherPaths.getWindowStateFile())) {
-            logger.debug("Loading previous window state");
-            final LauncherState state = GSON.fromJson(Files.newBufferedReader(LauncherPaths.getWindowStateFile()), LauncherState.class);
-            stage.setX(state.x());
-            stage.setY(state.y());
-            stage.setWidth(state.width());
-            stage.setHeight(state.height());
-        } else {
-            logger.debug("No previous window state found");
+//        if (Files.exists(LauncherPaths.getWindowStateFile())) {
+//            logger.debug("Loading previous window state");
+//            final LauncherState state = GSON.fromJson(Files.newBufferedReader(LauncherPaths.getWindowStateFile()), LauncherState.class);
+//            stage.setX(state.x());
+//            stage.setY(state.y());
+//            stage.setWidth(state.width());
+//            stage.setHeight(state.height());
+//        } else {
+//            logger.debug("No previous window state found");
             stage.setWidth(1280);
             stage.setHeight(720);
-        }
+//        }
 
         stage.setOnCloseRequest(ev -> {
             try {
@@ -206,7 +216,7 @@ public class Launcher extends Application {
         stackpane.getChildren().add(new Header(scene));
         stackpane.getChildren().add(new Footer(scene));
         scene.setFill(Color.TRANSPARENT);
-        scene.getStylesheets().add(Assets.getStyleSheet("style.css"));
+        scene.getStylesheets().add(Objects.requireNonNull(Launcher.class.getResource("style.css")).toExternalForm());
     }
 
     public static Scene getScene() {

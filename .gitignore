@@ -193,3 +193,4 @@ gradle-app.setting
 
 target/
 .idea/
+.kotlin/
