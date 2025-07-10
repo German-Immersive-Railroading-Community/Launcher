@@ -3,7 +3,7 @@ plugins {
     application
     alias(libs.plugins.javafxplugin)
     //alias(libs.plugins.shadow)
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "2.2.0"
     id("org.javamodularity.moduleplugin") version "1.8.15"
 }
 

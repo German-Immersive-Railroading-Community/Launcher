@@ -31,11 +31,7 @@ class Sidebar(val userService: UserService) : Builder<StackPane> {
         children += VBox().apply {
             alignment = Pos.CENTER
 
-            children += MenuButton
-
             children += Region().apply { VBox.setVgrow(this, Priority.ALWAYS) }
-
-            children += 
 
             children += VBox().apply {
                 alignment = Pos.CENTER
