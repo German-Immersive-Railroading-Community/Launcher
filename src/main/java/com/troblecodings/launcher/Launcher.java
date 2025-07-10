@@ -17,6 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -97,7 +98,7 @@ public class Launcher extends Application {
                 experiments = true;
             }
         }
-        experiments = false;
+        experiments = true;
 
         if (update) {
             logger.info("Checking for updates...");
@@ -142,37 +143,28 @@ public class Launcher extends Application {
             Header.setVisibility(authStatus);
         } else {
             final ViewManager viewManager = new ViewManager();
-            final MainView mainView = new MainView(viewManager);
+            final MainView mainView = new MainView(viewManager, userService);
             final Scene scene = new Scene(mainView.build());
-            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
+            //scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
             stage.setScene(scene);
         }
 
         stage.getIcons().add(Assets.getImage("icon.png"));
 
-//        if (Files.exists(LauncherPaths.getWindowStateFile())) {
-//            logger.debug("Loading previous window state");
-//            final LauncherState state = GSON.fromJson(Files.newBufferedReader(LauncherPaths.getWindowStateFile()), LauncherState.class);
-//            stage.setX(state.x());
-//            stage.setY(state.y());
-//            stage.setWidth(state.width());
-//            stage.setHeight(state.height());
-//        } else {
-//            logger.debug("No previous window state found");
-            stage.setWidth(1280);
-            stage.setHeight(720);
-//        }
+//        stage.setOnCloseRequest(ev -> {
+//            try {
+//                logger.debug("Persisting window state");
+//                final LauncherState state = new LauncherState(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+//                Files.writeString(LauncherPaths.getWindowStateFile(), GSON.toJson(state));
+//            } catch (final Exception e) {
+//                logger.warn("Failed to persist window state.", e);
+//            }
+//        });
 
-        stage.setOnCloseRequest(ev -> {
-            try {
-                logger.debug("Persisting window state");
-                final LauncherState state = new LauncherState(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-                Files.writeString(LauncherPaths.getWindowStateFile(), GSON.toJson(state));
-            } catch (final Exception e) {
-                logger.warn("Failed to persist window state.", e);
-            }
-        });
-
+        stage.setWidth(1280);
+        stage.setHeight(720);
+        stage.setMinWidth(1280);
+        stage.setMinHeight(720);
         stage.initStyle(StageStyle.DECORATED);
         stage.setTitle("GIRC-Launcher");
         stage.show();

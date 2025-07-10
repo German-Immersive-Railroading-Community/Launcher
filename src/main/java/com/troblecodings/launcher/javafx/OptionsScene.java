@@ -45,7 +45,7 @@ public class OptionsScene extends Scene {
         final Label ramlabel = new Label("RAM");
         ramlabel.setStyle("-fx-padding: 0px 0px 10px 0px;");
 
-        final ComboBox<String> ramcombobox = new ComboBox<String>();
+        final ComboBox<String> ramcombobox = new ComboBox<>();
         ramcombobox.getItems().addAll("1 GB", "2 GB", "4 GB", "6 GB", "8 GB", "10 GB", "16 GB", "20 GB", "24 GB");
         ramcombobox.setEditable(true);
         final int currentRam = Launcher.getInstance().getAppSettings().getMemory() / 1000;

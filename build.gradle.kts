@@ -2,13 +2,24 @@ plugins {
     java
     application
     alias(libs.plugins.javafxplugin)
-    alias(libs.plugins.shadow)
-    kotlin("jvm") version "2.2.0"
+    //alias(libs.plugins.shadow)
+    kotlin("jvm") version "1.9.23"
+    id("org.javamodularity.moduleplugin") version "1.8.15"
 }
 
 group = "com.troblecodings"
 version = "1.1.0"
-description = "girc-launcher"
+
+val junitVersion = "5.10.2"
+
+tasks.withType<JavaCompile>() {
+    options.encoding = "UTF-8"
+}
+
+tasks.withType<Javadoc>() {
+    options.encoding = "UTF-8"
+}
+
 
 repositories {
     mavenCentral()
@@ -37,13 +48,13 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 application {
-    mainClass = "com.troblecodings.launcher.Launcher"
-    //mainModule = "com.troblecodings.launcher"
+    mainModule.set("com.troblecodings.launcher")
+    mainClass.set("com.troblecodings.launcher.Launcher")
 }
 
 javafx {
     version = libs.versions.javafx.get()
-    modules = listOf("javafx.graphics", "javafx.controls")
+    modules = listOf("javafx.controls")
 }
 
 //tasks.shadowJar {
@@ -64,18 +75,10 @@ javafx {
 dependencies {
     implementation(libs.commons)
     implementation(libs.dirs)
-    implementation(libs.nbt)
+    //implementation(libs.nbt)
     implementation(libs.slf4japi)
     implementation(libs.logback)
     implementation(libs.mcauth)
     implementation(libs.gson)
     implementation(libs.guava)
-}
-
-tasks.withType<JavaCompile>() {
-    options.encoding = "UTF-8"
-}
-
-tasks.withType<Javadoc>() {
-    options.encoding = "UTF-8"
 }

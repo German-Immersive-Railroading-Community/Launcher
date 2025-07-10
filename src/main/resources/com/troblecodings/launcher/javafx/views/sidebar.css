@@ -1,0 +1,13 @@
+.sideBarButton {
+    -fx-font-family: "Roboto Light";
+}
+
+.sidebar-header {
+    -fx-text-fill: white;
+
+}
+
+.separator:horizontal .line {
+    -fx-border-color: gray transparent transparent transparent, gray transparent transparent transparent;
+    -fx-border-insets: 0, 1 0 0 0;
+}

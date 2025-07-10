@@ -6,10 +6,6 @@ import com.troblecodings.launcher.javafx.Footer;
 import com.troblecodings.launcher.models.girjson.*;
 import com.troblecodings.launcher.models.minecraft.MinecraftInfo;
 import com.troblecodings.launcher.models.minecraft.MinecraftObject;
-import net.querz.nbt.io.NBTUtil;
-import net.querz.nbt.io.NamedTag;
-import net.querz.nbt.tag.CompoundTag;
-import net.querz.nbt.tag.ListTag;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -340,18 +336,6 @@ public class StartupUtil {
                 Files.createDirectories(optionalFilesPath.getParent());
                 NetUtils.validateOrDownloadSha1(URI.create(optionalMod.url()), optionalFilesPath, optionalMod.sha1());
             }
-
-            Path serverDatPath = LauncherPaths.getGameDataDir().resolve("servers.dat");
-            NamedTag rootTag = NBTUtil.read(serverDatPath.toString());
-            CompoundTag rootCt = (CompoundTag) rootTag.getTag();
-            ListTag<CompoundTag> serverListTag = (ListTag<CompoundTag>) rootCt.get("servers");
-
-            if (serverListTag.size() > 1) {
-                while (serverListTag.size() > 1)
-                    serverListTag.remove(1);
-            }
-
-            NBTUtil.write(rootTag, serverDatPath.toString(), false);
 
             Footer.setProgress(0.001);
             return Launcher.getInstance().getUserService().makeArguments(json);
