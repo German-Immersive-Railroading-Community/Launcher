@@ -24,7 +24,7 @@ class Sidebar(val userService: UserService) : Builder<StackPane> {
 
         background = Background(
             BackgroundFill(
-                Color.hsb(12.0, 10.0 / 100.0, 19.0 / 100.0), null, null
+                Color.hsb(12.0, 0.1, 0.19), null, null
             )
         )
 
