@@ -4,9 +4,9 @@
 [versions]
 shadow = "9.0.0-rc1"
 javafxplugin = "0.1.0"
-javafx = "23"
+javafx = "21"
 
-commons = "3.14.0"
+commons = "3.18.0"
 dirs = "26"
 nbt = "6.1"
 slf4japi = "2.0.17"
