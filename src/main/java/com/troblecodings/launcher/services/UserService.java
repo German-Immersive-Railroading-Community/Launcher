@@ -7,11 +7,13 @@ import com.troblecodings.launcher.util.LauncherPaths;
 import javafx.application.Platform;
 import net.lenni0451.commons.httpclient.HttpClient;
 import net.raphimc.minecraftauth.MinecraftAuth;
+import net.raphimc.minecraftauth.step.java.StepMCProfile;
 import net.raphimc.minecraftauth.step.java.session.StepFullJavaSession;
 import net.raphimc.minecraftauth.step.msa.StepMsaDeviceCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -30,20 +32,20 @@ public final class UserService {
     }
 
     public synchronized void loadSession() throws IOException {
-        logger.debug("Trying to load session");
+        logger.debug("Trying to load local session.");
         if (!LauncherPaths.getSessionFile().toFile().exists()) {
-            logger.debug("No prior session found");
+            logger.info("No local session found.");
             javaSession = null;
             return;
         }
 
-        logger.debug("Session found");
+        logger.info("Local session found.");
         final JsonObject session = Launcher.GSON.fromJson(Files.newBufferedReader(LauncherPaths.getSessionFile()), JsonObject.class);
         javaSession = MinecraftAuth.JAVA_DEVICE_CODE_LOGIN.fromJson(session);
 
         logger.debug("Session expired: {}", javaSession.isExpired());
         logger.debug("Session expired or outdated: {}", javaSession.isExpiredOrOutdated());
-        logger.info("Session loaded.");
+        logger.info("Local session loaded.");
     }
 
     public synchronized void saveSession() throws IOException {
@@ -71,8 +73,16 @@ public final class UserService {
         saveSession();
     }
 
-    public synchronized void refresh() throws Exception{
-        if (javaSession == null || !javaSession.isExpired()) return;
+    public synchronized void refresh() throws Exception {
+        if (javaSession == null) {
+            logger.info("Could not find local session to refresh.");
+            return;
+        }
+
+        if (!javaSession.isExpired()) {
+            logger.info("Valid local session, skipping refresh.");
+            return;
+        }
 
         logger.debug("Trying to refresh session.");
         javaSession = MinecraftAuth.JAVA_DEVICE_CODE_LOGIN.refresh(client, javaSession);
@@ -84,6 +94,12 @@ public final class UserService {
         javaSession = null;
         Files.deleteIfExists(LauncherPaths.getSessionFile());
         logger.info("Successfully logged out.");
+    }
+
+    @Nullable
+    public StepMCProfile.MCProfile getMcProfile() {
+        if (javaSession == null) return null;
+        return javaSession.getMcProfile();
     }
 
     public String[] makeArguments(final GirJson json) {

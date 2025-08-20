@@ -21,7 +21,7 @@ public class Footer extends StackPane {
         bar.addListener((x, x2, x3) -> progressbar.setProgress(bar.get()));
 
         Button button = new Button("Lizensen und Kredits");
-        button.setOnAction(event -> Launcher.setScene(getCorrectScene(sc)));
+        button.setOnAction(event -> Launcher.setScene(new Scene(null)));
 
         this.getChildren().addAll(button, progressbar);
 
@@ -33,15 +33,6 @@ public class Footer extends StackPane {
 
     public static void setProgress(double progress) {
         Platform.runLater(() -> bar.set(progress));
-    }
-
-    // Returns the correct scene based on the authentication status. Not authenticated -> LoginScene; Authenticated -> HomeScene.
-    private static Scene getCorrectScene(Scene currentScene) {
-        if (currentScene instanceof CreditsScene) {
-            return Launcher.getInstance().getUserService().isValidSession() ? Launcher.HOMESCENE : Launcher.LOGINSCENE;
-        }
-
-        return Launcher.CREDITSSCENE;
     }
 
 }

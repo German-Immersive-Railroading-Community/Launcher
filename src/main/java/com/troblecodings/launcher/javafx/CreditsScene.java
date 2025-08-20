@@ -1,14 +1,6 @@
 package com.troblecodings.launcher.javafx;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-
 import com.troblecodings.launcher.Launcher;
-import javafx.application.HostServices;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -16,13 +8,9 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-public class CreditsScene extends Scene {
-
-    private static StackPane stackpane = new StackPane();
+public class CreditsScene extends StackPane {
 
     public CreditsScene() {
-        super(stackpane);
-        Launcher.setupScene(this, stackpane);
 
         ScrollPane sp = new ScrollPane();
 
@@ -37,7 +25,7 @@ public class CreditsScene extends Scene {
         vbox.setPrefSize(sp.getMaxWidth(), sp.getMaxHeight());
 
         vbox.setStyle("-fx-padding: 40px 60px;");
-        stackpane.getChildren().add(sp);
+        getChildren().add(sp);
 
         Label graficslabel = new Label("Graphics");
         graficslabel.setStyle("-fx-padding: 0px 0px 10px 0px;");
@@ -66,7 +54,7 @@ public class CreditsScene extends Scene {
         vbox.getChildren().addAll(graficslabel, mcjeronimo, programminglabel, mrtroblebutton, derzaubererbutton, shirosakaButton, codingbytimoButton, libarieslabel, mcauthenticatorbutton, jsonbutton, minecrafterbutton, gsonbutton);
     }
 
-    public static void openWebsiteInBrowser(String url) {
+    private void openWebsiteInBrowser(String url) {
         Launcher.getInstance().getHostServices().showDocument(url);
     }
 }

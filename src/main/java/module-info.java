@@ -12,16 +12,16 @@ module com.troblecodings.launcher {
     requires ch.qos.logback.classic;
 
     requires kotlin.stdlib;
-//    requires kotlin.reflect;
-//    requires kotlinx.coroutines.core;
-//    requires kotlin.native_utils;
 
     opens com.troblecodings.launcher.models to com.google.gson;
-//    opens com.troblecodings.launcher.models.girjson to com.google.gson;
-//    opens com.troblecodings.launcher.models.minecraft to com.google.gson;
 
     requires javafx.base;
     requires javafx.controls;
     requires javafx.graphics;
+
+    requires org.kordamp.ikonli.core;
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.fontawesome6;
+    requires jsr305;
     opens com.troblecodings.launcher to javafx.graphics;
 }

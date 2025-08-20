@@ -5,21 +5,32 @@ plugins {
     //alias(libs.plugins.shadow)
     kotlin("jvm") version "2.2.0"
     id("org.javamodularity.moduleplugin") version "1.8.15"
+    id("com.github.gmazzo.buildconfig") version "5.6.7"
+    id("org.beryx.jlink") version "3.1.3"
 }
 
 group = "com.troblecodings"
-version = "1.1.0"
+version = "2.0.0-dev"
+
+buildConfig {
+    className("LauncherConstants")
+    packageName("com.troblecodings.launcher")
+
+    useJavaOutput()
+
+    buildConfigField("APP_NAME", project.name)
+    buildConfigField("APP_VERSION", provider { "${project.version}" })
+}
 
 val junitVersion = "5.10.2"
 
-tasks.withType<JavaCompile>() {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
-tasks.withType<Javadoc>() {
+tasks.withType<Javadoc> {
     options.encoding = "UTF-8"
 }
-
 
 repositories {
     mavenCentral()
@@ -57,6 +68,10 @@ javafx {
     modules = listOf("javafx.controls")
 }
 
+jlink {
+    addExtraDependencies("javafx")
+}
+
 //tasks.shadowJar {
 //    minimize()
 //    mergeServiceFiles()
@@ -81,4 +96,6 @@ dependencies {
     implementation(libs.mcauth)
     implementation(libs.gson)
     implementation(libs.guava)
+    implementation("org.kordamp.ikonli:ikonli-javafx:12.4.0")
+    implementation("org.kordamp.ikonli:ikonli-fontawesome6-pack:12.4.0")
 }

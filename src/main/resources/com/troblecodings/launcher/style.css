@@ -1,6 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
+*:hover {
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-color: red;
+}
+
 .root {
     -fx-font-family: "Roboto Light";
     -fx-font-weight: 400;

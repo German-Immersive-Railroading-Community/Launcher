@@ -3,7 +3,6 @@ package com.troblecodings.launcher;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.troblecodings.launcher.assets.Assets;
-import com.troblecodings.launcher.assets.LauncherState;
 import com.troblecodings.launcher.javafx.*;
 import com.troblecodings.launcher.javafx.views.MainView;
 import com.troblecodings.launcher.models.AppSettings;
@@ -17,7 +16,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -38,7 +36,7 @@ public class Launcher extends Application {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
     private static Launcher instance = null;
-    private static boolean experiments = false;
+    private static boolean experiments = true;
 
     private static final List<Image> images = new ArrayList<>();
 
@@ -65,7 +63,7 @@ public class Launcher extends Application {
         logger = LoggerFactory.getLogger(Launcher.class);
 
         // Log some very basic system info, can help in debugging
-        logger.info("GIRC-Launcher v1.1.0");
+        logger.info("{} v{}", LauncherConstants.APP_NAME, LauncherConstants.APP_VERSION);
         logger.info("OS: {} ({}), OS Version: {}", SystemUtils.OS_NAME, SystemUtils.OS_ARCH, SystemUtils.OS_VERSION);
 
         logger.debug("Loading settings...");
@@ -113,13 +111,15 @@ public class Launcher extends Application {
         images.add(Assets.getImage("background_3.png"));
         images.add(Assets.getImage("background_4.png"));
         images.add(Assets.getImage("background_5.png"));
-        images.add(images.get(0));
+        images.add(images.getFirst());
 
-        OPTIONSSCENE = new OptionsScene();
-        HOMESCENE = new HomeScene();
-        LOGINSCENE = new LoginScene();
-        CREDITSSCENE = new CreditsScene();
-        OPTIONALMODSSCENE = new OptionalModsScene();
+        if (!experiments) {
+            OPTIONSSCENE = new OptionsScene();
+            HOMESCENE = new HomeScene();
+            LOGINSCENE = new LoginScene();
+            CREDITSSCENE = new CreditsScene();
+            OPTIONALMODSSCENE = new OptionalModsScene();
+        }
 
         userService = new UserService();
         userService.loadSession();
@@ -129,15 +129,15 @@ public class Launcher extends Application {
     public void start(Stage stage) throws IOException {
         this.stage = stage;
 
-        if (!experiments) {
-            if (!userService.isValidSession()) {
-                try {
-                    userService.refresh();
-                } catch (Exception e) {
-                    logger.error("Failed to refresh session!", e);
-                }
+        if (!userService.isValidSession()) {
+            try {
+                userService.refresh();
+            } catch (Exception e) {
+                logger.error("Failed to refresh session!", e);
             }
+        }
 
+        if (!experiments) {
             boolean authStatus = userService.isValidSession();
             stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
             Header.setVisibility(authStatus);
@@ -145,6 +145,7 @@ public class Launcher extends Application {
             final ViewManager viewManager = new ViewManager();
             final MainView mainView = new MainView(viewManager, userService);
             final Scene scene = new Scene(mainView.build());
+            scene.getStylesheets().add(Launcher.class.getResource("ok.css").toExternalForm());
             //scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
             stage.setScene(scene);
         }
@@ -166,7 +167,7 @@ public class Launcher extends Application {
         stage.setMinWidth(1280);
         stage.setMinHeight(720);
         stage.initStyle(StageStyle.DECORATED);
-        stage.setTitle("GIRC-Launcher");
+        stage.setTitle(LauncherConstants.APP_NAME);
         stage.show();
     }
 
@@ -236,18 +237,13 @@ public class Launcher extends Application {
         // See if this can be made better, seems overly clunky-like to me, but any other method doesn't generate a stack-trace.
         // toString and getMessage only return the String representation of what the exception actually is.
         if (getInstance().stage != null && getInstance().stage.isShowing()) {
-            try {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
+            try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
 
                 e.printStackTrace(pw);
 
                 ErrorScene errorScene = new ErrorScene(sw.toString(), getInstance().stage.getScene());
 
                 Platform.runLater(() -> Launcher.setScene(errorScene));
-
-                sw.close();
-                pw.close();
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
