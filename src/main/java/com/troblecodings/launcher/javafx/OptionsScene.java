@@ -146,7 +146,6 @@ public class OptionsScene extends Scene {
 //        resetconfigs.getStyleClass().add("optionButton");
 //        resetconfigs.setOnAction(evt -> FileUtil.resetFiles());
 
-
         final Button optionalModsButton = new Button("Optional Mods");
         optionalModsButton.getStyleClass().add("optionButton");
         optionalModsButton.setOnAction(ev -> Launcher.setScene(Launcher.OPTIONALMODSSCENE));

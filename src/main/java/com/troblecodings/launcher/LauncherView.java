@@ -1,5 +1,5 @@
 package com.troblecodings.launcher;
 
 public enum LauncherView {
-    LOGIN, HOME, OPTIONS, MODS
+    NONE, LOGIN, HOME, SETTINGS, MODS
 }

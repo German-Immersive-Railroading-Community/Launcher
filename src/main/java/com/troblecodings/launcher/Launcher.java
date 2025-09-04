@@ -145,7 +145,7 @@ public class Launcher extends Application {
             final ViewManager viewManager = new ViewManager();
             final MainView mainView = new MainView(viewManager, userService);
             final Scene scene = new Scene(mainView.build());
-            scene.getStylesheets().add(Launcher.class.getResource("ok.css").toExternalForm());
+            scene.getStylesheets().add(Objects.requireNonNull(Launcher.class.getResource("ok.css")).toExternalForm());
             //scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
             stage.setScene(scene);
         }
@@ -257,5 +257,9 @@ public class Launcher extends Application {
      */
     public static Launcher getInstance() {
         return instance;
+    }
+
+    public static void main(String[] args) {
+        Launcher.launch(args);
     }
 }

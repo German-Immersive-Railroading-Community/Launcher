@@ -5,6 +5,8 @@ import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.models.girjson.GirJson;
 import com.troblecodings.launcher.util.LauncherPaths;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import net.lenni0451.commons.httpclient.HttpClient;
 import net.raphimc.minecraftauth.MinecraftAuth;
 import net.raphimc.minecraftauth.step.java.StepMCProfile;
@@ -24,6 +26,10 @@ public final class UserService {
     private final HttpClient client;
     private final Logger logger;
 
+    private boolean isLocalSessionPresent;
+
+    private BooleanProperty loggedIn = new SimpleBooleanProperty(false);
+
     private volatile StepFullJavaSession.FullJavaSession javaSession;
 
     public UserService() {
@@ -31,11 +37,24 @@ public final class UserService {
         logger = LoggerFactory.getLogger(UserService.class);
     }
 
+    public boolean isLoggedIn() {
+        return loggedIn.get();
+    }
+
+    public void setLoggedIn(boolean value) {
+        loggedIn.set(value);
+    }
+
+    public BooleanProperty loggedInProperty() {
+        return loggedIn;
+    }
+
     public synchronized void loadSession() throws IOException {
         logger.debug("Trying to load local session.");
         if (!LauncherPaths.getSessionFile().toFile().exists()) {
             logger.info("No local session found.");
             javaSession = null;
+            isLocalSessionPresent = false;
             return;
         }
 
@@ -44,29 +63,42 @@ public final class UserService {
         javaSession = MinecraftAuth.JAVA_DEVICE_CODE_LOGIN.fromJson(session);
 
         logger.debug("Session expired: {}", javaSession.isExpired());
-        logger.debug("Session expired or outdated: {}", javaSession.isExpiredOrOutdated());
+        // This is true after every application restart for some reason, oh well
+        // Also, we know that the session didn't expire, because we explicitly checked before.
+        logger.debug("Session outdated: {}", javaSession.isExpiredOrOutdated());
         logger.info("Local session loaded.");
     }
 
     public synchronized void saveSession() throws IOException {
         JsonObject json = MinecraftAuth.JAVA_DEVICE_CODE_LOGIN.toJson(javaSession);
         Files.writeString(LauncherPaths.getSessionFile(), Launcher.GSON.toJson(json));
+        isLocalSessionPresent = true;
         logger.debug("Session saved.");
+    }
+
+    public boolean isLocalSessionPresent()  {
+        return isLocalSessionPresent;
     }
 
     public boolean isValidSession() {
         return javaSession != null && !javaSession.isExpired();
     }
 
+    /**
+     * Tries to authenticate with XBL.
+     *
+     * @param deviceCodeCallback This callback will be called on a non-JavaFX thread. You need to account for this if this callback is used in conjunction with UI.
+     * @throws Exception Idk the login process may not like us very much sometimes
+     */
     public synchronized void login(Consumer<StepMsaDeviceCode.MsaDeviceCode> deviceCodeCallback) throws Exception {
-        if (javaSession != null && javaSession.isExpired()) {
+        if (isValidSession()) {
             javaSession = MinecraftAuth.JAVA_DEVICE_CODE_LOGIN.refresh(client, javaSession);
             return;
         }
 
         javaSession = MinecraftAuth.JAVA_DEVICE_CODE_LOGIN.getFromInput(client, new StepMsaDeviceCode.MsaDeviceCodeCallback(msaDeviceCode -> {
             logger.debug("Device code: {}, Uri: {}", msaDeviceCode.getUserCode(), msaDeviceCode.getVerificationUri());
-            Platform.runLater(() -> deviceCodeCallback.accept(msaDeviceCode));
+            deviceCodeCallback.accept(msaDeviceCode);
         }));
 
         logger.info("Successfully logged in.");

@@ -50,15 +50,8 @@ public final class NetUtils {
 
     public static <T> Optional<T> downloadJson(final URI uri, Class<T> clazz) throws IOException, InterruptedException {
         //logger.debug("Downloading JSON resource from {}", uri);
-        HttpRequest req = HttpRequest.newBuilder(uri).GET().header("Content-Type", "application/json").build();
-
-        HttpResponse<String> res = client.send(req, BodyHandlers.ofString());
-
-        if (res.statusCode() != 200) {
-            return Optional.empty();
-        }
-
-        return Optional.of(Launcher.GSON.fromJson(res.body(), clazz));
+        var string = downloadString(uri);
+        return string.map(s -> Launcher.GSON.fromJson(s, clazz));
     }
 
     public static <T> Optional<T> downloadJson(final URI uri, TypeToken<T> clazz) throws IOException, InterruptedException {

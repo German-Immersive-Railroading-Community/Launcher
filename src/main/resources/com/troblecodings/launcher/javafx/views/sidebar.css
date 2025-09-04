@@ -1,4 +1,4 @@
-.sideBarButton {
+.sidebar-button {
     -fx-font-family: "Roboto Light";
 }
 
@@ -12,7 +12,37 @@
     -fx-border-insets: 0, 1 0 0 0;
 }
 
-.label.sidebar-item {
+.label.sidebar-item-name {
     -fx-text-fill: lightgray;
     -fx-font-size: 20px;
+}
+
+.sidebar-user {
+    -fx-background-color: transparent;
+    -fx-background-radius: 5px;
+}
+
+.sidebar-user:hover {
+    -fx-background-color: hsb(12.0, 10%, 25%);
+    -fx-cursor: hand;
+}
+
+.sidebar-user:pressed {
+    -fx-background-color: hsb(12.0, 10%, 35%);
+    -fx-cursor: hand;
+}
+
+.sidebar-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 5px;
+}
+
+.sidebar-item:hover {
+    -fx-background-color: hsb(12.0, 10%, 25%);
+    -fx-cursor: hand;
+}
+
+.sidebar-item:pressed {
+    -fx-background-color: hsb(12.0, 10%, 35%);
+    -fx-cursor: hand;
 }

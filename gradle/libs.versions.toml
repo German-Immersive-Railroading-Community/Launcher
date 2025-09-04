@@ -2,13 +2,11 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-shadow = "9.0.0-rc1"
 javafxplugin = "0.1.0"
 javafx = "21"
 
 commons = "3.18.0"
 dirs = "26"
-nbt = "6.1"
 slf4japi = "2.0.17"
 logback = "1.5.18"
 mcauth = "4.1.1"
@@ -17,12 +15,10 @@ guava = "32.1.2-jre"
 
 [plugins]
 javafxplugin = { id = "org.openjfx.javafxplugin", version.ref = "javafxplugin" }
-shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 
 [libraries]
 commons = { module = "org.apache.commons:commons-lang3", version.ref = "commons" }
 dirs = { module = "dev.dirs:directories", version.ref = "dirs" }
-nbt = { module = "com.github.Querz:NBT", version.ref = "nbt" }
 slf4japi = { module = "org.slf4j:slf4j-api", version.ref = "slf4japi" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 mcauth = { module = "net.raphimc:MinecraftAuth", version.ref = "mcauth" }

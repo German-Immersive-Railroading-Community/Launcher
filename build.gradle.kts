@@ -1,8 +1,9 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
 plugins {
     java
     application
     alias(libs.plugins.javafxplugin)
-    //alias(libs.plugins.shadow)
     kotlin("jvm") version "2.2.0"
     id("org.javamodularity.moduleplugin") version "1.8.15"
     id("com.github.gmazzo.buildconfig") version "5.6.7"
@@ -69,28 +70,35 @@ javafx {
 }
 
 jlink {
+    options = listOf("--compress", "zip-6")
     addExtraDependencies("javafx")
-}
 
-//tasks.shadowJar {
-//    minimize()
-//    mergeServiceFiles()
-//
-//    from({
-//        project.configurations.runtimeClasspath.get().map {
-//            if (it.isDirectory) it else zipTree(it)
-//        }
-//    }, {
-//        project.configurations.compileClasspath.get().map {
-//            if (it.isDirectory) it else zipTree(it)
-//        }
-//    })
-//}
+    launcher {
+        name = "GIRC-Launcher"
+        noConsole = false
+    }
+
+    jpackage {
+        imageName = "GIRC-Launcher"
+        skipInstaller = false
+
+        installerName = "GIRC-Launcher"
+        installerOptions = listOf("--verbose")
+        appVersion = project.version.toString().replace("-dev", "")
+
+        val platform = DefaultNativePlatform.getCurrentOperatingSystem()
+
+        if (platform.isWindows) {
+            installerOptions = listOf("--win-dir-chooser", "--win-menu", "--win-shortcut-prompt", "--win-per-user-install")
+        } else if (platform.isLinux){
+            installerOptions = listOf("--linux-shortcut")
+        }
+    }
+}
 
 dependencies {
     implementation(libs.commons)
     implementation(libs.dirs)
-    //implementation(libs.nbt)
     implementation(libs.slf4japi)
     implementation(libs.logback)
     implementation(libs.mcauth)

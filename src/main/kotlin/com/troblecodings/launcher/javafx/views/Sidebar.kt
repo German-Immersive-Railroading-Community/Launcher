@@ -1,11 +1,14 @@
 package com.troblecodings.launcher.javafx.views
 
+import com.troblecodings.launcher.Launcher
 import com.troblecodings.launcher.LauncherConstants
+import com.troblecodings.launcher.LauncherView
+import com.troblecodings.launcher.javafx.ViewManager
 import com.troblecodings.launcher.services.UserService
+import javafx.event.Event
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.Cursor
 import javafx.scene.SnapshotParameters
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
@@ -15,16 +18,24 @@ import javafx.scene.control.Separator
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.image.WritableImage
-import javafx.scene.input.MouseEvent
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.util.Builder
 import org.kordamp.ikonli.fontawesome6.FontAwesomeSolid
 import org.kordamp.ikonli.javafx.FontIcon
 
+data class SidebarItem(val name: String, val icon: FontIcon, val associatedView: LauncherView) {
+}
 
-class Sidebar(val userService: UserService) : Builder<StackPane> {
+
+class Sidebar(val viewManager: ViewManager, val userService: UserService) : Builder<StackPane> {
     private val userBox: HBox
+
+    private val sidebarItems: Array<SidebarItem> = arrayOf(
+        SidebarItem("Home", FontIcon(FontAwesomeSolid.HOME), LauncherView.HOME),
+        SidebarItem("Mods", FontIcon(FontAwesomeSolid.COGS), LauncherView.MODS),
+        SidebarItem("Settings", FontIcon(FontAwesomeSolid.SLIDERS_H), LauncherView.SETTINGS)
+    )
 
     // TODO: Make this change when user changes
     init {
@@ -40,30 +51,34 @@ class Sidebar(val userService: UserService) : Builder<StackPane> {
         }
 
         userBox = HBox().apply {
-            spacing = 4.0
-            padding = Insets(8.0, 0.0, 0.0, 0.0)
-            children += newImgView.apply {
-                style = "-fx-border-color: transparent; -fx-border-radius: 5px;"
-            }
-            children += Label(userService.mcProfile?.name).apply {
-                textFill = Color.LIGHTGRAY
-                style = "-fx-font-size: 18px;"
-                isUnderline = true
-                textOverrun = OverrunStyle.ELLIPSIS
+            children += HBox().apply {
+                spacing = 10.0
+                padding = Insets(8.0, 16.0, 8.0, 16.0)
+
+                styleClass += "sidebar-user"
+
+                children += newImgView
+
+                children += Label(userService.mcProfile?.name).apply {
+                    textFill = Color.LIGHTGRAY
+                    style = "-fx-font-size: 18px;"
+                    isUnderline = false
+                    textOverrun = OverrunStyle.ELLIPSIS
+                    translateY = 3.0
+                }
+
+                onMouseClicked = EventHandler { _ ->
+                    Launcher.getInstance().hostServices.showDocument(userService.mcProfile?.skinUrl)
+                }
             }
         }
     }
 
     override fun build(): StackPane = StackPane().apply {
         stylesheets += Sidebar::class.java.getResource("sidebar.css")?.toExternalForm()
+        style = "-fx-background-color: hsb(12.0, 10%, 19%);"
 
         prefWidth = 1280 * 0.20
-
-        background = Background(
-            BackgroundFill(
-                Color.hsb(12.0, 0.1, 0.19), null, null
-            )
-        )
 
         children += VBox().apply {
             alignment = Pos.CENTER
@@ -71,46 +86,34 @@ class Sidebar(val userService: UserService) : Builder<StackPane> {
 
             children += userBox.apply {
                 alignment = Pos.CENTER
+                userService.isLoggedIn = true
+            }
 
+            for (item in sidebarItems) {
+                children += HBox().apply {
+                    alignment = Pos.CENTER
+                    style = "-fx-border: solid; -fx-border-color: white; -fx-border-radius: 0px; -fx-border-width: 1.5px;"
+
+                    styleClass += "sidebar-item"
+
+                    children += item.icon.apply { style = "-fx-icon-color: lightgray; -fx-icon-size: 48px;" }
+                    children += Label(item.name).apply {
+                        padding = Insets(0.0, 0.0, 0.0, 5.0)
+                        styleClass += "sidebar-item-name"
+                    }
+
+                    onMouseClicked = EventHandler { _ ->
+                        viewManager.setCurrentView(item.associatedView)
+                    }
+                }
             }
 
             children += Region().apply { VBox.setVgrow(this, Priority.ALWAYS) }
-
-            children += HBox().apply {
-                alignment = Pos.CENTER
-                border = Border(BorderStroke(Color.WHITE, BorderStrokeStyle.SOLID, CornerRadii(0.0), BorderWidths(1.5)))
-
-                onMouseEntered = EventHandler { _: MouseEvent ->
-                    background = Background(BackgroundFill(Color.hsb(12.0, 0.1, 0.25), null, null))
-
-                    scene.cursor = Cursor.HAND
-                }
-
-                onMouseClicked = EventHandler { event: MouseEvent ->
-                }
-
-                onMouseExited = EventHandler { event: MouseEvent ->
-                    background = Background(
-                        BackgroundFill(
-                            Color.hsb(12.0, 0.1, 0.19), null, null
-                        )
-                    )
-                    scene.cursor = Cursor.DEFAULT
-                }
-
-                children += FontIcon(FontAwesomeSolid.SLIDERS_H).apply { style = "-fx-icon-color: lightgray; -fx-icon-size: 48px;" }
-                children += Label("Settings").apply {
-                    padding = Insets(0.0, 0.0, 0.0, 5.0)
-                    styleClass += "sidebar-item"
-                }
-            }
 
             children += VBox().apply {
                 alignment = Pos.CENTER
                 spacing = 0.0
                 padding = Insets(0.0, 0.0, 5.0, 0.0)
-
-//                setStyle("-fx-border-color: gray; -fx-border-style: none none solid none; -fx-border-width: 2px; ")
 
                 children += Separator().apply {
                     translateY = 20.0
