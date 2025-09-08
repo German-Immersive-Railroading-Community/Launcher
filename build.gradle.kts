@@ -2,6 +2,10 @@ plugins {
     java
     application
     alias(libs.plugins.javafxplugin)
+    
+    // ide-related plugins
+    eclipse
+    idea
 
     id("org.javamodularity.moduleplugin") version "1.8.15"
     id("com.github.gmazzo.buildconfig") version "5.6.7"

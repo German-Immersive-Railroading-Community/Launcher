@@ -191,6 +191,10 @@ gradle-app.setting
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
+# IDEA plugin generated files
+*.iml
+*.ipr
+
 target/
 .idea/
 .kotlin/
