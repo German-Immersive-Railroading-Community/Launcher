@@ -1,16 +1,18 @@
-import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
-
 plugins {
     java
     application
     alias(libs.plugins.javafxplugin)
-    kotlin("jvm") version "2.2.0"
+
     id("org.javamodularity.moduleplugin") version "1.8.15"
     id("com.github.gmazzo.buildconfig") version "5.6.7"
     id("org.beryx.jlink") version "3.1.3"
+
+    kotlin("jvm") version "2.2.0"
 }
 
 group = "com.troblecodings"
+description = "Launcher for the GIRC modpack."
+
 version = "2.0.0-dev"
 
 buildConfig {
@@ -24,6 +26,7 @@ buildConfig {
 }
 
 val junitVersion = "5.10.2"
+val os = org.gradle.internal.os.OperatingSystem.current()
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
@@ -70,28 +73,33 @@ javafx {
 }
 
 jlink {
-    options = listOf("--compress", "zip-6")
     addExtraDependencies("javafx")
+
+    options.addAll(listOf("--compress", "zip-6", "--strip-debug", "--no-header-files", "--no-man-pages"))
 
     launcher {
         name = "GIRC-Launcher"
-        noConsole = false
     }
 
     jpackage {
-        imageName = "GIRC-Launcher"
         skipInstaller = false
 
+        imageName = "GIRC-Launcher"
         installerName = "GIRC-Launcher"
-        installerOptions = listOf("--verbose")
         appVersion = project.version.toString().replace("-dev", "")
 
-        val platform = DefaultNativePlatform.getCurrentOperatingSystem()
+        installerOptions.add("--verbose")
 
-        if (platform.isWindows) {
-            installerOptions = listOf("--win-dir-chooser", "--win-menu", "--win-shortcut-prompt", "--win-per-user-install")
-        } else if (platform.isLinux){
-            installerOptions = listOf("--linux-shortcut")
+        if (os.isWindows) {
+            icon = "icon.ico"
+            installerType = "msi"
+            installerOptions.addAll(listOf("--win-dir-chooser", "--win-menu", "--win-shortcut-prompt", "--win-per-user-install"))
+        } else if (os.isLinux) {
+            icon = "icon.png"
+            installerType = "deb"
+            installerOptions.addAll(listOf("--linux-shortcut", "--linux-menu-group", "Games", "--linux-deb-maintainer", "shiro@shirosaka.dev"))
+        } else {
+            throw GradleException("Unsupported OS")
         }
     }
 }

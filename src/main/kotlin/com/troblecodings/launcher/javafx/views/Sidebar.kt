@@ -5,7 +5,6 @@ import com.troblecodings.launcher.LauncherConstants
 import com.troblecodings.launcher.LauncherView
 import com.troblecodings.launcher.javafx.ViewManager
 import com.troblecodings.launcher.services.UserService
-import javafx.event.Event
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -29,7 +28,34 @@ data class SidebarItem(val name: String, val icon: FontIcon, val associatedView:
 
 
 class Sidebar(val viewManager: ViewManager, val userService: UserService) : Builder<StackPane> {
-    private val userBox: HBox
+    private val userImgView: ImageView = ImageView()
+    private val userBoxContent: HBox = HBox().apply {
+        children += userImgView
+
+        children += Label(userService.mcProfile?.name).apply {
+            textFill = Color.LIGHTGRAY
+            style = "-fx-font-size: 18px;"
+            isUnderline = false
+            textOverrun = OverrunStyle.ELLIPSIS
+            translateY = 3.0
+        }
+    }
+
+    private val userBox: HBox = HBox().apply {
+        children += HBox().apply {
+            spacing = 10.0
+            padding = Insets(8.0, 16.0, 8.0, 16.0)
+
+            styleClass += "sidebar-user"
+
+            children += userBoxContent
+
+            onMouseClicked = EventHandler { _ ->
+                val url = userService.mcProfile?.skinUrl ?: return@EventHandler // If we don't have a skin url, just return lol
+                Launcher.getInstance().hostServices.showDocument(url)
+            }
+        }
+    }
 
     private val sidebarItems: Array<SidebarItem> = arrayOf(
         SidebarItem("Home", FontIcon(FontAwesomeSolid.HOME), LauncherView.HOME),
@@ -37,42 +63,23 @@ class Sidebar(val viewManager: ViewManager, val userService: UserService) : Buil
         SidebarItem("Settings", FontIcon(FontAwesomeSolid.SLIDERS_H), LauncherView.SETTINGS)
     )
 
-    // TODO: Make this change when user changes
-    init {
-        val img = Image(userService.mcProfile!!.skinUrl)
-        val newImg = getScaledRegion(img, 64.0, 64.0, 8.0, 8.0, 8.0, 8.0)
+    fun updateUserBox() {
 
-        val newImgView = ImageView(newImg).apply {
-            fitWidth = 32.0
-            fitHeight = 32.0
-            isSmooth = false
-            isPreserveRatio = true
-            isPickOnBounds = true
-        }
-
-        userBox = HBox().apply {
-            children += HBox().apply {
-                spacing = 10.0
-                padding = Insets(8.0, 16.0, 8.0, 16.0)
-
-                styleClass += "sidebar-user"
-
-                children += newImgView
-
-                children += Label(userService.mcProfile?.name).apply {
-                    textFill = Color.LIGHTGRAY
-                    style = "-fx-font-size: 18px;"
-                    isUnderline = false
-                    textOverrun = OverrunStyle.ELLIPSIS
-                    translateY = 3.0
-                }
-
-                onMouseClicked = EventHandler { _ ->
-                    Launcher.getInstance().hostServices.showDocument(userService.mcProfile?.skinUrl)
-                }
-            }
-        }
     }
+
+    // TODO: Make this change when user changes
+//    init {
+//        val img = Image(userService.mcProfile!!.skinUrl)
+//        val newImg = getScaledRegion(img, 64.0, 64.0, 8.0, 8.0, 8.0, 8.0)
+//
+//        val newImgView = ImageView(newImg).apply {
+//            fitWidth = 32.0
+//            fitHeight = 32.0
+//            isSmooth = false
+//            isPreserveRatio = true
+//            isPickOnBounds = true
+//        }
+//    }
 
     override fun build(): StackPane = StackPane().apply {
         stylesheets += Sidebar::class.java.getResource("sidebar.css")?.toExternalForm()

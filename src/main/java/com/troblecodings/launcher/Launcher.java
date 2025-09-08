@@ -152,22 +152,12 @@ public class Launcher extends Application {
 
         stage.getIcons().add(Assets.getImage("icon.png"));
 
-//        stage.setOnCloseRequest(ev -> {
-//            try {
-//                logger.debug("Persisting window state");
-//                final LauncherState state = new LauncherState(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-//                Files.writeString(LauncherPaths.getWindowStateFile(), GSON.toJson(state));
-//            } catch (final Exception e) {
-//                logger.warn("Failed to persist window state.", e);
-//            }
-//        });
-
-        stage.setWidth(1280);
-        stage.setHeight(720);
         stage.setMinWidth(1280);
         stage.setMinHeight(720);
+
         stage.initStyle(StageStyle.DECORATED);
         stage.setTitle(LauncherConstants.APP_NAME);
+
         stage.show();
     }
 
