@@ -100,6 +100,11 @@ class LoginView(val userService: UserService, val viewManager: ViewManager) : Bu
     }
 
     override fun build(): BorderPane = BorderPane().apply {
+        if(userService.isLoggedIn) {
+            viewManager.setCurrentView(LauncherView.HOME)
+            return@apply
+        }
+
         val css = LoginView::class.java.getResource("loginview.css")
 
         if (css != null) stylesheets += css.toExternalForm()
