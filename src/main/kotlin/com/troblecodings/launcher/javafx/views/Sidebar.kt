@@ -5,6 +5,9 @@ import com.troblecodings.launcher.LauncherConstants
 import com.troblecodings.launcher.LauncherView
 import com.troblecodings.launcher.javafx.ViewManager
 import com.troblecodings.launcher.services.UserService
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.StringProperty
+import javafx.beans.property.StringPropertyBase
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -28,16 +31,29 @@ data class SidebarItem(val name: String, val icon: FontIcon, val associatedView:
 
 
 class Sidebar(val viewManager: ViewManager, val userService: UserService) : Builder<StackPane> {
-    private val userImgView: ImageView = ImageView()
+    private val userNameProperty: StringProperty = SimpleStringProperty("")
+
+    private val userImgView: ImageView = ImageView().apply {
+        fitWidth = 32.0
+        fitHeight = 32.0
+        isSmooth = false
+        isPreserveRatio = true
+        isPickOnBounds = true
+    }
+
     private val userBoxContent: HBox = HBox().apply {
+        spacing = 10.0
+
         children += userImgView
 
-        children += Label(userService.mcProfile?.name).apply {
+        children += Label().apply {
             textFill = Color.LIGHTGRAY
             style = "-fx-font-size: 18px;"
             isUnderline = false
             textOverrun = OverrunStyle.ELLIPSIS
             translateY = 3.0
+
+            textProperty().bind(userNameProperty)
         }
     }
 
@@ -63,25 +79,35 @@ class Sidebar(val viewManager: ViewManager, val userService: UserService) : Buil
         SidebarItem("Settings", FontIcon(FontAwesomeSolid.SLIDERS_H), LauncherView.SETTINGS)
     )
 
-    fun updateUserBox() {
+    private fun updateUserBox() {
+        if (userService.isLoggedIn) {
+            val tempImg = Image(userService.mcProfile!!.skinUrl)
+            val finalImg = getScaledRegion(tempImg, 64.0, 64.0, 8.0, 8.0, 8.0, 8.0)
+            userImgView.image = finalImg
+            userNameProperty.set(userService.mcProfile!!.name)
+        } else {
+            userImgView.image = null
+            userNameProperty.set("Not logged in")
+        }
 
     }
 
-    // TODO: Make this change when user changes
-//    init {
-//        val img = Image(userService.mcProfile!!.skinUrl)
-//        val newImg = getScaledRegion(img, 64.0, 64.0, 8.0, 8.0, 8.0, 8.0)
-//
-//        val newImgView = ImageView(newImg).apply {
-//            fitWidth = 32.0
-//            fitHeight = 32.0
-//            isSmooth = false
-//            isPreserveRatio = true
-//            isPickOnBounds = true
-//        }
-//    }
+    private fun navigateToView(view: LauncherView) {
+        // Don't try to navigate anywhere if we are not logged in
+        if (!userService.isLoggedIn) return
+
+        viewManager.setCurrentView(view)
+    }
 
     override fun build(): StackPane = StackPane().apply {
+        userService.loggedInProperty().addListener {
+            updateUserBox()
+        }
+
+        if (userService.isLoggedIn) {
+            updateUserBox()
+        }
+
         stylesheets += Sidebar::class.java.getResource("sidebar.css")?.toExternalForm()
         style = "-fx-background-color: hsb(12.0, 10%, 19%);"
 
@@ -93,7 +119,6 @@ class Sidebar(val viewManager: ViewManager, val userService: UserService) : Buil
 
             children += userBox.apply {
                 alignment = Pos.CENTER
-                userService.isLoggedIn = true
             }
 
             for (item in sidebarItems) {
@@ -110,7 +135,8 @@ class Sidebar(val viewManager: ViewManager, val userService: UserService) : Buil
                     }
 
                     onMouseClicked = EventHandler { _ ->
-                        viewManager.setCurrentView(item.associatedView)
+                        // TODO: Notification for not being logged in
+                        navigateToView(item.associatedView)
                     }
                 }
             }

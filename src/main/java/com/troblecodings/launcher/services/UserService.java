@@ -66,6 +66,11 @@ public final class UserService {
         // This is true after every application restart for some reason, oh well
         // Also, we know that the session didn't expire, because we explicitly checked before.
         logger.debug("Session outdated: {}", javaSession.isExpiredOrOutdated());
+
+        if (!javaSession.isExpired()) {
+            setLoggedIn(true);
+        }
+
         logger.info("Local session loaded.");
     }
 
@@ -73,10 +78,11 @@ public final class UserService {
         JsonObject json = MinecraftAuth.JAVA_DEVICE_CODE_LOGIN.toJson(javaSession);
         Files.writeString(LauncherPaths.getSessionFile(), Launcher.GSON.toJson(json));
         isLocalSessionPresent = true;
+        setLoggedIn(true);
         logger.debug("Session saved.");
     }
 
-    public boolean isLocalSessionPresent()  {
+    public boolean isLocalSessionPresent() {
         return isLocalSessionPresent;
     }
 
