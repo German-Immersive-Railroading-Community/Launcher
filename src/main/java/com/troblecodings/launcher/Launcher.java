@@ -34,7 +34,6 @@ public class Launcher extends Application {
     public static HomeScene HOMESCENE;
     public static OptionsScene OPTIONSSCENE;
     public static LoginScene LOGINSCENE;
-    public static MojangLoginScene MOJANGLOGINSCENE;
     public static MicrosoftLoginScene MICROSOFTLOGINSCENE;
     public static CreditsScene CREDITSSCENE;
     public static OptionalModsScene OPTIONALMODSSCENE;
@@ -88,7 +87,6 @@ public class Launcher extends Application {
         OPTIONSSCENE = new OptionsScene();
         HOMESCENE = new HomeScene();
         LOGINSCENE = new LoginScene();
-        MOJANGLOGINSCENE = new MojangLoginScene();
         CREDITSSCENE = new CreditsScene();
         OPTIONALMODSSCENE = new OptionalModsScene();
     }
