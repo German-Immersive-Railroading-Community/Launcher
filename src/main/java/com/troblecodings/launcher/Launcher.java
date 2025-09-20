@@ -27,7 +27,6 @@ import org.apache.logging.log4j.Logger;
 public class Launcher extends Application {
     private static Logger logger;
     private static Launcher instance = null;
-    private static boolean beta_mode = false;
 
     private static final List<Image> images = new ArrayList<>();
 
@@ -61,15 +60,13 @@ public class Launcher extends Application {
         Parameters params = getParameters();
 
         for (String param : params.getRaw()) {
-            logger.info("Iterating over parameter: " + param);
+            logger.info("Iterating over parameter: {param}", param);
 
             if ("--no-update".equals(param)) {
                 logger.info("Skipping updates!");
                 update = false;
-            } else if ("-eb".equals(param) || "--enable-beta".equals(param)) {
-                logger.info("Enabling access to beta versions.");
-                beta_mode = true;
-                StartupUtil.refreshBetaJson();
+            } else {
+                logger.warn("unknown parameter: {param}", param);
             }
         }
 
@@ -139,10 +136,6 @@ public class Launcher extends Application {
         stackpane.getChildren().add(new Footer(scene));
         scene.setFill(Color.TRANSPARENT);
         scene.getStylesheets().add(Assets.getStyleSheet("style.css"));
-    }
-
-    public static boolean getBetaMode() {
-        return beta_mode;
     }
 
     public static Scene getScene() {
