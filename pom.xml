@@ -15,7 +15,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <javafx.version>18.0.1</javafx.version>
+        <javafx.version>18</javafx.version>
         <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
     </properties>
 
@@ -60,14 +60,14 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>${javafx.maven.plugin.version}</version>
-                <configuration>
-                    <mainClass>com.troblecodings.launcher.Launcher</mainClass>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.openjfx</groupId>-->
+<!--                <artifactId>javafx-maven-plugin</artifactId>-->
+<!--                <version>${javafx.maven.plugin.version}</version>-->
+<!--                <configuration>-->
+<!--                    <mainClass>com.troblecodings.launcher.Launcher</mainClass>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
@@ -124,17 +124,17 @@
             <version>20250517</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.openjfx</groupId>-->
+<!--            <artifactId>javafx-controls</artifactId>-->
+<!--            <version>${javafx.version}</version>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.openjfx</groupId>-->
+<!--            <artifactId>javafx-web</artifactId>-->
+<!--            <version>${javafx.version}</version>-->
+<!--        </dependency>-->
     </dependencies>
 
 </project>
