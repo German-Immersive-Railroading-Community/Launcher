@@ -118,7 +118,6 @@ public class StartupUtil {
 
     public static void update() {
         try {
-            addServerToData();
             String str = ConnectionUtil.getStringFromURL(RELEASE_API);
             if (str == null) {
                 Launcher.getLogger().info("Couldn't read updater information!");
