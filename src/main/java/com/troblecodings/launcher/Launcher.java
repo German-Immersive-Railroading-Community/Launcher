@@ -52,8 +52,8 @@ public class Launcher extends Application {
             FileUtil.SETTINGS = new FileUtil.SettingsData();
 
         System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
-        logger = LogManager.getLogger("GIRC");
-        logger.info("Initializing...");
+        logger = LogManager.getLogger();
+        logger.info("--- GIR Launcher v{} ---", GirBuildConfig.VERSION);
 
         boolean update = true;
 

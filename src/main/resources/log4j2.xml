@@ -2,10 +2,10 @@
 <Configuration status="WARN">
     <Appenders>
         <Console name="SysOut" target="SYSTEM_OUT">
-              <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %msg%n"/>
+              <PatternLayout pattern="[%d{HH:mm:ss}] %-5p [%t] %c{1.}: %msg%n"/>
         </Console>
         <RollingRandomAccessFile name="File" fileName="${sys:app.root}/launcher/logs/latest.log" filePattern="${sys:app.root}/launcher/logs/%d{yyyy-MM-dd}-%i.log.gz">
-            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %msg%n" />
+            <PatternLayout pattern="[%d{HH:mm:ss}] %-5p [%t] %c{1.}: %msg%n" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
                 <OnStartupTriggeringPolicy />
