@@ -6,7 +6,7 @@
 
     <groupId>com.troblecodings</groupId>
     <artifactId>Launcher</artifactId>
-    <version>1.0.301</version>
+    <version>1.1.0-dev</version>
 
     <packaging>jar</packaging>
 
@@ -57,6 +57,19 @@
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
                             </descriptorRefs>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>templating-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <id>filtering-java-templates</id>
+                        <goals>
+                            <goal>filter-sources</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
