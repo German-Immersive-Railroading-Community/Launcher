@@ -31,9 +31,6 @@
                     <jdkToolchain>
                         <version>1.8</version>
                     </jdkToolchain>
-                    <verbose>false</verbose>
-                    <useIncrementalCompilation>false</useIncrementalCompilation>
-                    <executable>${env.JAVA_HOME}/bin/javac</executable>
                 </configuration>
             </plugin>
             <plugin>
@@ -73,14 +70,22 @@
                     </execution>
                 </executions>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.openjfx</groupId>-->
-<!--                <artifactId>javafx-maven-plugin</artifactId>-->
-<!--                <version>${javafx.maven.plugin.version}</version>-->
-<!--                <configuration>-->
-<!--                    <mainClass>com.troblecodings.launcher.Launcher</mainClass>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <mainClass>com.troblecodings.launcher.Launcher</mainClass>
+                </configuration>
+            </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>org.openjfx</groupId>-->
+            <!--                <artifactId>javafx-maven-plugin</artifactId>-->
+            <!--                <version>${javafx.maven.plugin.version}</version>-->
+            <!--                <configuration>-->
+            <!--                    <mainClass>com.troblecodings.launcher.Launcher</mainClass>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
         </plugins>
     </build>
 
@@ -137,17 +142,17 @@
             <version>20250517</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.openjfx</groupId>-->
-<!--            <artifactId>javafx-controls</artifactId>-->
-<!--            <version>${javafx.version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.openjfx</groupId>-->
+        <!--            <artifactId>javafx-controls</artifactId>-->
+        <!--            <version>${javafx.version}</version>-->
+        <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>org.openjfx</groupId>-->
-<!--            <artifactId>javafx-web</artifactId>-->
-<!--            <version>${javafx.version}</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.openjfx</groupId>-->
+        <!--            <artifactId>javafx-web</artifactId>-->
+        <!--            <version>${javafx.version}</version>-->
+        <!--        </dependency>-->
     </dependencies>
 
 </project>
