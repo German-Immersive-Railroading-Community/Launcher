@@ -4,23 +4,19 @@ import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.Footer;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.logging.log4j.LogManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarEntry;
@@ -28,9 +24,6 @@ import java.util.jar.JarFile;
 import java.util.stream.Stream;
 
 public class StartupUtil {
-
-    private static final String RELEASE_API = "https://api.github.com/repos/German-Immersive-Railroading-Community/Launcher/releases";
-
     private static String LIBPATHS = "";
     private static String MAINCLASS = null;
 
@@ -113,49 +106,6 @@ public class StartupUtil {
             } catch (IOException e) {
                 Launcher.onError(e);
             }
-        }
-    }
-
-    public static void update() {
-        try {
-            String str = ConnectionUtil.getStringFromURL(RELEASE_API);
-            if (str == null) {
-                Launcher.getLogger().info("Couldn't read updater information!");
-                return;
-            }
-            JSONArray obj = new JSONArray(str);
-            JSONObject newversion = obj.getJSONObject(0).getJSONArray("assets").getJSONObject(0);
-            String downloadURL = newversion.getString("browser_download_url");
-            File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            if (!location.isFile()) {
-                Launcher.getLogger().debug("Dev version no update!");
-                return;
-            }
-            long size = Files.size(Paths.get(location.toURI()));
-            long newsize = newversion.getNumber("size").longValue();
-            if (newsize == size) {
-                Launcher.getLogger().info("The new version ({}) is equal to the old ({})", newsize, size);
-                return;
-            }
-            Launcher.getLogger().info("Updating Launcher!");
-            ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
-            Path pth = Paths.get(location.toURI());
-            Files.copy(pth, Paths.get(pth + ".tmp"), StandardCopyOption.REPLACE_EXISTING);
-            OutputStream stream = Files.newOutputStream(pth);
-            if (!ConnectionUtil.openConnection(downloadURL, stream,
-                    bytesize -> progress.setProgress(bytesize.intValue()))) {
-                stream.close();
-                Files.copy(Paths.get(pth + ".tmp"), pth, StandardCopyOption.REPLACE_EXISTING);
-                return;
-            }
-            stream.close();
-            LogManager.shutdown(false, true);
-            ProcessBuilder builder = new ProcessBuilder("java", "-jar", location.toString());
-            builder.redirectError(Redirect.INHERIT);
-            builder.redirectOutput(Redirect.INHERIT);
-            System.exit(builder.start().waitFor());
-        } catch (Throwable e) {
-            Launcher.onError(e);
         }
     }
 
