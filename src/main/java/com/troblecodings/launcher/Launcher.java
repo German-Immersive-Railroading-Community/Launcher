@@ -2,14 +2,9 @@ package com.troblecodings.launcher;
 
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.*;
+import com.troblecodings.launcher.update.UpdateManager;
 import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
-import com.troblecodings.launcher.util.StartupUtil;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -23,6 +18,12 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Launcher extends Application {
     private static Logger logger;
@@ -53,7 +54,7 @@ public class Launcher extends Application {
 
         System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
         logger = LogManager.getLogger();
-        logger.info("--- GIR Launcher v{} ---", GirBuildConfig.VERSION);
+        logger.info("--- GIR Launcher v{} ---", Version.parse(GirBuildConfig.VERSION));
 
         boolean update = true;
 
@@ -70,8 +71,12 @@ public class Launcher extends Application {
             }
         }
 
-        if (update)
-            StartupUtil.update();
+        if (update) {
+            boolean updateResult = UpdateManager.tryUpdate();
+            if (!updateResult) {
+                logger.warn("Update failed.");
+            }
+        }
 
         // loading images into list
         images.add(Assets.getImage("background.png"));
@@ -80,7 +85,7 @@ public class Launcher extends Application {
         images.add(Assets.getImage("background_4.png"));
         images.add(Assets.getImage("background_5.png"));
         images.add(images.get(0));
-        
+
         OPTIONSSCENE = new OptionsScene();
         HOMESCENE = new HomeScene();
         LOGINSCENE = new LoginScene();
