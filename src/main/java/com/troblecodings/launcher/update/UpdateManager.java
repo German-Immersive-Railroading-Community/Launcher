@@ -17,7 +17,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 public final class UpdateManager {
     private static final String GH_RELEASE_API_URL = "https://api.github.com/repos/German-Immersive-Railroading-Community/Launcher/releases";
@@ -29,7 +28,7 @@ public final class UpdateManager {
 
     public static boolean tryUpdate() {
         //noinspection ConstantValue
-        if (GirBuildConfig.VERSION.endsWith("-dev") && false) {
+        if (GirBuildConfig.VERSION.endsWith("-dev")) {
             LOGGER.info("Development build, skipping update.");
             return true;
         }
@@ -54,7 +53,7 @@ public final class UpdateManager {
         Version releaseVersion = Version.parse(lastTag);
 
         LOGGER.info("Latest release: {} (Draft: {}, Pre-Release: {})", releaseVersion, isDraft, isPreRelease);
-        LOGGER.debug("{}", Version.parse(GirBuildConfig.VERSION));
+
         if (releaseVersion.isLessThan(Version.parse(GirBuildConfig.VERSION))) {
             LOGGER.info("Already on latest version.");
             return true;
@@ -71,10 +70,10 @@ public final class UpdateManager {
             return false;
         }
 
-        Path oldFile;
+        Path parentDir;
 
         try {
-            oldFile = Paths.get(UpdateManager.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            parentDir = Paths.get(UpdateManager.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
         } catch (final URISyntaxException e) {
             LOGGER.error("Could not locate the current launcher location.", e);
             return false;
@@ -82,16 +81,16 @@ public final class UpdateManager {
 
         switch (releaseVersion.getMajor()) {
             case 1:
-                return updateV1(latestRelease, oldFile.getParent(), oldFile);
+                return updateV1(latestRelease, parentDir);
             case 2:
-                return updateV2(latestRelease, oldFile.getParent());
+                return updateV2(latestRelease, parentDir);
             default:
                 LOGGER.warn("No update method for new major version: {}", releaseVersion.getMajor());
                 return false;
         }
     }
 
-    private static boolean updateV1(JsonObject latestRelease, Path parentDir, Path oldFile) {
+    private static boolean updateV1(JsonObject latestRelease, Path parentDir) {
         JsonArray assets = latestRelease.getAsJsonArray("assets");
 
         for (JsonElement asset : assets.asList()) {
