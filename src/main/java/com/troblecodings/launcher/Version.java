@@ -67,4 +67,21 @@ public final class Version implements Comparable<Version> {
     public String toString() {
         return String.format("%d.%d.%d%s", major, minor, patch, appendix);
     }
+
+    public static Version parse(String version) {
+        String[] parts = version.split("\\.");
+        int major = Integer.parseInt(parts[0]);
+        int minor = Integer.parseInt(parts[1]);
+        String patchStr = parts[2];
+        int i = patchStr.indexOf('-');
+
+        if (i > -1) {
+            int patch = Integer.parseInt(parts[2].substring(0, i));
+            String appendix = parts[2].substring(i);
+            return new Version(major, minor, patch, appendix);
+        } else {
+            int patch = Integer.parseInt(patchStr);
+            return new Version(major, minor, patch);
+        }
+    }
 }
