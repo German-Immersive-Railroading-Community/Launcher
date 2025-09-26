@@ -53,10 +53,13 @@ public final class Version implements Comparable<Version> {
 
     @Override
     public int compareTo(Version other) {
-        if(major > other.major || minor > other.minor || patch > other.patch)
-            return 1;
-        else if(major <  other.major || minor < other.minor || patch < other.patch)
-            return -1;
+        if (major > other.major) return 1;
+        else if (major < other.major) return -1;
+        else if (minor > other.minor) return 1;
+        else if (minor < other.minor) return -1;
+        else if (patch > other.patch) return 1;
+        else if (patch < other.patch) return -1;
+
         return 0;
     }
 
