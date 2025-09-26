@@ -106,7 +106,7 @@ public final class UpdateManager {
             } else {
                 try (OutputStream stream = Files.newOutputStream(path)) {
                     LOGGER.info("Downloading {} to {}...", name, path);
-                    ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) size);
+                    ProgressMonitor progress = new ProgressMonitor(new JButton(), String.format("Downloading new Version %s!", name), "", 0, (int) size);
 
                     if (!ConnectionUtil.openConnection(downloadUrl, stream, bytesize -> progress.setProgress(bytesize.intValue()))) {
                         return false;
