@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.troblecodings.launcher.GirBuildConfig;
+import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.Version;
 import com.troblecodings.launcher.util.ConnectionUtil;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +27,7 @@ public final class UpdateManager {
     private UpdateManager() {
     }
 
-    public static boolean tryUpdate() {
+    public static boolean tryUpdate(boolean allowPreReleases) {
         //noinspection ConstantValue
         if (GirBuildConfig.VERSION.endsWith("-dev")) {
             LOGGER.info("Development build, skipping update.");
@@ -65,7 +66,7 @@ public final class UpdateManager {
         }
 
         // FIXME: Handle beta updates via opt-in pre-releases here, for now return
-        if (isPreRelease) {
+        if (isPreRelease && !allowPreReleases) {
             LOGGER.info("Last release is a pre-release, skipping update.");
             return false;
         }

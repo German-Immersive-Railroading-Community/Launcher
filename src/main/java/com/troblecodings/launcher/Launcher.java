@@ -57,6 +57,7 @@ public class Launcher extends Application {
         logger.info("--- GIR Launcher v{} ---", Version.parse(GirBuildConfig.VERSION));
 
         boolean update = true;
+        boolean allowPreReleases = false;
 
         Parameters params = getParameters();
 
@@ -66,13 +67,16 @@ public class Launcher extends Application {
             if ("--no-update".equals(param)) {
                 logger.info("Skipping updates!");
                 update = false;
+            } else if ("--allow-pre-releases".equals(param)) {
+                logger.info("Allowing download of pre-releases");
+                allowPreReleases = true;
             } else {
                 logger.warn("unknown parameter: {param}", param);
             }
         }
 
         if (update) {
-            boolean updateResult = UpdateManager.tryUpdate();
+            boolean updateResult = UpdateManager.tryUpdate(allowPreReleases);
             if (!updateResult) {
                 logger.warn("Update failed.");
             }
