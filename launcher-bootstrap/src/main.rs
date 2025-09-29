@@ -33,9 +33,6 @@ struct GitHubSource {
 
     /// If true, downloads the latest pre-release. If false, downloads the latest stable release.
     pre_release: bool,
-
-    // Exists so that we can retrieve release info easily when we download an asset
-    releases: Vec<GitHubRelease>,
 }
 
 impl GitHubSource {
@@ -50,7 +47,6 @@ impl GitHubSource {
             repo_uri,
             access_token,
             pre_release,
-            releases: Vec::new(),
         }
     }
 
@@ -143,26 +139,32 @@ impl UpdateSource for GitHubSource {
         progress_sender: Option<std::sync::mpsc::Sender<i16>>,
     ) -> Result<(), Error> {
         if let Some(release) = self
-            .releases
+            .get_releases(self.pre_release)?
             .iter()
             .find(|r| r.assets.iter().any(|r| r.name == asset.FileName))
         {
             if let Some(asset) = release.assets.iter().find(|a| a.name == asset.FileName) {
                 info!(
                     "About to download GitHub release from URL '{}' to file '{}'",
-                    asset.url, local_file
+                    asset.browser_download_url, local_file
                 );
 
-                download::download_url_to_file(&asset.url, local_file, move |p| {
-                    if let Some(progress_sender) = &progress_sender {
-                        let _ = progress_sender.send(p);
-                    }
-                })?;
+                download::download_url_to_file(
+                    &asset.browser_download_url,
+                    local_file,
+                    move |p| {
+                        if let Some(progress) = &progress_sender {
+                            let _ = progress.send(p);
+                        }
+                    },
+                )?;
             } else {
                 return Err(Error::Generic("Couldn't find correct asset whoops".into()));
             }
         } else {
-            return Err(Error::Generic("Couldn't find correct release whoops".into()));
+            return Err(Error::Generic(
+                "Couldn't find correct release whoops".into(),
+            ));
         }
 
         Ok(())
