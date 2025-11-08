@@ -3,6 +3,7 @@ package com.troblecodings.launcher;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.troblecodings.launcher.assets.Assets;
+import com.troblecodings.launcher.javafx.*;
 import com.troblecodings.launcher.javafx.views.MainView;
 import com.troblecodings.launcher.models.AppSettings;
 import com.troblecodings.launcher.services.UserService;
@@ -168,14 +169,7 @@ public class Launcher extends Application {
 
         stage.initStyle(StageStyle.DECORATED);
         stage.setTitle(LauncherConstants.APP_NAME);
-
-        // TODO: temporary for multi-monitor development, remove me
-        Platform.runLater(() -> {
-            stage.setY(2600);
-            stage.centerOnScreen();
-            logger.warn("REMOVE ME");
-        });
-
+        
         stage.show();
     }
 
