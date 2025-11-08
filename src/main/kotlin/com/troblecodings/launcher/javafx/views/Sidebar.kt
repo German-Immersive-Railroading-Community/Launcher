@@ -119,6 +119,7 @@ class Sidebar(val viewManager: ViewManager, val userService: UserService) : Buil
 
             children += userBox.apply {
                 alignment = Pos.CENTER
+                padding = Insets(8.0, 0.0, 8.0, 0.0)
             }
 
             for (item in sidebarItems) {

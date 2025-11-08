@@ -100,8 +100,10 @@ class LoginView(val userService: UserService, val viewManager: ViewManager) : Bu
     }
 
     override fun build(): BorderPane = BorderPane().apply {
-        if(userService.isLoggedIn) {
-            viewManager.setCurrentView(LauncherView.HOME)
+        // Skip further view construction if we are already logged in
+        // TODO: rethink
+        if (userService.isLoggedIn) {
+            Platform.runLater { viewManager.setCurrentView(LauncherView.HOME) }
             return@apply
         }
 
