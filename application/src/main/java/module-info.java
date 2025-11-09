@@ -33,6 +33,7 @@ module com.troblecodings.launcher {
     requires org.kordamp.ikonli.fontawesome6;
 
     requires jsr305;
+    requires static lombok;
 
     opens com.troblecodings.launcher to javafx.graphics;
 }

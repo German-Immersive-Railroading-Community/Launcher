@@ -19,6 +19,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import lombok.Getter;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +39,13 @@ import java.util.concurrent.ScheduledExecutorService;
 public class Launcher extends Application {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 
+    @Getter
     private static final Executor appExecutor = Executors.newScheduledThreadPool(1);
 
+    /**
+     * Gets the current Launcher instance.
+     */
+    @Getter
     private static Launcher instance = null;
     private static boolean experiments = true;
 
@@ -53,7 +59,11 @@ public class Launcher extends Application {
 
     private Logger logger;
     private Stage stage;
+
+    @Getter
     private AppSettings appSettings;
+
+    @Getter
     private UserService userService;
 
     public Launcher() {
@@ -169,27 +179,19 @@ public class Launcher extends Application {
 
         stage.initStyle(StageStyle.DECORATED);
         stage.setTitle(LauncherConstants.APP_NAME);
-        
+
         stage.show();
     }
 
     @Override
     public void stop() throws IOException {
         logger.info("Exit requested");
-        ((ScheduledExecutorService)appExecutor).shutdownNow();
+        ((ScheduledExecutorService) appExecutor).shutdownNow();
 
         logger.info("Saving settings...");
         Files.writeString(LauncherPaths.getSettingsFile(), GSON.toJson(appSettings));
 
         logger.info("Goodbye!");
-    }
-
-    public UserService getUserService() {
-        return userService;
-    }
-
-    public AppSettings getAppSettings() {
-        return appSettings;
     }
 
     public static void setupScene(Scene scene, StackPane stackpane) {
@@ -254,19 +256,6 @@ public class Launcher extends Application {
                 ioe.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Gets the Launcher instance.
-     *
-     * @return The Launcher instance.
-     */
-    public static Launcher getInstance() {
-        return instance;
-    }
-
-    public static Executor getAppExecutor() {
-        return appExecutor;
     }
 
     public static void main(String[] args) {

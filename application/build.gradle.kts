@@ -6,6 +6,8 @@ plugins {
     eclipse
     idea
 
+    id("io.freefair.lombok") version "9.1.0"
+
     id("org.javamodularity.moduleplugin") version "1.8.15"
     id("org.openjfx.javafxplugin") version "0.1.0"
     id("org.beryx.jlink") version "3.1.3"
@@ -22,7 +24,7 @@ buildConfig {
 
     useJavaOutput()
 
-    buildConfigField("APP_NAME", project.name)
+    buildConfigField("APP_NAME", "GIRC Launcher")
     buildConfigField("APP_VERSION", provider { "${project.version}" })
 }
 
@@ -69,6 +71,7 @@ dependencies {
     implementation("dev.dirs:directories:26")
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("ch.qos.logback:logback-classic:1.5.20")
+    implementation("ch.qos.logback:logback-core:1.5.20")
     implementation("net.raphimc:MinecraftAuth:4.1.1")
     implementation("com.google.code.gson:gson:2.13.1")
     implementation("com.google.guava:guava:32.1.2-jre")

@@ -33,7 +33,7 @@ public class MainView implements Builder<Parent> {
         });
 
         mainPane.setLeft(sidebar.build());
-        mainPane.setCenter(loginView.build());
+        mainPane.setCenter(new HomeView().build());
 
         return mainPane;
     }

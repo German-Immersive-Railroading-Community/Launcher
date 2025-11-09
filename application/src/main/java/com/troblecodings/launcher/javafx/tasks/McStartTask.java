@@ -32,7 +32,8 @@ public final class McStartTask extends Task<McStartInfo> {
 
         var progress = 0L;
 
-        return new McStartInfo(girJson.mainClass(), "");
+        throw new Exception("Test");
+        //return new McStartInfo(girJson.mainClass(), "");
     }
 
     private void newUpdateProgress(long progress) {

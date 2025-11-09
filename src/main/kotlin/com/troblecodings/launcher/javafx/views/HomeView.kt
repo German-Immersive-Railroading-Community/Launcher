@@ -16,8 +16,7 @@ import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.util.Builder
 
-class
-HomeView : Builder<BorderPane> {
+class HomeView : Builder<BorderPane> {
     private var startTask: Task<McStartInfo>? = null
     private var startThread: Thread? = null
 
