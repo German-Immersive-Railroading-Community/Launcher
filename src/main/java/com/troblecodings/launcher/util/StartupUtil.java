@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
@@ -45,64 +44,6 @@ public class StartupUtil {
 	private static String MAINCLASS = null;
 
 	public static final String OSSHORTNAME = getOSShortName();
-
-	private static BetaInfo activeBeta = null;
-	public static void setActiveBeta(BetaInfo info) {
-		if(activeBeta == info)
-			return;
-
-        Launcher.getLogger().info("Changed active beta to {}", info);
-		activeBeta = info;
-	}
-
-	/**
-	 * Gets all currently available pull-request artifacts for GIRC-related mods.
-	 * @param refreshBetaData Indicates whether to re-download the beta.json.
-	 * @return An array of Strings containing the beta versions of the mod; or null in case of the mod not having any.
-	 */
-	public static BetaInfo[] getBetaVersions(boolean refreshBetaData) {
-		if (!Launcher.getBetaMode())
-			return new BetaInfo[0];
-
-		List<BetaInfo> betaInfo = new ArrayList<>();
-
-		try {
-			Path betaJsonPath = Paths.get(FileUtil.SETTINGS.baseDir + "/beta.json");
-
-			if (refreshBetaData || !Files.exists(betaJsonPath))
-				refreshBetaJson();
-
-			JSONObject root = new JSONObject(new String(Files.readAllBytes(betaJsonPath)));
-
-			root.keySet().forEach(key -> {
-				JSONObject mod = root.getJSONObject(key);
-				mod.keySet().forEach(pr -> {
-					try {
-						JSONObject prObj = mod.getJSONObject(pr);
-						BetaInfo info = new BetaInfo(key, Integer.parseInt(pr), prObj.getString("name"), prObj.getString("download"), prObj.getInt("port"));
-						betaInfo.add(info);
-					} catch (Exception ignored) {
-					}
-				});
-			});
-		} catch (Exception e) {
-			Launcher.getLogger().trace("Could not parse beta.json!", e);
-			return new BetaInfo[0];
-		}
-
-		return betaInfo.toArray(new BetaInfo[0]);
-	}
-
-	public static void refreshBetaJson() {
-		if (!Launcher.getBetaMode())
-			return;
-
-		if (!ConnectionUtil.download(BETA_API, FileUtil.SETTINGS.baseDir + "/beta.json")) {
-			Launcher.getLogger().warn("Could not download beta.json!");
-		} else {
-			Launcher.getLogger().info("Refreshed beta.json!");
-		}
-	}
 
 	private static String getOSShortName() {
 		String longname = System.getProperty("os.name").toLowerCase();
@@ -332,23 +273,9 @@ public class StartupUtil {
 					JSONObject jfileobj = (JSONObject) fileobj;
 					String name = jfileobj.getString("name");
 
-					Path path;
-
-					if (activeBeta != null && name.toLowerCase().contains(activeBeta.getModName())) {
-						try {
-							if(Files.deleteIfExists(Paths.get(FileUtil.SETTINGS.baseDir, key, name)))
-								Launcher.getLogger().info("Deleted {} in favour of {}!", name, activeBeta.getJarFileName());
-						} catch (IOException e) {
-							Launcher.getLogger().trace("Failed to delete normal mod file for beta mod: " + activeBeta.toString() + "!", e);
-						}
-
-						path = Paths.get(FileUtil.SETTINGS.baseDir, key, activeBeta.getJarFileName());
-						ConnectionUtil.download(activeBeta.getPrDownload(), path.toString(), in -> Footer.setProgress((counter.get() + in) / max));
-					} else {
-						path = Paths.get(FileUtil.SETTINGS.baseDir, key, name);
+					Path path = Paths.get(FileUtil.SETTINGS.baseDir, key, name);
 						ConnectionUtil.validateDownloadRetry(jfileobj.getString("url"), path.toString(),
 								jfileobj.getString("sha1"), in -> Footer.setProgress((counter.get() + in) / max));
-					}
 
 					counter.getAndAdd(jfileobj.getInt("size"));
 				});
@@ -360,10 +287,6 @@ public class StartupUtil {
 			additional.keySet().forEach(key -> {
 				try {
 					List<Object> array = additional.getJSONArray(key).toList();
-
-					if(activeBeta != null) {
-						array.add(activeBeta.getJarFileName());
-					}
 
 					Files.list(optionalMods).filter(file -> file.toString().endsWith(".jar")).forEach(file -> {
 						Path filePath = Paths.get(FileUtil.SETTINGS.baseDir, "mods", file.getFileName().toString());
