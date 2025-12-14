@@ -28,11 +28,6 @@ import javax.swing.ProgressMonitor;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 
-import net.querz.nbt.io.NamedTag;
-import net.querz.nbt.io.NBTUtil;
-import net.querz.nbt.tag.CompoundTag;
-import net.querz.nbt.tag.StringTag;
-import net.querz.nbt.tag.ListTag;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -412,27 +407,6 @@ public class StartupUtil {
 				Path optionalFilesPath = Paths.get(optionalMods.toString(), optionalJsonObj.getString("name"));
 				ConnectionUtil.validateDownloadRetry(optionalJsonObj.getString("url"), optionalFilesPath.toString(), optionalJsonObj.getString("sha1"));
 			}
-
-			Path serverDatPath = Paths.get(FileUtil.SETTINGS.baseDir, "servers.dat");
-			NamedTag rootTag = NBTUtil.read(serverDatPath.toString());
-			CompoundTag rootCt = (CompoundTag) rootTag.getTag();
-			ListTag<CompoundTag> serverListTag = (ListTag<CompoundTag>) rootCt.get("servers");
-
-			if(serverListTag.size() > 1) {
-				while(serverListTag.size() > 1)
-					serverListTag.remove(1);
-			}
-
-			if(activeBeta != null) {
-				CompoundTag betaTag = new CompoundTag();
-				betaTag.put("ip", new StringTag("wgrmur2iejm3iuat.myfritz.net:" + activeBeta.getPrPort()));
-				betaTag.put("name", new StringTag("GIR Beta Server"));
-				betaTag.put("icon", serverListTag.get(0).getStringTag("icon"));
-
-				serverListTag.add(1, betaTag);
-			}
-
-			NBTUtil.write(rootTag, serverDatPath.toString(), false);
 
 			Footer.setProgress(0.001);
 			return AuthUtil.make(object);
