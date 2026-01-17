@@ -16,40 +16,6 @@
     </properties>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/java/</directory>
-                <includes>
-                    <include>com/troblecodings/launcher/assets/*.png</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/java/</directory>
-                <includes>
-                    <include>com/troblecodings/launcher/assets/*.css</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/java/</directory>
-                <includes>
-                    <include>com/troblecodings/launcher/assets/*.dat</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/java/</directory>
-                <includes>
-                    <include>*.xml</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/java/</directory>
-                <includes>
-                    <include>com/troblecodings/launcher/*.txt</include>
-                </includes>
-            </resource>
-        </resources>
-
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
