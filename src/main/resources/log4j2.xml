@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" disableAnsi="false">
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout disableAnsi="false">
+                <Pattern>
+                    %style{%d{yyyy-MM-dd HH:mm:ss.SSS}}{bright_black} %highlight{%5p} %style{%pid}{magenta} %style{---}{bright_black} %style{[%15.15t]}{bright_black} %style{%-40.40c{1.}}{cyan} %style{:}{bright_black} %m%n%xEx
+                </Pattern>
+            </PatternLayout>
+        </Console>
+        <RollingRandomAccessFile name="FILE" fileName="${sys:app.root}/logs/launcher.log" filePattern="${sys:app.root}/logs/launcher-%d{yyyy-MM-dd}.log.gz">
+            <PatternLayout>
+                <Pattern>
+                    %d{yyyy-MM-dd HH:mm:ss.SSS} %5p %pid --- [%15.15t] %-40.40c{1.} : %m%n%xEx
+                </Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="logs" maxDepth="1">
+                    <IfFileName glob="launcher-*.log.gz" />
+                    <IfLastModified age="3d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingRandomAccessFile>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="FILE"/>
+        </Root>
+    </Loggers>
+</Configuration>
