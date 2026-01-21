@@ -12,16 +12,19 @@ import java.util.ArrayList;
 
 import com.google.gson.Gson;
 import com.troblecodings.launcher.Launcher;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class FileUtil {
 
+	private static final Logger log = LogManager.getLogger(FileUtil.class);
 	public static SettingsData SETTINGS = new SettingsData();
 	public static String ASSET_DIR = null;
 	public static String LIB_DIR = null;
 
 	public static Path REMEMBERFILE;
 
-	public static final Path SETTINGSPATH = Paths.get(System.getProperty("user.home") + "/.launcher/settings.json");
+	public static final Path SETTINGSPATH = LauncherPaths.getSettingsFilePath();
 
 	private static String setCreateIfNotExists(String pathstr) {
 		Path path = Paths.get(pathstr);
@@ -63,8 +66,14 @@ public class FileUtil {
 			Files.walk(old).sorted((c1, c2) -> {
 				int c1l = c1.toString().length();
 				int c2l = c2.toString().length();
-				return c1l < c2l ? 1 : (c1l == c2l ? 0 : -1);
+				return Integer.compare(c2l, c1l);
 			}).forEach(p -> {
+				File pFile = p.toFile();
+				if(!pFile.exists())return;
+				if(!pFile.delete()) {
+					log.warn("Could not delete file {}", p);
+				}
+
 				try {
 					Files.deleteIfExists(p);
 				} catch (IOException e) {
@@ -82,7 +91,7 @@ public class FileUtil {
 
 	public static class SettingsData {
 
-		public String baseDir = System.getenv("APPDATA") + "/gir";
+		public String baseDir = LauncherPaths.getDataDir().toString();
 		public int width = 1280;
 		public int height = 720;
 		public int ram = 4096;

@@ -44,7 +44,8 @@ public class Launcher extends Application {
     }
 
     @Override
-    public void init() {
+    public void init() throws IOException {
+        LauncherPaths.init();
         FileUtil.init();
         FileUtil.readSettings();
 
