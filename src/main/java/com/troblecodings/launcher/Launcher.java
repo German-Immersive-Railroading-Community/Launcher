@@ -131,10 +131,8 @@ public class Launcher extends Application {
 
     @Override
     public void stop() {
-        logger.info("Saving settings");
+        logger.info("Stopping...");
         FileUtil.saveSettings();
-
-        logger.info("Shutting down.");
     }
 
     public static void setupScene(Scene scene, StackPane stackpane) {

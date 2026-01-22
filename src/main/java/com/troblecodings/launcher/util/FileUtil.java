@@ -22,8 +22,6 @@ public class FileUtil {
     public static String ASSET_DIR = null;
     public static String LIB_DIR = null;
 
-    public static Path REMEMBERFILE;
-
     public static final Path SETTINGSPATH = LauncherPaths.getSettingsFilePath();
 
     private static String setCreateIfNotExists(String pathstr) {
@@ -122,7 +120,7 @@ public class FileUtil {
     }
 
     public static void saveSettings() {
-        log.info("Save Settings!");
+        log.info("Writing settings to disk!");
         try {
             Writer writer = Files.newBufferedWriter(SETTINGSPATH);
             GSON.toJson(SETTINGS, writer);
@@ -141,8 +139,6 @@ public class FileUtil {
     public static void init() {
         ASSET_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/assets");
         LIB_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/libraries");
-
-        REMEMBERFILE = Paths.get(SETTINGS.baseDir + "/ac.ce");
     }
 
     // Delete option files and mod, assets and libraries folder
