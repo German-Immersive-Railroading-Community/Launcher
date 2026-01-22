@@ -120,12 +120,6 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-
         <!-- Source: https://mvnrepository.com/artifact/net.rapxchimc/MinecraftAuth -->
         <dependency>
             <groupId>net.raphimc</groupId>
