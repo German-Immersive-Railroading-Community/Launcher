@@ -3,12 +3,8 @@ package com.troblecodings.launcher;
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.*;
 import com.troblecodings.launcher.util.FileUtil;
+import com.troblecodings.launcher.util.LauncherPaths;
 import com.troblecodings.launcher.util.StartupUtil;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -20,8 +16,16 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Launcher extends Application {
     private static Logger logger;
@@ -58,7 +62,7 @@ public class Launcher extends Application {
             FileUtil.SETTINGS = new FileUtil.SettingsData();
 
         System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
-        logger = LogManager.getLogger("GIRC");
+        logger = LogManager.getLogger(Launcher.class);
         logger.info("Initializing...");
 
         boolean update = true;
@@ -66,30 +70,35 @@ public class Launcher extends Application {
         Parameters params = getParameters();
 
         for (String param : params.getRaw()) {
-            logger.info("Iterating over parameter: " + param);
+            logger.debug("Iterating over parameter: " + param);
 
             if ("--no-update".equals(param)) {
-                logger.info("Skipping updates!");
+                logger.debug("Skipping updates!");
                 update = false;
+            }
+
+            if ("--debug".equals(param) || "-d".equals(param)) {
+                Configurator.setRootLevel(Level.DEBUG);
+                logger.debug("Debug logging enabled.");
             }
         }
 
         if (update)
             StartupUtil.update();
 
-        // loading images into list
-        images.add(Assets.getImage("background.png"));
-        images.add(Assets.getImage("background_2.png"));
-        images.add(Assets.getImage("background_3.png"));
-        images.add(Assets.getImage("background_4.png"));
-        images.add(Assets.getImage("background_5.png"));
-        images.add(images.get(0));
-        
-        OPTIONSSCENE = new OptionsScene();
-        HOMESCENE = new HomeScene();
-        LOGINSCENE = new LoginScene();
-        CREDITSSCENE = new CreditsScene();
-        OPTIONALMODSSCENE = new OptionalModsScene();
+        logger.debug("Data directory: " + FileUtil.SETTINGS.baseDir);
+
+        Platform.runLater(() -> {
+            logger.debug("Loading background images");
+
+            // loading images into list
+            images.add(Assets.getImage("background.png"));
+            images.add(Assets.getImage("background_2.png"));
+            images.add(Assets.getImage("background_3.png"));
+            images.add(Assets.getImage("background_4.png"));
+            images.add(Assets.getImage("background_5.png"));
+            images.add(images.get(0));
+        });
 
         userService = new UserService();
     }
@@ -97,7 +106,13 @@ public class Launcher extends Application {
     @Override
     public void start(Stage stage) {
         this.stage = stage;
+
         MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
+        OPTIONSSCENE = new OptionsScene();
+        HOMESCENE = new HomeScene();
+        LOGINSCENE = new LoginScene();
+        CREDITSSCENE = new CreditsScene();
+        OPTIONALMODSSCENE = new OptionalModsScene();
 
         userService.loadLocalSession();
         boolean authStatus = userService.isLoggedIn();
@@ -110,13 +125,16 @@ public class Launcher extends Application {
         stage.setWidth(1280);
         stage.setHeight(720);
         stage.initStyle(StageStyle.TRANSPARENT);
-        stage.setTitle("GIR Launcher");
+        stage.setTitle("GIRC Launcher");
         stage.show();
     }
 
     @Override
     public void stop() {
+        logger.info("Saving settings");
         FileUtil.saveSettings();
+
+        logger.info("Shutting down.");
     }
 
     public static void setupScene(Scene scene, StackPane stackpane) {
