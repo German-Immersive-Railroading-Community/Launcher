@@ -1,0 +1,37 @@
+Label {
+    -fx-font-size: 11pt;
+    -fx-font-weight: normal;
+    -fx-text-fill: white;
+    /*-fx-padding: 0px 0px 10px 0px;*/
+    -fx-padding: 0px 0px;
+    -fx-min-height: 0px;
+    -fx-text-alignment: left;
+}
+
+VBox {
+    -fx-spacing: 10px;
+    -fx-padding: 0px 70px;
+    -fx-border-insets: 0px 10px 0px 10px;
+}
+
+HBox {
+    -fx-alignment: baseline-left;
+    -fx-spacing: 2px;
+}
+
+Hyperlink{
+    -fx-font-size: 11pt;
+    -fx-min-height: 0px;
+    -fx-text-alignment: right;
+}
+
+TextField {
+    -fx-background-color: transparent;
+    -fx-font-size: 11pt;
+    -fx-font-weight: normal;
+    -fx-text-fill: white;
+    -fx-text-alignment: right;
+    -fx-min-height: 0px;
+    -fx-background-radius: 0px;
+    -fx-padding: 0px;
+}
