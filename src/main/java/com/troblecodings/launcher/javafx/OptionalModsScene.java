@@ -19,7 +19,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class OptionalModsScene extends Scene {
-
     private static final StackPane stackPane = new StackPane();
     private static final ArrayList<CheckBox> optionalMods = new ArrayList<>();
     private static final Path modsPath = Paths.get(FileUtil.SETTINGS.baseDir, "mods");
@@ -71,7 +70,7 @@ public class OptionalModsScene extends Scene {
 
     private static void RefreshOptionalMods(VBox vBox) {
         try {
-            if(!Files.exists(optionalModsPath))
+            if (!Files.exists(optionalModsPath))
                 Files.createDirectories(optionalModsPath);
 
             optionalMods.forEach(mod -> {
@@ -86,7 +85,7 @@ public class OptionalModsScene extends Scene {
                 chkBox.setSelected(FileUtil.SETTINGS.optionalMods.contains(fileName));
                 chkBox.setText(fileName.split("\\.jar$")[0]);
                 chkBox.setOnAction(ev -> {
-                    if(chkBox.isIndeterminate())
+                    if (chkBox.isIndeterminate())
                         return;
 
                     SetOptionalModState(chkBox.getText(), chkBox.isSelected());
@@ -94,7 +93,7 @@ public class OptionalModsScene extends Scene {
                 optionalMods.add(chkBox);
                 vBox.getChildren().add(chkBox);
             });
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             Launcher.onError(ioe);
         }
     }
@@ -105,8 +104,7 @@ public class OptionalModsScene extends Scene {
 
         Path optionalModPath = optionalModsPath.resolve(modName);
 
-        if(!Files.exists(optionalModPath))
-        {
+        if (!Files.exists(optionalModPath)) {
             Launcher.onError(new IOException("Could not find the mod " + optionalModPath));
             return;
         }
@@ -114,16 +112,16 @@ public class OptionalModsScene extends Scene {
         Path modPath = modsPath.resolve(modName);
 
         try {
-            if(Files.exists(modPath)) {
+            if (Files.exists(modPath)) {
                 Files.delete(modPath);
                 FileUtil.SETTINGS.optionalMods.remove(modName);
             }
 
-            if(state) {
+            if (state) {
                 Files.copy(optionalModPath, modPath);
                 FileUtil.SETTINGS.optionalMods.add(modName);
             }
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             Launcher.onError(ioe);
         }
     }

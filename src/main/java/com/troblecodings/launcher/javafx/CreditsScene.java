@@ -1,10 +1,5 @@
 package com.troblecodings.launcher.javafx;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-
 import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
 import javafx.scene.Scene;

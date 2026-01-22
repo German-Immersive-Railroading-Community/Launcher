@@ -72,9 +72,7 @@ public final class UserService {
     /**
      * Log in to Minecraft services.
      * <p>
-     * Actual login (with blocking device-code polling) is run on a background thread.
-     * <p>
-     * In case of a local session file being present, this method will proceed to try and load it. (TODO: commented out)
+     * This operation should be run from a background thread, as device code response polling is a blocking operation.
      *
      * @param callback Callback with device code information, executed on the JavaFX Application thread.
      * @return true on successful login or if already logged in; false otherwise.
@@ -84,11 +82,6 @@ public final class UserService {
             log.info("Already logged in.");
             return true;
         }
-
-//        if(Files.exists(LauncherPaths.getSessionFilePath()) && loadLocalSession()){
-//            log.info("Loaded local session.");
-//            return true;
-//        }
 
         JavaAuthManager.Builder builder = JavaAuthManager.create(client);
 

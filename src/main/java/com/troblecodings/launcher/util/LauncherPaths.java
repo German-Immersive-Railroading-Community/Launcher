@@ -15,6 +15,7 @@ public final class LauncherPaths {
 
     /**
      * Initialise directories if they don't exist.
+     *
      * @throws IOException if an I/O error occurs.
      */
     public static void init() throws IOException {

@@ -214,8 +214,4 @@ public class Launcher extends Application {
     public static Launcher getInstance() {
         return instance;
     }
-
-    public static Logger getLogger() {
-        return logger;
-    }
 }

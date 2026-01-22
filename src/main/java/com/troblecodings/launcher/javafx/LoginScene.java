@@ -12,32 +12,31 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 public class LoginScene extends Scene {
+    private static final StackPane stackpane = new StackPane();
 
-	private static StackPane stackpane = new StackPane();
+    public LoginScene() {
+        super(stackpane);
+        Launcher.setupScene(this, stackpane);
 
-	public LoginScene() {
-		super(stackpane);
-		Launcher.setupScene(this, stackpane);
+        VBox vbox = new VBox();
+        vbox.setMaxHeight(400);
+        vbox.setMaxWidth(625);
+        vbox.setAlignment(Pos.CENTER);
+        stackpane.getChildren().add(vbox);
 
-		VBox vbox = new VBox();
-		vbox.setMaxHeight(400);
-		vbox.setMaxWidth(625);
-		vbox.setAlignment(Pos.CENTER);
-		stackpane.getChildren().add(vbox);
+        final Button microsoftLoginButton = new Button();
+        microsoftLoginButton.getStyleClass().add("microsoftLoginButton");
+        VBox.setMargin(microsoftLoginButton, new Insets(20, 0, 20, 0));
+        microsoftLoginButton.setOnAction(event -> {
+            Launcher.setScene(Launcher.MICROSOFTLOGINSCENE);
+            Launcher.MICROSOFTLOGINSCENE.startFlow();
+        });
 
-		final Button microsoftLoginButton = new Button();
-		microsoftLoginButton.getStyleClass().add("microsoftLoginButton");
-		VBox.setMargin(microsoftLoginButton, new Insets(20, 0, 20, 0));
-		microsoftLoginButton.setOnAction(event -> {
-			Launcher.setScene(Launcher.MICROSOFTLOGINSCENE);
-			Launcher.MICROSOFTLOGINSCENE.startFlow();
-		});
+        vbox.getChildren().addAll(microsoftLoginButton);
 
-		vbox.getChildren().addAll(microsoftLoginButton);
-		
-		final ImageView trainImageView = new ImageView(Assets.getImage("train2.png"));
-		trainImageView.setTranslateX(760 - trainImageView.getImage().getWidth());
-		trainImageView.setTranslateY(325 - trainImageView.getImage().getHeight());
-		stackpane.getChildren().add(trainImageView);
-	}
+        final ImageView trainImageView = new ImageView(Assets.getImage("train2.png"));
+        trainImageView.setTranslateX(760 - trainImageView.getImage().getWidth());
+        trainImageView.setTranslateY(325 - trainImageView.getImage().getHeight());
+        stackpane.getChildren().add(trainImageView);
+    }
 }
