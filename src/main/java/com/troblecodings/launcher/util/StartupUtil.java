@@ -193,7 +193,9 @@ public class StartupUtil {
             JSONObject clientDL = object.getJSONObject("downloads").getJSONObject("client");
             ConnectionUtil.validateDownloadRetry(clientDL.getString("url"), ogMC.toString(),
                     clientDL.getString("sha1"));
-            LIBPATHS = ogMC + ";";
+
+            StringBuilder libsBuilder = new StringBuilder();
+            libsBuilder.append(ogMC).append(File.pathSeparatorChar);
 
             JSONObject additional = object.getJSONObject("additional");
             JSONArray arr = object.getJSONArray("libraries");
@@ -219,7 +221,7 @@ public class StartupUtil {
                     String name = FileUtil.LIB_DIR + "/" + artifact.getString("path");
                     String sha1 = artifact.getString("sha1");
 
-                    LIBPATHS += name + ";";
+                    libsBuilder.append(name).append(File.pathSeparatorChar);
                     ConnectionUtil.validateDownloadRetry(url, name, sha1);
                 } else {
                     JSONObject natives = libobj.getJSONObject("natives");
@@ -239,6 +241,8 @@ public class StartupUtil {
                 }
                 Footer.setProgress(counter.addAndGet(1) / maxItems);
             }
+
+            LIBPATHS = libsBuilder.toString();
 
             // Asset lockup and download
             String baseurl = "https://resources.download.minecraft.net/";
@@ -364,7 +368,7 @@ public class StartupUtil {
             }
         }
 
-        if (!Files.exists(Paths.get(javaVersionPath)) || !javaVersionPath.endsWith("java.exe"))
+        if (!Files.exists(Paths.get(javaVersionPath)) || (!javaVersionPath.endsWith("java.exe") && !javaVersionPath.endsWith("java")))
             javaVersionPath = "java";
 
         String[] parameter = prestart();
@@ -379,8 +383,8 @@ public class StartupUtil {
                 "-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", width, "-height",
                 height};
 
-        ProcessBuilder builder = new ProcessBuilder(
-                Stream.concat(Arrays.stream(preparameter), Arrays.stream(parameter)).toArray(String[]::new));
+        String[] finalArgs = Stream.concat(Arrays.stream(preparameter), Arrays.stream(parameter)).toArray(String[]::new);
+        ProcessBuilder builder = new ProcessBuilder(finalArgs);
         builder.directory(new File(FileUtil.SETTINGS.baseDir));
         builder.redirectError(Redirect.INHERIT);
         builder.redirectOutput(Redirect.INHERIT);

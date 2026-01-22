@@ -102,7 +102,7 @@ public class OptionsScene extends Scene {
         javaversionbutton.setOnAction(evt -> {
 
             final FileChooser chooser = new FileChooser();
-            chooser.getExtensionFilters().add(new ExtensionFilter("Java executable", "java.exe"));
+            chooser.getExtensionFilters().add(new ExtensionFilter("Java executable", "java.exe", "java"));
             File selectedFile = chooser.showOpenDialog(Launcher.getStage());
             if (selectedFile != null) {
                 javaversionfield.setText(FileUtil.SETTINGS.javaPath = selectedFile.getPath());
