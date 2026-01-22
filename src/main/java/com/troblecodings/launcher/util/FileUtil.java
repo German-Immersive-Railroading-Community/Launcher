@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class FileUtil {
 
-    private static final Logger log = LogManager.getLogger(FileUtil.class);
+    private static Logger log;
     public static SettingsData SETTINGS = new SettingsData();
     public static String ASSET_DIR = null;
     public static String LIB_DIR = null;
@@ -139,6 +139,7 @@ public class FileUtil {
     public static void init() {
         ASSET_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/assets");
         LIB_DIR = setCreateIfNotExists(SETTINGS.baseDir + "/libraries");
+        log = LogManager.getLogger(FileUtil.class);
     }
 
     // Delete option files and mod, assets and libraries folder

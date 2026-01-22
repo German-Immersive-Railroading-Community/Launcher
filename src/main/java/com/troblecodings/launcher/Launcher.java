@@ -55,13 +55,15 @@ public class Launcher extends Application {
     @Override
     public void init() throws IOException {
         LauncherPaths.init();
+        // This needs to happen before any loggers have the chance to be configured.
+        System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
+        
         FileUtil.init();
         FileUtil.readSettings();
 
         if (FileUtil.SETTINGS == null)
             FileUtil.SETTINGS = new FileUtil.SettingsData();
 
-        System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
         logger = LogManager.getLogger(Launcher.class);
         logger.info("Initializing...");
 
