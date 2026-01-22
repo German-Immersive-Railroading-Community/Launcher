@@ -126,27 +126,27 @@ public class OptionsScene extends Scene {
 
         // folder
 
-        final Label baseDir = new Label("Folder");
-        baseDir.setStyle("-fx-padding: 20px 0px 10px 0px;");
-
-        final TextField baseDirField = new TextField(FileUtil.SETTINGS.baseDir);
-        baseDirField.setEditable(false);
-
-        final Button baseDirFinder = new Button("Open Folder");
-        baseDirFinder.getStyleClass().add("optionButton");
-        baseDirFinder.setOnAction(evt -> {
-            final DirectoryChooser chooser = new DirectoryChooser();
-            chooser.setInitialDirectory(new File(FileUtil.SETTINGS.baseDir));
-            final File fl = chooser.showDialog(Launcher.getStage());
-            if (fl != null && fl.exists() && fl.isDirectory()) {
-                baseDirField.setText(fl.toString());
-                FileUtil.moveBaseDir(baseDirField.getText());
-            }
-        });
-
+//        final Label baseDir = new Label("Folder");
+//        baseDir.setStyle("-fx-padding: 20px 0px 10px 0px;");
+//
+//        final TextField baseDirField = new TextField(FileUtil.SETTINGS.baseDir);
+//        baseDirField.setEditable(false);
+//
+//        final Button baseDirFinder = new Button("Open Folder");
+//        baseDirFinder.getStyleClass().add("optionButton");
+//        baseDirFinder.setOnAction(evt -> {
+//            final DirectoryChooser chooser = new DirectoryChooser();
+//            chooser.setInitialDirectory(new File(FileUtil.SETTINGS.baseDir));
+//            final File fl = chooser.showDialog(Launcher.getStage());
+//            if (fl != null && fl.exists() && fl.isDirectory()) {
+//                baseDirField.setText(fl.toString());
+//                FileUtil.moveBaseDir(baseDirField.getText());
+//            }
+//        });
+//
         final HBox hbox = new HBox(10);
         hbox.setPrefWidth(500);
-        hbox.getChildren().addAll(baseDirField, baseDirFinder);
+//        hbox.getChildren().addAll(baseDirField, baseDirFinder);
 
         final Button logout = new Button("Logout");
         logout.getStyleClass().add("optionButton");
@@ -181,7 +181,7 @@ public class OptionsScene extends Scene {
         javaversion1.setPrefWidth(hbox.getPrefWidth());
         javaversion1.getChildren().addAll(javaversionfield, javaversionbutton);
 
-        vbox.getChildren().addAll(resolution, resolutioncombobox, baseDir, hbox, lar, logouthbox,
+        vbox.getChildren().addAll(resolution, resolutioncombobox, hbox, lar, logouthbox,
                 javaversion, javaversion1);
 
         ImageView settingsTrainView = new ImageView(Assets.getImage("train3.png"));
