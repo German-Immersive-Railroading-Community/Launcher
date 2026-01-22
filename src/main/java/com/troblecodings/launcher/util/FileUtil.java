@@ -195,7 +195,8 @@ public class FileUtil {
             return;
         }
 
-        Files.move(oldPath, LauncherPaths.getDataDir(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.COPY_ATTRIBUTES);
+        Files.delete(LauncherPaths.getDataDir());
+        Files.move(oldPath, LauncherPaths.getDataDir());
         log.info("Migrated old directory to new location.");
     }
 }

@@ -60,7 +60,6 @@ public class Launcher extends Application {
 
         FileUtil.init();
         FileUtil.readSettings();
-        FileUtil.migrateOldDirectory();
 
         if (FileUtil.SETTINGS == null)
             FileUtil.SETTINGS = new FileUtil.SettingsData();
@@ -88,6 +87,8 @@ public class Launcher extends Application {
 
         if (update)
             StartupUtil.update();
+        
+        FileUtil.migrateOldDirectory();
 
         logger.debug("Data directory: " + FileUtil.SETTINGS.baseDir);
 
