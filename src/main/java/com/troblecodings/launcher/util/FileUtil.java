@@ -178,4 +178,24 @@ public class FileUtil {
         }
     }
 
+    /**
+     * This method is to only be used for migration purposes, and to be removed in the next update.
+     */
+    @Deprecated
+    public static void migrateOldDirectory() throws IOException {
+        String appData = System.getenv("APPDATA");
+        if (appData == null) {
+            log.info("Not on Windows, skipping migration.");
+            return;
+        }
+
+        Path oldPath = Paths.get(appData, "gir");
+        if (!Files.exists(oldPath)) {
+            log.info("%APPDATA%/gir does not exist, nothing to migrate.");
+            return;
+        }
+
+        Files.move(oldPath, LauncherPaths.getDataDir(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.COPY_ATTRIBUTES);
+        log.info("Migrated old directory to new location.");
+    }
 }

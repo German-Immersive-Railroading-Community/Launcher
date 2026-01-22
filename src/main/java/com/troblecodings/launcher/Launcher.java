@@ -57,9 +57,10 @@ public class Launcher extends Application {
         LauncherPaths.init();
         // This needs to happen before any loggers have the chance to be configured.
         System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
-        
+
         FileUtil.init();
         FileUtil.readSettings();
+        FileUtil.migrateOldDirectory();
 
         if (FileUtil.SETTINGS == null)
             FileUtil.SETTINGS = new FileUtil.SettingsData();
