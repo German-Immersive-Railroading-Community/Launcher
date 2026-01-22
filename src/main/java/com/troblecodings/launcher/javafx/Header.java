@@ -1,6 +1,7 @@
 package com.troblecodings.launcher.javafx;
 
 import com.troblecodings.launcher.Launcher;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -48,7 +49,7 @@ public class Header extends StackPane {
 
         Button closebutton = new Button();
         closebutton.getStyleClass().add("closebutton");
-        closebutton.setOnAction(event -> System.exit(0));
+        closebutton.setOnAction(event -> Platform.exit());
         closebutton.setTranslateX(-20);
         closebutton.setTranslateY(20);
         StackPane.setAlignment(closebutton, Pos.TOP_RIGHT);
