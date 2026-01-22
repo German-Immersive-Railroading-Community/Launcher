@@ -87,7 +87,7 @@ public class Launcher extends Application {
 
         if (update)
             StartupUtil.update();
-        
+
         FileUtil.migrateOldDirectory();
 
         logger.debug("Data directory: " + FileUtil.SETTINGS.baseDir);
