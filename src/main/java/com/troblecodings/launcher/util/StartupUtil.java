@@ -375,6 +375,8 @@ public class StartupUtil {
         if (parameter == null)
             return null;
 
+        String[] optimisedFlags = {"-XX:+UseG1GC", "-XX:+ParallelRefProcEnabled", "-XX:MaxGCPauseMillis=200", "-XX:+UnlockExperimentalVMOptions", "-XX:+DisableExplicitGC", "-XX:+AlwaysPreTouch", "-XX:G1NewSizePercent=30", "-XX:G1MaxNewSizePercent=40", "-XX:G1HeapRegionSize=8M", "-XX:G1ReservePercent=20", "-XX:G1HeapWastePercent=5", "-XX:G1MixedGCCountTarget=4"};
+
         String width = String.valueOf(FileUtil.SETTINGS.width);
         String height = String.valueOf(FileUtil.SETTINGS.height);
         String ram = String.valueOf(FileUtil.SETTINGS.ram);
@@ -383,7 +385,7 @@ public class StartupUtil {
                 "-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", width, "-height",
                 height};
 
-        String[] finalArgs = Stream.concat(Arrays.stream(preparameter), Arrays.stream(parameter)).toArray(String[]::new);
+        String[] finalArgs = Stream.concat(Stream.concat(Arrays.stream(preparameter), Arrays.stream(optimisedFlags)), Arrays.stream(parameter)).toArray(String[]::new);
         ProcessBuilder builder = new ProcessBuilder(finalArgs);
         builder.directory(new File(FileUtil.SETTINGS.baseDir));
         builder.redirectError(Redirect.INHERIT);
