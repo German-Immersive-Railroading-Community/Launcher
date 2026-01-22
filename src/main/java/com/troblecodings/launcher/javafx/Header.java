@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 
 import com.troblecodings.launcher.Launcher;
 
-import com.troblecodings.launcher.util.AuthUtil;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -40,7 +39,7 @@ public class Header extends StackPane {
 				btn.getStyleClass().add("navbar");
 				btn.setText(page.name().toUpperCase());
 				btn.setOnAction(evt -> {
-					if(!AuthUtil.checkSession()) return;
+					if(!Launcher.getInstance().getUserService().isLoggedIn()) return;
 					Launcher.setScene(page.supplier.get());
 				});
 				hbox.getChildren().add(btn);

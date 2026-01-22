@@ -103,12 +103,6 @@
         </dependency>
 
         <dependency>
-            <groupId>net.hycrafthd</groupId>
-            <artifactId>minecraft_authenticator</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.9.0</version>

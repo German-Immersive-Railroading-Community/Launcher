@@ -2,7 +2,6 @@ package com.troblecodings.launcher;
 
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.*;
-import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 import com.troblecodings.launcher.util.StartupUtil;
 import java.io.IOException;
@@ -38,6 +37,12 @@ public class Launcher extends Application {
     public static OptionalModsScene OPTIONALMODSSCENE;
 
     private Stage stage;
+
+    private UserService userService;
+
+    public UserService getUserService() {
+        return userService;
+    }
 
     public Launcher() {
         instance = this;
@@ -85,6 +90,8 @@ public class Launcher extends Application {
         LOGINSCENE = new LoginScene();
         CREDITSSCENE = new CreditsScene();
         OPTIONALMODSSCENE = new OptionalModsScene();
+
+        userService = new UserService();
     }
 
     @Override
@@ -92,7 +99,8 @@ public class Launcher extends Application {
         this.stage = stage;
         MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
 
-        boolean authStatus = AuthUtil.checkSession();
+        userService.loadLocalSession();
+        boolean authStatus = userService.isLoggedIn();
         stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
 
         stage.getIcons().add(Assets.getImage("icon.png"));

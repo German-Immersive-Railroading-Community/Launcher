@@ -3,12 +3,13 @@ package com.troblecodings.launcher.javafx;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
+import java.io.IOException;
 
 import com.troblecodings.launcher.Launcher;
 import com.troblecodings.launcher.assets.Assets;
-import com.troblecodings.launcher.util.AuthUtil;
 import com.troblecodings.launcher.util.FileUtil;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -135,8 +136,14 @@ public class OptionsScene extends Scene {
 		final Button logout = new Button("Logout");
 		logout.getStyleClass().add("optionButton");
 		logout.setOnAction(evt -> {
-			AuthUtil.logout();
-			Header.setVisibility(false);
+            try {
+                Launcher.getInstance().getUserService().logout();
+				Platform.runLater(() -> Launcher.setScene(Launcher.LOGINSCENE));
+            } catch (IOException e) {
+                Launcher.onError(e);
+            }
+
+            Header.setVisibility(false);
 		});
 
 		final Button resetconfigs = new Button("Reset");

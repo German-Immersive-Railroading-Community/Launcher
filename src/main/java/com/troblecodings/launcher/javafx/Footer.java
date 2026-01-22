@@ -2,7 +2,6 @@ package com.troblecodings.launcher.javafx;
 
 import com.troblecodings.launcher.Launcher;
 
-import com.troblecodings.launcher.util.AuthUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Pos;
@@ -40,7 +39,7 @@ public class Footer extends StackPane {
 	// Returns the correct scene based on the authentication status. Not authenticated -> LoginScene; Authenticated -> HomeScene.
 	private static Scene getCorrectScene(Scene currentScene) {
 		if(currentScene instanceof CreditsScene) {
-			return AuthUtil.checkSession() ? Launcher.HOMESCENE : Launcher.LOGINSCENE;
+			return Launcher.getInstance().getUserService().isLoggedIn() ? Launcher.HOMESCENE : Launcher.LOGINSCENE;
 		}
 
 		return Launcher.CREDITSSCENE;
