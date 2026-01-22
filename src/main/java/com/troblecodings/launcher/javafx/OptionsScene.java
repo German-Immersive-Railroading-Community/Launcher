@@ -12,12 +12,8 @@ import com.troblecodings.launcher.util.FileUtil;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -25,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.StringConverter;
 
 public class OptionsScene extends Scene {
 
@@ -48,21 +45,39 @@ public class OptionsScene extends Scene {
         // Ram
 
         final Label ramlabel = new Label("RAM");
-        ramlabel.setStyle("-fx-padding: 0px 0px 10px 0px;");
+        ramlabel.setStyle("-fx-padding: 0px 0px 0px 0px;");
+        vbox.getChildren().add(ramlabel);
 
-        final ComboBox<String> ramcombobox = new ComboBox<>();
-        ramcombobox.getItems().addAll("1 GB", "2 GB", "4 GB", "6 GB", "8 GB", "10 GB", "16 GB", "20 GB", "24 GB");
-        ramcombobox.setEditable(true);
-        final int currentRam = FileUtil.SETTINGS.ram / 1000;
-        ramcombobox.getItems().stream().filter(str -> str.startsWith(String.valueOf(currentRam))).findFirst()
-                .ifPresent(ramcombobox.getSelectionModel()::select);
-        ramcombobox.setOnAction(evt -> {
-            try {
-                final String ram = ramcombobox.getSelectionModel().getSelectedItem();
-                FileUtil.SETTINGS.ram = Integer.parseInt(ram.substring(0, ram.length() - 3)) * 1000;
-            } catch (Exception ignored) {
+        final Slider ramSlider = new Slider(4*1024, 24*1024, FileUtil.SETTINGS.ram);
+        ramSlider.setShowTickLabels(true);
+        ramSlider.setShowTickMarks(true);
+        ramSlider.setMajorTickUnit(4*1024);
+        ramSlider.setMinorTickCount(3);
+        ramSlider.setBlockIncrement(1024);
+        ramSlider.setSnapToTicks(true);
+        ramSlider.setLabelFormatter(new StringConverter<Double>() {
+            @Override
+            public String toString(Double n) {
+                return String.format("%.0f MB", n);
+            }
+
+            @Override
+            public Double fromString(String s) {
+                return 0.0;
             }
         });
+
+        Label infoLabel = new Label("Selected Memory: " + ((int) ramSlider.getValue()) + " MB");
+        infoLabel.setStyle("-fx-font-size: 12pt; -fx-font-weight: normal;");
+
+        ramSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            int ramValue = newVal.intValue();
+            FileUtil.SETTINGS.ram = ramValue;
+            infoLabel.setText("Selected Memory: " + ramValue + " MB");
+        });
+
+        vbox.getChildren().add(infoLabel);
+        vbox.getChildren().add(ramSlider);
 
         // Auflösung
 
@@ -166,7 +181,7 @@ public class OptionsScene extends Scene {
         javaversion1.setPrefWidth(hbox.getPrefWidth());
         javaversion1.getChildren().addAll(javaversionfield, javaversionbutton);
 
-        vbox.getChildren().addAll(ramlabel, ramcombobox, resolution, resolutioncombobox, baseDir, hbox, lar, logouthbox,
+        vbox.getChildren().addAll(resolution, resolutioncombobox, baseDir, hbox, lar, logouthbox,
                 javaversion, javaversion1);
 
         ImageView settingsTrainView = new ImageView(Assets.getImage("train3.png"));
