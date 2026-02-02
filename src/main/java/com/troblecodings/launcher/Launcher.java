@@ -8,8 +8,8 @@ import com.troblecodings.launcher.util.StartupUtil;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -21,17 +21,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 public class Launcher extends Application {
     private static Logger logger;
     private static Launcher instance = null;
 
-    private static final List<Image> images = new ArrayList<>();
+    private static BufferedImage[] images = {};
 
     public static HomeScene HOMESCENE;
     public static OptionsScene OPTIONSSCENE;
@@ -75,7 +77,7 @@ public class Launcher extends Application {
             logger.debug("Iterating over parameter: " + param);
 
             if ("--no-update".equals(param)) {
-                logger.debug("Skipping updates!");
+                logger.warn("Updates disabled.");
                 update = false;
             }
 
@@ -90,18 +92,22 @@ public class Launcher extends Application {
 
         FileUtil.migrateOldDirectory();
 
-        logger.debug("Data directory: " + FileUtil.SETTINGS.baseDir);
+        logger.debug("Data directory: {}", FileUtil.SETTINGS.baseDir);
+        logger.debug("Loading background images");
 
-        Platform.runLater(() -> {
-            logger.debug("Loading background images");
-
-            // loading images into list
-            images.add(Assets.getImage("background.png"));
-            images.add(Assets.getImage("background_2.png"));
-            images.add(Assets.getImage("background_3.png"));
-            images.add(Assets.getImage("background_4.png"));
-            images.add(Assets.getImage("background_5.png"));
-            images.add(images.get(0));
+        CompletableFuture.runAsync(() -> {
+            try {
+                // loading images into list
+                images = new BufferedImage[]{
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/background.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/background_2.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/background_3.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/background_4.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/background_5.png"))),
+                };
+            } catch (IOException e) {
+                logger.error("Failed to load background images.", e);
+            }
         });
 
         userService = new UserService();
@@ -151,8 +157,10 @@ public class Launcher extends Application {
 
             @Override
             protected void interpolate(double fraction) {
-                int index = (int) (fraction * (images.size() - 1));
-                backgroundImg.setImage(images.get(index));
+                if (images.length == 0) return;
+
+                int index = (int) (fraction * (images.length - 1));
+                backgroundImg.setImage(SwingFXUtils.toFXImage(images[index], null));
             }
         };
 

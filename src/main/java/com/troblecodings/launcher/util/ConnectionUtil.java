@@ -1,5 +1,7 @@
 package com.troblecodings.launcher.util;
 
+import com.troblecodings.launcher.Launcher;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,25 +9,15 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.function.Consumer;
 
-import com.troblecodings.launcher.Launcher;
-
 public class ConnectionUtil {
-
-    public static final String URL = "";
-
     private static void addHeader(HttpURLConnection connection) {
-        connection.addRequestProperty("User-Agent",
-                "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101 Firefox/64.0");
+        connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101 Firefox/64.0");
     }
 
     public static boolean openConnection(final String url, final OutputStream channel) {
@@ -72,15 +64,15 @@ public class ConnectionUtil {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         if (!openConnection(url, output))
             return null;
-        return new String(output.toByteArray());
+        return output.toString();
     }
 
     // Downloads a given file from the given URL onto the machine
-    public static boolean download(String url, String name) {
-        return download(url, name, null);
+    public static void download(String url, String name) {
+        download(url, name, null);
     }
 
-    public static boolean download(String url, String name, final Consumer<Long> update) {
+    public static void download(String url, String name, final Consumer<Long> update) {
         Path pathtofile = Paths.get(name + ".tmp");
         Path parent = pathtofile.getParent();
         if (parent != null) {
@@ -93,7 +85,7 @@ public class ConnectionUtil {
 
         try (OutputStream fos = Files.newOutputStream(pathtofile, StandardOpenOption.CREATE)) {
             if (!openConnection(url, fos, update))
-                return false;
+                return;
         } catch (Exception e) {
             Launcher.onError(e);
         }
@@ -103,7 +95,6 @@ public class ConnectionUtil {
         } catch (IOException e) {
             Launcher.onError(e);
         }
-        return true;
     }
 
     // Checks if the file exist and that its sha1 hash equals the given

@@ -70,6 +70,8 @@ public class MicrosoftLoginScene extends Scene {
     }
 
     public void startFlow() {
+        log.info("Login requested");
+
         CompletableFuture.supplyAsync(() -> Launcher.getInstance().getUserService().login(msa -> {
             log.debug("Device code expires: {}", Date.from(Instant.ofEpochMilli(msa.getExpireTimeMs())));
 
