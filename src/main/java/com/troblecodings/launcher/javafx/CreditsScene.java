@@ -94,6 +94,11 @@ public class CreditsScene extends Scene {
         commonsLangButton.getStyleClass().add("link");
         vbox.getChildren().add(commonsLangButton);
 
+        Button commonsIoButton = new Button("commons-io: Apache License 2.0 [GitHub]");
+        commonsIoButton.setOnAction(e -> openWebsiteInBrowser("https://github.com/apache/commons-io/blob/master/LICENSE.txt"));
+        commonsIoButton.getStyleClass().add("link");
+        vbox.getChildren().add(commonsIoButton);
+
         Button devDirsButton = new Button("directories-jvm: MPL Version 2.0 [GitHub]");
         devDirsButton.setOnAction(e -> openWebsiteInBrowser("https://codeberg.org/dirs/directories-jvm/src/branch/main/LICENSE"));
         devDirsButton.getStyleClass().add("link");
