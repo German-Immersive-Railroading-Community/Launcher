@@ -15,7 +15,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileUtil {
@@ -182,9 +183,25 @@ public class FileUtil {
             return;
         }
 
-        FileUtils.deleteDirectory(LauncherPaths.getDataDir().toFile());
-        FileUtils.moveDirectory(oldPath.toFile(), LauncherPaths.getDataDir().toFile());
+        // Skip 1, index 0 is the Roaming/gir/ directory file entry. We don't want to move that.
+        try (Stream<Path> walk = Files.walk(oldPath).skip(1)) {
+            Path dataDir = LauncherPaths.getDataDir();
+            List<Path> files = walk.collect(Collectors.toList());
 
-        log.info("Migrated old directory to new location.");
+            for (Path p : files) {
+                Path relPath = oldPath.relativize(p);
+                Path newPath = dataDir.resolve(relPath);
+
+                if (Files.isDirectory(p)) {
+                    log.debug("Creating directory {} if it doesn't exist", relPath);
+                    Files.createDirectories(newPath);
+                } else {
+                    log.debug("Migrating {} to new folder", relPath);
+                    Files.copy(p, newPath, StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+        }
+
+        log.info("Copied old directory to new location. You are free to delete the old directory now.");
     }
 }
