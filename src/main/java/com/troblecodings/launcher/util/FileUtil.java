@@ -2,6 +2,7 @@ package com.troblecodings.launcher.util;
 
 import com.google.gson.Gson;
 import com.troblecodings.launcher.Launcher;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,6 +15,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.stream.Stream;
 
 public class FileUtil {
 
@@ -195,8 +198,9 @@ public class FileUtil {
             return;
         }
 
-        Files.delete(LauncherPaths.getDataDir());
-        Files.move(oldPath, LauncherPaths.getDataDir());
+        FileUtils.deleteDirectory(LauncherPaths.getDataDir().toFile());
+        FileUtils.moveDirectory(oldPath.toFile(), LauncherPaths.getDataDir().toFile());
+
         log.info("Migrated old directory to new location.");
     }
 }
