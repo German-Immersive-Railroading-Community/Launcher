@@ -2,6 +2,7 @@ package com.troblecodings.launcher;
 
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.*;
+import com.troblecodings.launcher.services.UserService;
 import com.troblecodings.launcher.util.FileUtil;
 import com.troblecodings.launcher.util.LauncherPaths;
 import com.troblecodings.launcher.util.StartupUtil;

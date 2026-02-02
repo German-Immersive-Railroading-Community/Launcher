@@ -1,4 +1,4 @@
-package com.troblecodings.launcher;
+package com.troblecodings.launcher.services;
 
 import com.google.gson.JsonObject;
 import com.troblecodings.launcher.util.FileUtil;
