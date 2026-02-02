@@ -125,6 +125,8 @@ public class Launcher extends Application {
         OPTIONALMODSSCENE = new OptionalModsScene();
 
         userService.loadLocalSession();
+        userService.refreshSession();
+
         boolean authStatus = userService.isLoggedIn();
         stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
 

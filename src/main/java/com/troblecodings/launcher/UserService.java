@@ -140,6 +140,14 @@ public final class UserService {
         }
     }
 
+    public void refreshSession() {
+        if(session == null) return;
+
+        log.info("Refreshing session...");
+        session.getMinecraftProfile().refreshAsync();
+        session.getMinecraftToken().refreshAsync();
+    }
+
     private String getOrDefault(final JSONObject json, final String id, final String def) {
         if (json.has(id))
             return json.getString(id);
