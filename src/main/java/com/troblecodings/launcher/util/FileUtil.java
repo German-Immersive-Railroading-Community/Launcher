@@ -147,37 +147,21 @@ public class FileUtil {
 
     // Delete option files and mod, assets and libraries folder
     public static void resetFiles() {
-        log.info("Started launcher reset!");
-        deleteFile(Paths.get(SETTINGS.baseDir + "/options.txt").toFile());
-        deleteFile(Paths.get(SETTINGS.baseDir + "/optionsof.txt").toFile());
-        deleteFile(Paths.get(SETTINGS.baseDir + "/GIR.json").toFile());
-        deleteDirectory(Paths.get(SETTINGS.baseDir + "/mods").toFile());
-        deleteDirectory(Paths.get(SETTINGS.baseDir + "/assets").toFile());
-        deleteDirectory(Paths.get(SETTINGS.baseDir + "/libraries").toFile());
-        deleteDirectory(Paths.get(SETTINGS.baseDir + "/config").toFile());
-        FileUtil.init();
-        log.info("Finished launcher reset!");
-    }
+        log.info("Reset requested.");
 
-    private static void deleteDirectory(File directory) {
-        if (directory != null && directory.exists()) {
-            File[] files = directory.listFiles();
-            if (null != files) {
-                for (int i = 0; i < files.length; i++) {
-                    if (files[i].isDirectory()) {
-                        deleteDirectory(files[i]);
-                    } else {
-                        files[i].delete();
-                    }
-                }
-            }
-            directory.delete();
-        }
-    }
+        try {
+            FileUtils.delete(Paths.get(SETTINGS.baseDir + "/options.txt").toFile());
+            FileUtils.delete(Paths.get(SETTINGS.baseDir + "/optionsof.txt").toFile());
+            FileUtils.delete(Paths.get(SETTINGS.baseDir + "/GIR.json").toFile());
+            FileUtils.deleteDirectory(Paths.get(SETTINGS.baseDir + "/mods").toFile());
+            FileUtils.deleteDirectory(Paths.get(SETTINGS.baseDir + "/assets").toFile());
+            FileUtils.deleteDirectory(Paths.get(SETTINGS.baseDir + "/libraries").toFile());
+            FileUtils.deleteDirectory(Paths.get(SETTINGS.baseDir + "/config").toFile());
+            FileUtil.init();
 
-    private static void deleteFile(File file) {
-        if (file != null && file.exists() && !file.isDirectory()) {
-            file.delete();
+            log.info("Reset complete.");
+        } catch (final IOException e) {
+            log.error("Reset operation failed: ", e);
         }
     }
 
