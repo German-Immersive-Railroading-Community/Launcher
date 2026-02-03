@@ -183,6 +183,12 @@ public class FileUtil {
             return;
         }
 
+        Path migrationStateFile = LauncherPaths.getDataDir().resolve(".did-migrate");
+        if(Files.exists(migrationStateFile)) {
+            log.info("Migration already occurred, nothing to migrate.");
+            return;
+        }
+
         // Skip 1, index 0 is the Roaming/gir/ directory file entry. We don't want to move that.
         try (Stream<Path> walk = Files.walk(oldPath).skip(1)) {
             Path dataDir = LauncherPaths.getDataDir();
@@ -202,6 +208,7 @@ public class FileUtil {
             }
         }
 
-        log.info("Copied old directory to new location. You are free to delete the old directory now.");
+        Files.createFile(migrationStateFile);
+        log.info("Migration complete. You may now delete the old directory at your convenience.");
     }
 }
