@@ -1,16 +1,33 @@
 package com.troblecodings.launcher.models.gir;
 
-public final class AssetIndex {
+import com.google.gson.annotations.SerializedName;
+
+public class AssetIndex {
+    @SerializedName("id")
     private String id;
-
+    
+    @SerializedName("sha1")
     private String sha1;
-
+    
+    @SerializedName("size")
     private long size;
-
+    
+    @SerializedName("totalSize")
     private long totalSize;
-
+    
+    @SerializedName("url")
     private String url;
 
+    public AssetIndex() {
+    }
+
+    public AssetIndex(String id, String sha1, long size, long totalSize, String url) {
+        this.id = id;
+        this.sha1 = sha1;
+        this.size = size;
+        this.totalSize = totalSize;
+        this.url = url;
+    }
 
     public String getId() {
         return id;

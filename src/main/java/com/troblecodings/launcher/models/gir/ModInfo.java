@@ -1,16 +1,33 @@
 package com.troblecodings.launcher.models.gir;
 
-public final class ModDl {
+import com.google.gson.annotations.SerializedName;
+
+public class ModInfo {
+    @SerializedName("name")
     private String name;
-
+    
+    @SerializedName("url")
     private String url;
-
+    
+    @SerializedName("sha1")
     private String sha1;
-
+    
+    @SerializedName("sha256")
     private String sha256;
-
+    
+    @SerializedName("size")
     private long size;
 
+    public ModInfo() {
+    }
+
+    public ModInfo(String name, String url, String sha1, String sha256, long size) {
+        this.name = name;
+        this.url = url;
+        this.sha1 = sha1;
+        this.sha256 = sha256;
+        this.size = size;
+    }
 
     public String getName() {
         return name;

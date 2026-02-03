@@ -1,14 +1,29 @@
 package com.troblecodings.launcher.models.gir;
 
-public final class LibraryArtifact {
+import com.google.gson.annotations.SerializedName;
+
+public class LibraryArtifact {
+    @SerializedName("path")
     private String path;
-
+    
+    @SerializedName("url")
+    private String url;
+    
+    @SerializedName("sha1")
     private String sha1;
-
+    
+    @SerializedName("size")
     private long size;
 
-    private String url;
+    public LibraryArtifact() {
+    }
 
+    public LibraryArtifact(String path, String url, String sha1, long size) {
+        this.path = path;
+        this.url = url;
+        this.sha1 = sha1;
+        this.size = size;
+    }
 
     public String getPath() {
         return path;
@@ -16,6 +31,14 @@ public final class LibraryArtifact {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getSha1() {
@@ -32,13 +55,5 @@ public final class LibraryArtifact {
 
     public void setSize(long size) {
         this.size = size;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 }

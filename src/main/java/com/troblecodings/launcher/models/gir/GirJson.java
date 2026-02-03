@@ -1,41 +1,58 @@
 package com.troblecodings.launcher.models.gir;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 import java.util.Map;
 
-public final class GirJson {
+public class GirJson {
+    @SerializedName("assetIndex")
     private AssetIndex assetIndex;
-
+    
+    @SerializedName("assets")
     private String assets;
-
-    private Map<String, MojangDl> downloads = new HashMap<>();
-
+    
+    @SerializedName("downloads")
+    private Downloads downloads;
+    
+    @SerializedName("id")
     private String id;
-
+    
+    @SerializedName("time")
     private String time;
-
+    
+    @SerializedName("releaseTime")
     private String releaseTime;
-
+    
+    @SerializedName("type")
     private String type;
-
+    
+    @SerializedName("mainClass")
     private String mainClass;
-
+    
+    @SerializedName("inheritsFrom")
     private String inheritsFrom;
-
-    // private <type> logging TODO: logging is empty in gir.json, what is this used for?
-
+    
+    @SerializedName("logging")
+    private Map<String, Object> logging;
+    
+    @SerializedName("minecraftArguments")
     private String minecraftArguments;
-
-    private Map<String, List<ModDl>> additional = new HashMap<>();
-
-    private List<LibraryInfo> libraries = new ArrayList<>();
-
+    
+    @SerializedName("additional")
+    private AdditionalMods additional;
+    
+    @SerializedName("libraries")
+    private List<Library> libraries;
+    
+    @SerializedName("wholeSize")
     private long wholeSize;
+    
+    @SerializedName("optionalMods")
+    private List<ModInfo> optionalMods;
 
-    private List<ModDl> optionalMods = new ArrayList<>();
-
+    public GirJson() {
+    }
 
     public AssetIndex getAssetIndex() {
         return assetIndex;
@@ -53,11 +70,11 @@ public final class GirJson {
         this.assets = assets;
     }
 
-    public Map<String, MojangDl> getDownloads() {
+    public Downloads getDownloads() {
         return downloads;
     }
 
-    public void setDownloads(Map<String, MojangDl> downloads) {
+    public void setDownloads(Downloads downloads) {
         this.downloads = downloads;
     }
 
@@ -109,6 +126,14 @@ public final class GirJson {
         this.inheritsFrom = inheritsFrom;
     }
 
+    public Map<String, Object> getLogging() {
+        return logging;
+    }
+
+    public void setLogging(Map<String, Object> logging) {
+        this.logging = logging;
+    }
+
     public String getMinecraftArguments() {
         return minecraftArguments;
     }
@@ -117,19 +142,19 @@ public final class GirJson {
         this.minecraftArguments = minecraftArguments;
     }
 
-    public Map<String, List<ModDl>> getAdditional() {
+    public AdditionalMods getAdditional() {
         return additional;
     }
 
-    public void setAdditional(Map<String, List<ModDl>> additional) {
+    public void setAdditional(AdditionalMods additional) {
         this.additional = additional;
     }
 
-    public List<LibraryInfo> getLibraries() {
+    public List<Library> getLibraries() {
         return libraries;
     }
 
-    public void setLibraries(List<LibraryInfo> libraries) {
+    public void setLibraries(List<Library> libraries) {
         this.libraries = libraries;
     }
 
@@ -141,11 +166,11 @@ public final class GirJson {
         this.wholeSize = wholeSize;
     }
 
-    public List<ModDl> getOptionalMods() {
+    public List<ModInfo> getOptionalMods() {
         return optionalMods;
     }
 
-    public void setOptionalMods(List<ModDl> optionalMods) {
+    public void setOptionalMods(List<ModInfo> optionalMods) {
         this.optionalMods = optionalMods;
     }
 }

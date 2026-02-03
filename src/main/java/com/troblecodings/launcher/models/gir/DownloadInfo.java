@@ -1,12 +1,25 @@
 package com.troblecodings.launcher.models.gir;
 
-public final class MojangDl {
+import com.google.gson.annotations.SerializedName;
+
+public class DownloadInfo {
+    @SerializedName("sha1")
     private String sha1;
-
+    
+    @SerializedName("size")
     private long size;
-
+    
+    @SerializedName("url")
     private String url;
 
+    public DownloadInfo() {
+    }
+
+    public DownloadInfo(String sha1, long size, String url) {
+        this.sha1 = sha1;
+        this.size = size;
+        this.url = url;
+    }
 
     public String getSha1() {
         return sha1;
