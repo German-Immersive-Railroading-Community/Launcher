@@ -18,6 +18,14 @@
     </properties>
 
     <build>
+        <!-- This makes stuff like ${project.version} inside a properties file in src/main/resources possible -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

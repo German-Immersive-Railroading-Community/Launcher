@@ -56,7 +56,7 @@ public class Launcher extends Application {
 
     @Override
     public void init() throws IOException {
-        log.info("Initializing...");
+        log.info("Starting Launcher v{}...", System.getProperty("app.version"));
 
         FileUtil.init();
         FileUtil.readSettings();
