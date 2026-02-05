@@ -118,53 +118,6 @@ public class StartupUtil {
         }
     }
 
-    public static void update() {
-        try {
-            File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            if (!location.isFile()) {
-                log.info("Development environment detected, skipping updates.");
-                return;
-            }
-
-            // TODO: Move this to pre-game startup phase
-            addServerToData();
-            String str = ConnectionUtil.getStringFromURL(RELEASE_API);
-            if (str == null) {
-                log.info("Couldn't read updater information!");
-                return;
-            }
-            JSONArray obj = new JSONArray(str);
-            JSONObject newversion = obj.getJSONObject(0).getJSONArray("assets").getJSONObject(0);
-            String downloadURL = newversion.getString("browser_download_url");
-
-            long size = Files.size(Paths.get(location.toURI()));
-            long newsize = newversion.getNumber("size").longValue();
-            if (newsize == size) {
-                log.info("The new version ({}) is equal to the old ({})", newsize, size);
-                return;
-            }
-            log.info("Updating Launcher!");
-            ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) newsize);
-            Path pth = Paths.get(location.toURI());
-            Files.copy(pth, Paths.get(pth + ".tmp"), StandardCopyOption.REPLACE_EXISTING);
-            OutputStream stream = Files.newOutputStream(pth);
-            if (!ConnectionUtil.openConnection(downloadURL, stream,
-                    bytesize -> progress.setProgress(bytesize.intValue()))) {
-                stream.close();
-                Files.copy(Paths.get(pth + ".tmp"), pth, StandardCopyOption.REPLACE_EXISTING);
-                return;
-            }
-            stream.close();
-            LogManager.shutdown(false, true);
-            ProcessBuilder builder = new ProcessBuilder("java", "-jar", location.toString());
-            builder.redirectError(Redirect.INHERIT);
-            builder.redirectOutput(Redirect.INHERIT);
-            System.exit(builder.start().waitFor());
-        } catch (Throwable e) {
-            Launcher.onError(e);
-        }
-    }
-
     @SuppressWarnings("unchecked")
     private static String[] prestart() {
         try {
@@ -327,6 +280,8 @@ public class StartupUtil {
                 Path optionalFilesPath = Paths.get(optionalMods.toString(), optionalJsonObj.getString("name"));
                 ConnectionUtil.validateDownloadRetry(optionalJsonObj.getString("url"), optionalFilesPath.toString(), optionalJsonObj.getString("sha1"));
             }
+
+            addServerToData();
 
             Footer.setProgress(0.001);
             return Launcher.getInstance().getUserService().make(object);

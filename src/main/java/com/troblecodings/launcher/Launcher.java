@@ -2,9 +2,11 @@ package com.troblecodings.launcher;
 
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.*;
+import com.troblecodings.launcher.services.UpdateService;
 import com.troblecodings.launcher.services.UserService;
 import com.troblecodings.launcher.util.FileUtil;
 import com.troblecodings.launcher.util.StartupUtil;
+import com.troblecodings.launcher.util.Version;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -31,6 +33,9 @@ import java.util.concurrent.CompletableFuture;
 
 public class Launcher extends Application {
     private static final Logger log = LogManager.getLogger(Launcher.class);
+
+    public static final Version VERSION = new Version(System.getProperty("app.version"));
+
     private static Launcher instance = null;
 
     private static BufferedImage[] images = {};
@@ -45,6 +50,9 @@ public class Launcher extends Application {
     private Stage stage;
 
     private UserService userService;
+
+
+    private final UpdateService updateService = new UpdateService();
 
     public UserService getUserService() {
         return userService;
@@ -81,8 +89,16 @@ public class Launcher extends Application {
             }
         }
 
-        if (update)
-            StartupUtil.update();
+        boolean updatesAvailable = updateService.checkForUpdates();
+
+        // TODO: Turn this into a dialog
+        if (update && updatesAvailable) {
+            try {
+                updateService.doUpdate();
+            } catch (final Exception ex) {
+                log.error("Failed to update!", ex);
+            }
+        }
 
         FileUtil.migrateOldDirectory();
 
