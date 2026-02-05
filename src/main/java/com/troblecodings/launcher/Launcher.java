@@ -4,7 +4,6 @@ import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.*;
 import com.troblecodings.launcher.services.UserService;
 import com.troblecodings.launcher.util.FileUtil;
-import com.troblecodings.launcher.util.LauncherPaths;
 import com.troblecodings.launcher.util.StartupUtil;
 import javafx.animation.Transition;
 import javafx.application.Application;
@@ -31,7 +30,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class Launcher extends Application {
-    private static Logger logger;
+    private static final Logger log = LogManager.getLogger(Launcher.class);
     private static Launcher instance = null;
 
     private static BufferedImage[] images = {};
@@ -57,9 +56,7 @@ public class Launcher extends Application {
 
     @Override
     public void init() throws IOException {
-        LauncherPaths.init();
-        // This needs to happen before any loggers have the chance to be configured.
-        System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
+        log.info("Initializing...");
 
         FileUtil.init();
         FileUtil.readSettings();
@@ -67,24 +64,20 @@ public class Launcher extends Application {
         if (FileUtil.SETTINGS == null)
             FileUtil.SETTINGS = new FileUtil.SettingsData();
 
-        logger = LogManager.getLogger(Launcher.class);
-        logger.info("Initializing...");
-
         boolean update = true;
-
         Parameters params = getParameters();
 
         for (String param : params.getRaw()) {
-            logger.debug("Iterating over parameter: " + param);
+            log.debug("Iterating over parameter: " + param);
 
             if ("--no-update".equals(param)) {
-                logger.warn("Updates disabled.");
+                log.warn("Updates disabled.");
                 update = false;
             }
 
             if ("--debug".equals(param) || "-d".equals(param)) {
                 Configurator.setRootLevel(Level.DEBUG);
-                logger.debug("Debug logging enabled.");
+                log.debug("Debug logging enabled.");
             }
         }
 
@@ -93,8 +86,8 @@ public class Launcher extends Application {
 
         FileUtil.migrateOldDirectory();
 
-        logger.debug("Data directory: {}", FileUtil.SETTINGS.baseDir);
-        logger.debug("Loading background images");
+        log.debug("Data directory: {}", FileUtil.SETTINGS.baseDir);
+        log.debug("Loading background images");
 
         CompletableFuture.runAsync(() -> {
             try {
@@ -107,7 +100,7 @@ public class Launcher extends Application {
                         ImageIO.read(Objects.requireNonNull(getClass().getResource("/background_5.png"))),
                 };
             } catch (IOException e) {
-                logger.error("Failed to load background images.", e);
+                log.error("Failed to load background images.", e);
             }
         });
 
@@ -144,7 +137,7 @@ public class Launcher extends Application {
 
     @Override
     public void stop() {
-        logger.info("Stopping...");
+        log.info("Stopping...");
         FileUtil.saveSettings();
     }
 
@@ -191,12 +184,12 @@ public class Launcher extends Application {
     public static void onError(Throwable e) {
         // Return here since we cannot show any error.
         if (e == null) {
-            logger.error("Error found but was passed null!");
+            log.error("Error found but was passed null!");
             return;
         } else if (e.getMessage() == null)
-            logger.trace("", e);
+            log.trace("", e);
         else
-            logger.trace(e.getMessage(), e);
+            log.trace(e.getMessage(), e);
 
         // See if this can be made better, seems overly clunky-like to me, but any other method doesn't generate a stack-trace.
         // toString and getMessage only return the String representation of what the exception actually is.
