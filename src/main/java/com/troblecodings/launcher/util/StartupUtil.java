@@ -120,6 +120,13 @@ public class StartupUtil {
 
     public static void update() {
         try {
+            File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            if (!location.isFile()) {
+                log.info("Development environment detected, skipping updates.");
+                return;
+            }
+
+            // TODO: Move this to pre-game startup phase
             addServerToData();
             String str = ConnectionUtil.getStringFromURL(RELEASE_API);
             if (str == null) {
@@ -129,11 +136,7 @@ public class StartupUtil {
             JSONArray obj = new JSONArray(str);
             JSONObject newversion = obj.getJSONObject(0).getJSONArray("assets").getJSONObject(0);
             String downloadURL = newversion.getString("browser_download_url");
-            File location = new File(StartupUtil.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            if (!location.isFile()) {
-                log.debug("Dev version no update!");
-                return;
-            }
+
             long size = Files.size(Paths.get(location.toURI()));
             long newsize = newversion.getNumber("size").longValue();
             if (newsize == size) {
