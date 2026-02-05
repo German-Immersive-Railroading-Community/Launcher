@@ -18,7 +18,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
@@ -184,7 +183,7 @@ public class OptionsScene extends Scene {
         vbox.getChildren().addAll(resolution, resolutioncombobox, hbox, lar, logouthbox,
                 javaversion, javaversion1);
 
-        ImageView settingsTrainView = new ImageView(Assets.getImage("train3.png"));
+        ImageView settingsTrainView = new ImageView(Assets.getImage("images/train3.png"));
         settingsTrainView.setScaleX(-1);
         settingsTrainView.setTranslateX((-1280 / 1.75) + settingsTrainView.getImage().getWidth());
         settingsTrainView.setTranslateY(360 - settingsTrainView.getImage().getHeight());

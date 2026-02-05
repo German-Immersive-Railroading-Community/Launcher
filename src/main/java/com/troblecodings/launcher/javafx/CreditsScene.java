@@ -16,7 +16,7 @@ public class CreditsScene extends Scene {
     public CreditsScene() {
         super(stackpane);
         Launcher.setupScene(this, stackpane);
-        this.getStylesheets().add(Assets.getStyleSheet("credits.css"));
+        this.getStylesheets().add(Assets.getStyleSheet("css/credits.css"));
 
         ScrollPane sp = new ScrollPane();
 

@@ -2,14 +2,14 @@ package com.troblecodings.launcher;
 
 import com.troblecodings.launcher.assets.Assets;
 import com.troblecodings.launcher.javafx.*;
+import com.troblecodings.launcher.services.UserService;
 import com.troblecodings.launcher.util.FileUtil;
-import com.troblecodings.launcher.util.LauncherPaths;
 import com.troblecodings.launcher.util.StartupUtil;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -21,17 +21,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 public class Launcher extends Application {
-    private static Logger logger;
+    private static final Logger log = LogManager.getLogger(Launcher.class);
     private static Launcher instance = null;
 
-    private static final List<Image> images = new ArrayList<>();
+    private static BufferedImage[] images = {};
 
     public static HomeScene HOMESCENE;
     public static OptionsScene OPTIONSSCENE;
@@ -54,9 +56,7 @@ public class Launcher extends Application {
 
     @Override
     public void init() throws IOException {
-        LauncherPaths.init();
-        // This needs to happen before any loggers have the chance to be configured.
-        System.setProperty("app.root", FileUtil.SETTINGS.baseDir);
+        log.info("Starting Launcher v{}...", System.getProperty("app.version"));
 
         FileUtil.init();
         FileUtil.readSettings();
@@ -64,24 +64,20 @@ public class Launcher extends Application {
         if (FileUtil.SETTINGS == null)
             FileUtil.SETTINGS = new FileUtil.SettingsData();
 
-        logger = LogManager.getLogger(Launcher.class);
-        logger.info("Initializing...");
-
         boolean update = true;
-
         Parameters params = getParameters();
 
         for (String param : params.getRaw()) {
-            logger.debug("Iterating over parameter: " + param);
+            log.debug("Iterating over parameter: " + param);
 
             if ("--no-update".equals(param)) {
-                logger.debug("Skipping updates!");
+                log.warn("Updates disabled.");
                 update = false;
             }
 
             if ("--debug".equals(param) || "-d".equals(param)) {
                 Configurator.setRootLevel(Level.DEBUG);
-                logger.debug("Debug logging enabled.");
+                log.debug("Debug logging enabled.");
             }
         }
 
@@ -90,18 +86,22 @@ public class Launcher extends Application {
 
         FileUtil.migrateOldDirectory();
 
-        logger.debug("Data directory: " + FileUtil.SETTINGS.baseDir);
+        log.debug("Data directory: {}", FileUtil.SETTINGS.baseDir);
+        log.debug("Loading background images");
 
-        Platform.runLater(() -> {
-            logger.debug("Loading background images");
-
-            // loading images into list
-            images.add(Assets.getImage("background.png"));
-            images.add(Assets.getImage("background_2.png"));
-            images.add(Assets.getImage("background_3.png"));
-            images.add(Assets.getImage("background_4.png"));
-            images.add(Assets.getImage("background_5.png"));
-            images.add(images.get(0));
+        CompletableFuture.runAsync(() -> {
+            try {
+                // loading images into list
+                images = new BufferedImage[]{
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background_2.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background_3.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background_4.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background_5.png"))),
+                };
+            } catch (IOException e) {
+                log.error("Failed to load background images.", e);
+            }
         });
 
         userService = new UserService();
@@ -119,10 +119,12 @@ public class Launcher extends Application {
         OPTIONALMODSSCENE = new OptionalModsScene();
 
         userService.loadLocalSession();
+        userService.refreshSession();
+
         boolean authStatus = userService.isLoggedIn();
         stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
 
-        stage.getIcons().add(Assets.getImage("icon.png"));
+        stage.getIcons().add(Assets.getImage("images/icon.png"));
 
         Header.setVisibility(authStatus);
 
@@ -135,7 +137,7 @@ public class Launcher extends Application {
 
     @Override
     public void stop() {
-        logger.info("Stopping...");
+        log.info("Stopping...");
         FileUtil.saveSettings();
     }
 
@@ -151,8 +153,10 @@ public class Launcher extends Application {
 
             @Override
             protected void interpolate(double fraction) {
-                int index = (int) (fraction * (images.size() - 1));
-                backgroundImg.setImage(images.get(index));
+                if (images.length == 0) return;
+
+                int index = (int) (fraction * (images.length - 1));
+                backgroundImg.setImage(SwingFXUtils.toFXImage(images[index], null));
             }
         };
 
@@ -162,7 +166,7 @@ public class Launcher extends Application {
         stackpane.getChildren().add(new Header(scene));
         stackpane.getChildren().add(new Footer(scene));
         scene.setFill(Color.TRANSPARENT);
-        scene.getStylesheets().add(Assets.getStyleSheet("style.css"));
+        scene.getStylesheets().add(Assets.getStyleSheet("css/style.css"));
     }
 
     public static Scene getScene() {
@@ -180,12 +184,12 @@ public class Launcher extends Application {
     public static void onError(Throwable e) {
         // Return here since we cannot show any error.
         if (e == null) {
-            logger.error("Error found but was passed null!");
+            log.error("Error found but was passed null!");
             return;
         } else if (e.getMessage() == null)
-            logger.trace("", e);
+            log.trace("", e);
         else
-            logger.trace(e.getMessage(), e);
+            log.trace(e.getMessage(), e);
 
         // See if this can be made better, seems overly clunky-like to me, but any other method doesn't generate a stack-trace.
         // toString and getMessage only return the String representation of what the exception actually is.

@@ -17,7 +17,7 @@ public class HomeScene extends Scene {
         super(stackpane);
         Launcher.setupScene(this, stackpane);
 
-        ImageView imagelogo = new ImageView(Assets.getImage("logo.png"));
+        ImageView imagelogo = new ImageView(Assets.getImage("images/logo.png"));
 
         Button launchbutton = new Button();
         launchbutton.getStyleClass().add("launchbutton");

@@ -30,7 +30,7 @@ public class MicrosoftLoginScene extends Scene {
     public MicrosoftLoginScene() {
         super(stackpane);
         Launcher.setupScene(this, stackpane);
-        this.getStylesheets().add(Assets.getStyleSheet("microsoftlogin.css"));
+        this.getStylesheets().add(Assets.getStyleSheet("css/microsoftlogin.css"));
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -63,13 +63,15 @@ public class MicrosoftLoginScene extends Scene {
 
         vbox.getChildren().addAll(new HBox(userCodeFlow), new HBox(normalLink), new HBox(verificationLink), new HBox(directLink), new HBox(directVerificationLink));
 
-        final ImageView trainImageView = new ImageView(Assets.getImage("train2.png"));
+        final ImageView trainImageView = new ImageView(Assets.getImage("images/train2.png"));
         trainImageView.setTranslateX(760 - trainImageView.getImage().getWidth());
         trainImageView.setTranslateY(325 - trainImageView.getImage().getHeight());
         stackpane.getChildren().add(trainImageView);
     }
 
     public void startFlow() {
+        log.info("Login requested");
+
         CompletableFuture.supplyAsync(() -> Launcher.getInstance().getUserService().login(msa -> {
             log.debug("Device code expires: {}", Date.from(Instant.ofEpochMilli(msa.getExpireTimeMs())));
 

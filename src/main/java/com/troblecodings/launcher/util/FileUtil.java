@@ -40,57 +40,6 @@ public class FileUtil {
         return pathstr;
     }
 
-    public static boolean moveBaseDir(String file) {
-        Path ptof = Paths.get(file);
-        if (Files.notExists(ptof) || !Files.isDirectory(ptof))
-            return false;
-
-        Path old = Paths.get(SETTINGS.baseDir);
-        if (ptof.equals(old))
-            return false;
-
-        SETTINGS.baseDir = file;
-
-        try { // Why? WHY? Let me disable Exceptions pls
-            Files.walk(old).forEach(pt -> {
-                try { // I really hate this language ... I mean ... really
-                    Path newpth = Paths.get(pt.toString().replace(old.toString(), file));
-                    if (Files.isDirectory(pt)) {
-                        Files.createDirectories(newpth);
-                        return;
-                    }
-                    Files.move(pt, newpth, StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    Launcher.onError(e);
-                    // I fucking don't care if this fails
-                }
-            });
-            Files.walk(old).sorted((c1, c2) -> {
-                int c1l = c1.toString().length();
-                int c2l = c2.toString().length();
-                return Integer.compare(c2l, c1l);
-            }).forEach(p -> {
-                File pFile = p.toFile();
-                if (!pFile.exists()) return;
-                if (!pFile.delete()) {
-                    log.warn("Could not delete file {}", p);
-                }
-
-                try {
-                    Files.deleteIfExists(p);
-                } catch (IOException e) {
-                    Launcher.onError(e);
-                    // I fucking don't care if this fails
-                }
-            });
-        } catch (IOException e) {
-            Launcher.onError(e);
-            return false;
-        }
-        init();
-        return true;
-    }
-
     public static class SettingsData {
 
         public String baseDir = LauncherPaths.getDataDir().toString();

@@ -4,7 +4,7 @@
         <Console name="CONSOLE" target="SYSTEM_OUT">
             <PatternLayout disableAnsi="false">
                 <Pattern>
-                    %style{%d{yyyy-MM-dd HH:mm:ss.SSS}}{bright_black} %highlight{%5p} %style{%pid}{magenta} %style{---}{bright_black} %style{[%15.15t]}{bright_black} %style{%-40.40c{1.}}{cyan} %style{:}{bright_black} %m%n%xEx
+                    %style{%d{yyyy-MM-dd HH:mm:ss.SSS}}{bright_black} %highlight{%5p} %style{%pid}{magenta} %style{---}{bright_black} %style{[%15.15t]}{bright_black} %style{%-24.24c{1.}}{cyan} %style{:}{bright_black} %m%n%xEx
                 </Pattern>
             </PatternLayout>
         </Console>

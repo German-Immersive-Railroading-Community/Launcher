@@ -16,7 +16,7 @@ public final class LauncherPaths {
     /**
      * Initialise directories if they don't exist.
      *
-     * @throws IOException if an I/O error occurs.
+     * @throws IOException on error when creating a directory.
      */
     public static void init() throws IOException {
         Files.createDirectories(getConfigDir());
