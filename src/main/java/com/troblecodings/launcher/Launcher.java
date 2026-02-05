@@ -93,11 +93,11 @@ public class Launcher extends Application {
             try {
                 // loading images into list
                 images = new BufferedImage[]{
-                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/background.png"))),
-                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/background_2.png"))),
-                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/background_3.png"))),
-                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/background_4.png"))),
-                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/background_5.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background_2.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background_3.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background_4.png"))),
+                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background_5.png"))),
                 };
             } catch (IOException e) {
                 log.error("Failed to load background images.", e);
@@ -124,7 +124,7 @@ public class Launcher extends Application {
         boolean authStatus = userService.isLoggedIn();
         stage.setScene(authStatus ? HOMESCENE : LOGINSCENE);
 
-        stage.getIcons().add(Assets.getImage("icon.png"));
+        stage.getIcons().add(Assets.getImage("images/icon.png"));
 
         Header.setVisibility(authStatus);
 

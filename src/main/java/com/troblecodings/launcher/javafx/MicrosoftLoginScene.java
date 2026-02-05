@@ -63,7 +63,7 @@ public class MicrosoftLoginScene extends Scene {
 
         vbox.getChildren().addAll(new HBox(userCodeFlow), new HBox(normalLink), new HBox(verificationLink), new HBox(directLink), new HBox(directVerificationLink));
 
-        final ImageView trainImageView = new ImageView(Assets.getImage("train2.png"));
+        final ImageView trainImageView = new ImageView(Assets.getImage("images/train2.png"));
         trainImageView.setTranslateX(760 - trainImageView.getImage().getWidth());
         trainImageView.setTranslateY(325 - trainImageView.getImage().getHeight());
         stackpane.getChildren().add(trainImageView);

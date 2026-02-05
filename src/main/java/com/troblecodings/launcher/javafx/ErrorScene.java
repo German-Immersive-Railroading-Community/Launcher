@@ -47,7 +47,7 @@ public class ErrorScene extends Scene {
 
         vbox.getChildren().addAll(errorHeader, errorReason, button);
 
-        final ImageView trainImageView = new ImageView(Assets.getImage("train1.png"));
+        final ImageView trainImageView = new ImageView(Assets.getImage("images/train1.png"));
         trainImageView.setTranslateX(720 - trainImageView.getImage().getWidth());
         trainImageView.setTranslateY(250 - trainImageView.getImage().getHeight());
         _stackPane.getChildren().add(trainImageView);
