@@ -281,6 +281,8 @@ public class StartupUtil {
                 ConnectionUtil.validateDownloadRetry(optionalJsonObj.getString("url"), optionalFilesPath.toString(), optionalJsonObj.getString("sha1"));
             }
 
+            addServerToData();
+
             Footer.setProgress(0.001);
             return Launcher.getInstance().getUserService().make(object);
         } catch (Throwable e) {
