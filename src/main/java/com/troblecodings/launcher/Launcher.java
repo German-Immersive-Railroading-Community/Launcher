@@ -166,7 +166,7 @@ public class Launcher extends Application {
         stackpane.getChildren().add(new Header(scene));
         stackpane.getChildren().add(new Footer(scene));
         scene.setFill(Color.TRANSPARENT);
-        scene.getStylesheets().add(Assets.getStyleSheet("style.css"));
+        scene.getStylesheets().add(Assets.getStyleSheet("css/style.css"));
     }
 
     public static Scene getScene() {

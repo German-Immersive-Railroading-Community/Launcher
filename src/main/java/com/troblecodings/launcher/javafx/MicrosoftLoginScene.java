@@ -30,7 +30,7 @@ public class MicrosoftLoginScene extends Scene {
     public MicrosoftLoginScene() {
         super(stackpane);
         Launcher.setupScene(this, stackpane);
-        this.getStylesheets().add(Assets.getStyleSheet("microsoftlogin.css"));
+        this.getStylesheets().add(Assets.getStyleSheet("css/microsoftlogin.css"));
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
