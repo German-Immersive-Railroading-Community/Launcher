@@ -35,11 +35,11 @@ public class Version {
     }
 
     public boolean isNewerThan(Version other) {
-        return this.major > other.major || this.minor > other.minor || this.patch > other.patch;
+        return this.major > other.major || (this.major == other.major && this.minor > other.minor) || (this.major == other.major && this.minor == other.minor && this.patch > other.patch);
     }
 
     public boolean isOlderThan(Version other) {
-        return this.major < other.major || this.minor < other.minor || this.patch < other.patch;
+        return this.major < other.major || (this.major == other.major && this.minor < other.minor) || (this.major == other.major && this.minor == other.minor && this.patch < other.patch);
     }
 
     @Override
