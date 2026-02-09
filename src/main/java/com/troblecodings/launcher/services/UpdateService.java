@@ -94,18 +94,19 @@ public final class UpdateService {
 
         GitHubAsset asset = assetOpt.get();
 
+        // TODO: Maybe ask the user if they want to restart
         ProgressMonitor progress = new ProgressMonitor(new JButton(), "Downloading update!", "", 0, (int) asset.getSize());
         Path launcherPath = Paths.get(Launcher.class.getProtectionDomain().getCodeSource().getLocation().toURI());
         Path tempLauncherPath = Paths.get(launcherPath + ".tmp");
-        try (OutputStream stream = Files.newOutputStream(tempLauncherPath)) {
+        Files.copy(launcherPath, tempLauncherPath, StandardCopyOption.REPLACE_EXISTING);
+        try (OutputStream stream = Files.newOutputStream(launcherPath)) {
             if (!ConnectionUtil.openConnection(asset.getBrowserDownloadUrl(), stream, downloadedSize -> progress.setProgress(downloadedSize.intValue()))) {
                 log.error("Error when downloading new Launcher version!");
+                Files.copy(tempLauncherPath, launcherPath, StandardCopyOption.REPLACE_EXISTING);
                 return;
             }
         }
 
-        // TODO: Maybe ask the user if they want to restart
-        Files.move(tempLauncherPath, launcherPath, StandardCopyOption.REPLACE_EXISTING);
         ProcessBuilder builder = new ProcessBuilder("java", "-jar", launcherPath.toString());
         builder.redirectError(ProcessBuilder.Redirect.INHERIT);
         builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
