@@ -5,13 +5,12 @@ import com.troblecodings.launcher.javafx.*;
 import com.troblecodings.launcher.services.UpdateService;
 import com.troblecodings.launcher.services.UserService;
 import com.troblecodings.launcher.util.FileUtil;
-import com.troblecodings.launcher.util.StartupUtil;
 import com.troblecodings.launcher.util.Version;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -23,9 +22,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Objects;
@@ -38,7 +36,7 @@ public class Launcher extends Application {
 
     private static Launcher instance = null;
 
-    private static BufferedImage[] images = {};
+    private static Image[] images = {};
 
     public static HomeScene HOMESCENE;
     public static OptionsScene OPTIONSSCENE;
@@ -105,18 +103,24 @@ public class Launcher extends Application {
         log.debug("Data directory: {}", FileUtil.SETTINGS.baseDir);
         log.debug("Loading background images");
 
+        String[] imagesToLoad = {
+                "/images/background.png",
+                "/images/background_2.png",
+                "/images/background_3.png",
+                "/images/background_4.png",
+                "/images/background_5.png"
+        };
+
+        images = new Image[imagesToLoad.length];
+
         CompletableFuture.runAsync(() -> {
             try {
-                // loading images into list
-                images = new BufferedImage[]{
-                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background.png"))),
-                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background_2.png"))),
-                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background_3.png"))),
-                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background_4.png"))),
-                        ImageIO.read(Objects.requireNonNull(getClass().getResource("/images/background_5.png"))),
-                };
-            } catch (IOException e) {
-                log.error("Failed to load background images.", e);
+                for(int i = 0; i < imagesToLoad.length; i++) {
+                    log.debug("Loading image {}", imagesToLoad[i]);
+                    images[i] = new Image(imagesToLoad[i]);
+                }
+            } catch (Exception ex) {
+                log.error("Failed to load background images:", ex);
             }
         });
 
@@ -172,7 +176,7 @@ public class Launcher extends Application {
                 if (images.length == 0) return;
 
                 int index = (int) (fraction * (images.length - 1));
-                backgroundImg.setImage(SwingFXUtils.toFXImage(images[index], null));
+                backgroundImg.setImage(images[index]);
             }
         };
 
