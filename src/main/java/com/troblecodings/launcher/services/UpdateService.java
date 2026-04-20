@@ -50,23 +50,29 @@ public final class UpdateService {
             return false;
         }
 
-        String releaseContentJson = ConnectionUtil.getStringFromURL(latest_release_uri);
-        cachedRelease = FileUtil.GSON.fromJson(releaseContentJson, GitHubRelease.class);
+        // TODO: rework connectionutil
+        try {
+            String releaseContentJson = ConnectionUtil.getStringFromURL(latest_release_uri);
+            cachedRelease = FileUtil.GSON.fromJson(releaseContentJson, GitHubRelease.class);
 
-        Matcher matcher = version_regex.matcher(cachedRelease.getTagName());
-        if (!matcher.find()) {
-            log.warn("Failed to retrieve version information from GitHub Api request.");
+            Matcher matcher = version_regex.matcher(cachedRelease.getTagName());
+            if (!matcher.find()) {
+                log.warn("Failed to retrieve version information from GitHub Api request.");
+                return false;
+            }
+
+            latestVersion = new Version(matcher.group());
+            if (!latestVersion.isNewerThan(Launcher.VERSION)) {
+                log.info("No new updates available.");
+                return false;
+            }
+
+            log.info("New updates are available!");
+            return true;
+        } catch (final Exception ex) {
+            log.warn("Failed to update!", ex);
             return false;
         }
-
-        latestVersion = new Version(matcher.group());
-        if (!latestVersion.isNewerThan(Launcher.VERSION)) {
-            log.info("No new updates available.");
-            return false;
-        }
-
-        log.info("New updates are available!");
-        return true;
     }
 
     public void doUpdate() throws IOException, URISyntaxException, InterruptedException {
