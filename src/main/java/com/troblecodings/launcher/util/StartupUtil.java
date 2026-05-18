@@ -323,11 +323,13 @@ public class StartupUtil {
             }
         }
 
-        if (!Files.exists(Paths.get(javaVersionPath)) || (!javaVersionPath.endsWith("java.exe") && !javaVersionPath.endsWith("java")))
+        if (!Files.exists(Paths.get(javaVersionPath)) || (!javaVersionPath.endsWith("java.exe") && !javaVersionPath.endsWith("java") && !javaVersionPath.endsWith("javaw.exe") && !javaVersionPath.endsWith("javaw")))
             javaVersionPath = "java";
 
-        String[] parameter = prestart();
-        if (parameter == null)
+        log.debug("Using java installation: {}", javaVersionPath);
+
+        String[] userInfoParamenter = prestart();
+        if (userInfoParamenter == null)
             return null;
 
         String[] optimisedFlags = {"-XX:+UseG1GC", "-XX:+ParallelRefProcEnabled", "-XX:MaxGCPauseMillis=200", "-XX:+UnlockExperimentalVMOptions", "-XX:+DisableExplicitGC", "-XX:+AlwaysPreTouch", "-XX:G1NewSizePercent=30", "-XX:G1MaxNewSizePercent=40", "-XX:G1HeapRegionSize=8M", "-XX:G1ReservePercent=20", "-XX:G1HeapWastePercent=5", "-XX:G1MixedGCCountTarget=4"};
@@ -335,21 +337,31 @@ public class StartupUtil {
         String width = String.valueOf(FileUtil.SETTINGS.width);
         String height = String.valueOf(FileUtil.SETTINGS.height);
         String ram = String.valueOf(FileUtil.SETTINGS.ram);
-        String[] preparameter = new String[]{javaVersionPath, "-Xmx" + ram + "M", "-Xms" + ram + "M",
-                "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
-                "-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", width, "-height",
-                height};
+        List<String> javaArgs = Arrays.asList(javaVersionPath, "-Xmx" + ram + "M", "-Xms" + ram + "M", "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump", "-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", width, "-height", height);
 
-        String[] finalArgs = Stream.concat(Stream.concat(Arrays.stream(preparameter), Arrays.stream(optimisedFlags)), Arrays.stream(parameter)).toArray(String[]::new);
-        ProcessBuilder builder = new ProcessBuilder(finalArgs);
+        List<String> argsBuilder = new ArrayList<>(javaArgs);
+
+        if (!FileUtil.SETTINGS.javaSettings.getJreArgs().isEmpty()) {
+            log.debug("Using alternative java args: {}", FileUtil.SETTINGS.javaSettings.getJreArgs());
+            argsBuilder.addAll(Arrays.asList(FileUtil.SETTINGS.javaSettings.getJreArgs().split("\n")));
+        } else {
+            log.debug("Using pre-defined optimized args: {}", String.join(", ", optimisedFlags));
+            argsBuilder.addAll(Arrays.asList(optimisedFlags));
+        }
+
+        argsBuilder.addAll(Arrays.asList(userInfoParamenter));
+
+        ProcessBuilder builder = new ProcessBuilder(argsBuilder);
         builder.directory(new File(FileUtil.SETTINGS.baseDir));
         builder.redirectError(Redirect.INHERIT);
         builder.redirectOutput(Redirect.INHERIT);
+
         try {
             return builder.start();
         } catch (IOException e) {
             Launcher.onError(e);
         }
+
         return null;
     }
 }
