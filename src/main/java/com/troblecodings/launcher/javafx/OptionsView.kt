@@ -128,6 +128,8 @@ class OptionsView : Scene(stackPane) {
 
                     children += TextArea(FileUtil.SETTINGS.javaSettings.jreArgs).apply ta@{
                         promptText = "Extra Argumente hier hinzufügen."
+                        isWrapText = true
+                        prefHeight = 120.0
                         val pauseTransition = PauseTransition(Duration.millis(300.0)).apply {
                             onFinished = { _ ->
                                 log.debug("Changing custom jvm arguments: {}", this@ta.text)
