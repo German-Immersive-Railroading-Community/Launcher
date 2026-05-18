@@ -10,18 +10,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.ProcessBuilder.Redirect;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarEntry;
@@ -315,7 +312,7 @@ public class StartupUtil {
     }
 
     public static Process start() {
-        String javaVersionPath = FileUtil.SETTINGS.javaPath;
+        String javaVersionPath = FileUtil.SETTINGS.javaSettings.getJreLocation();
         if (javaVersionPath.isEmpty()) {
             Optional<String> javaVers = findJavaVersion();
             if (!javaVers.isPresent()) {

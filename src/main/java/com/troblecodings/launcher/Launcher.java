@@ -23,10 +23,8 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class Launcher extends Application {
@@ -39,7 +37,7 @@ public class Launcher extends Application {
     private static Image[] images = {};
 
     public static HomeScene HOMESCENE;
-    public static OptionsScene OPTIONSSCENE;
+    public static OptionsView OPTIONS_VIEW;
     public static LoginScene LOGINSCENE;
     public static MicrosoftLoginScene MICROSOFTLOGINSCENE;
     public static CreditsScene CREDITSSCENE;
@@ -132,7 +130,7 @@ public class Launcher extends Application {
         this.stage = stage;
 
         MICROSOFTLOGINSCENE = new MicrosoftLoginScene();
-        OPTIONSSCENE = new OptionsScene();
+        OPTIONS_VIEW = new OptionsView();
         HOMESCENE = new HomeScene();
         LOGINSCENE = new LoginScene();
         CREDITSSCENE = new CreditsScene();
