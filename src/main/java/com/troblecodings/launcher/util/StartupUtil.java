@@ -337,13 +337,13 @@ public class StartupUtil {
         String width = String.valueOf(FileUtil.SETTINGS.width);
         String height = String.valueOf(FileUtil.SETTINGS.height);
         String ram = String.valueOf(FileUtil.SETTINGS.ram);
-        
+
         List<String> javaArgs = Arrays.asList(javaVersionPath, "-Xmx" + ram + "M", "-Xms" + ram + "M", "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump");
         List<String> argsBuilder = new ArrayList<>(javaArgs);
 
         if (!FileUtil.SETTINGS.javaSettings.getJreArgs().isEmpty()) {
             log.debug("Using alternative java args: {}", FileUtil.SETTINGS.javaSettings.getJreArgs());
-            argsBuilder.addAll(Arrays.asList(FileUtil.SETTINGS.javaSettings.getJreArgs().split("\n")));
+            argsBuilder.addAll(Arrays.asList(FileUtil.SETTINGS.javaSettings.getJreArgs().split(" ")));
         } else {
             log.debug("Using pre-defined optimized args: {}", String.join(", ", optimisedFlags));
             argsBuilder.addAll(Arrays.asList(optimisedFlags));
