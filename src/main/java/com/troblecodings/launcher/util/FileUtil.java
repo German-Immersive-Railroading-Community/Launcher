@@ -2,11 +2,11 @@ package com.troblecodings.launcher.util;
 
 import com.google.gson.Gson;
 import com.troblecodings.launcher.Launcher;
+import com.troblecodings.launcher.models.CustomJavaSettings;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -47,7 +47,7 @@ public class FileUtil {
         public int height = 720;
         public int ram = 4096;
         public ArrayList<String> optionalMods = new ArrayList<>();
-        public String javaPath = "";
+        public CustomJavaSettings javaSettings = new CustomJavaSettings("", "");
     }
 
     public static final Gson GSON = new Gson();
