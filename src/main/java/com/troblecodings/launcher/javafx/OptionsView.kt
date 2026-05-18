@@ -3,6 +3,7 @@ package com.troblecodings.launcher.javafx
 import com.troblecodings.launcher.Launcher
 import com.troblecodings.launcher.assets.Assets
 import com.troblecodings.launcher.util.FileUtil
+import javafx.animation.PauseTransition
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.geometry.Insets
@@ -16,6 +17,7 @@ import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.stage.FileChooser
+import javafx.util.Duration
 import javafx.util.StringConverter
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -112,7 +114,7 @@ class OptionsView : Scene(stackPane) {
                             override fun fromString(string: String?): Double = 0.0
                         }
 
-                        valueProperty().addListener { obs, old, new ->
+                        valueProperty().addListener { _, _, new ->
                             FileUtil.SETTINGS.ram = new.toInt()
                             infoLabel.text = "Max. RAM: ${new.toInt()} MB"
                             log.debug("Max. memory changed to ${new.toInt()} MB")
@@ -124,8 +126,16 @@ class OptionsView : Scene(stackPane) {
                         style = "-fx-font-weight: normal; -fx-font-size: 18px;"
                     }
 
-                    children += TextArea().apply {
-                        promptText = "Extra Argumente können hier beigefügt werden."
+                    children += TextArea(FileUtil.SETTINGS.javaSettings.jreArgs).apply ta@{
+                        promptText = "Extra Argumente hier hinzufügen."
+                        val pauseTransition = PauseTransition(Duration.millis(300.0)).apply {
+                            onFinished = { _ ->
+                                log.debug("Changing custom jvm arguments: {}", this@ta.text)
+                                FileUtil.SETTINGS.javaSettings.jreArgs = this@ta.text
+                            }
+                        }
+
+                        textProperty().addListener { _ -> pauseTransition.playFromStart() }
                     }
 
                     // Resolution
