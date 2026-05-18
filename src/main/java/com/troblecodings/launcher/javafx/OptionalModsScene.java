@@ -55,7 +55,7 @@ public class OptionalModsScene extends Scene {
 
         final Button backButton = new Button("Back");
         backButton.getStyleClass().add("optionButton");
-        backButton.setOnAction(ev -> Launcher.setScene(Launcher.OPTIONSSCENE));
+        backButton.setOnAction(ev -> Launcher.setScene(Launcher.OPTIONS_VIEW));
 
         final Button refreshButton = new Button("Refresh");
         refreshButton.getStyleClass().add("optionButton");

@@ -18,7 +18,7 @@ public class Header extends StackPane {
     private static double yOffset = 0;
 
     private enum EnumPages {
-        HOME(() -> Launcher.HOMESCENE), OPTIONS(() -> Launcher.OPTIONSSCENE);
+        HOME(() -> Launcher.HOMESCENE), OPTIONS(() -> Launcher.OPTIONS_VIEW);
 
         public final Supplier<Scene> supplier;
 
