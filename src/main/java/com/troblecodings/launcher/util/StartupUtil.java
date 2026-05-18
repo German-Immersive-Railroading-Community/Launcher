@@ -337,8 +337,8 @@ public class StartupUtil {
         String width = String.valueOf(FileUtil.SETTINGS.width);
         String height = String.valueOf(FileUtil.SETTINGS.height);
         String ram = String.valueOf(FileUtil.SETTINGS.ram);
-        List<String> javaArgs = Arrays.asList(javaVersionPath, "-Xmx" + ram + "M", "-Xms" + ram + "M", "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump", "-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", width, "-height", height);
-
+        
+        List<String> javaArgs = Arrays.asList(javaVersionPath, "-Xmx" + ram + "M", "-Xms" + ram + "M", "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump");
         List<String> argsBuilder = new ArrayList<>(javaArgs);
 
         if (!FileUtil.SETTINGS.javaSettings.getJreArgs().isEmpty()) {
@@ -349,6 +349,8 @@ public class StartupUtil {
             argsBuilder.addAll(Arrays.asList(optimisedFlags));
         }
 
+        // JVM flags MUST come before mainclass, so append mainclass and libraries afterwards
+        argsBuilder.addAll(Arrays.asList("-Djava.library.path=" + FileUtil.LIB_DIR, "-cp", LIBPATHS, MAINCLASS, "-width", width, "-height", height));
         argsBuilder.addAll(Arrays.asList(userInfoParamenter));
 
         ProcessBuilder builder = new ProcessBuilder(argsBuilder);
