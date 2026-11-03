@@ -1,16 +1,29 @@
+import com.github.gmazzo.buildconfig.BuildConfigExtension
+
 plugins {
     id("org.openjfx.javafxplugin") version "0.1.0" apply false
+    id("org.javamodularity.moduleplugin") version "2.1.0" apply false
+    id("com.github.gmazzo.buildconfig") version "6.1.2" apply false
 }
-
-group = "eu.girc.launcher"
-version = "0.1.0"
 
 allprojects {
     repositories { mavenCentral() }
 }
 
 subprojects {
-    apply(plugin = "java")
+    apply{
+        plugin("java")
+        plugin("com.github.gmazzo.buildconfig")
+    }
+
+    group = "com.troblecodings"
+    version = "2.0.0-dev"
+
+    extensions.configure<BuildConfigExtension> {
+        buildConfigField("APP_NAME", project.name)
+        buildConfigField("APP_VERSION", provider { "${project.version}" })
+
+    }
 
     extensions.configure<JavaPluginExtension> {
         toolchain.languageVersion = JavaLanguageVersion.of(25)

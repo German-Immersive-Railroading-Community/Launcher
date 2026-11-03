@@ -8,4 +8,4 @@ plugins {
 }
 
 rootProject.name = "gir-launcher"
-include("schnittlauch")
+include("launcher")

@@ -1,0 +1,7 @@
+[package]
+name = "girc-launcher-updater"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+velopack = "1.2.161"
