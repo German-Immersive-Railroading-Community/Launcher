@@ -2,7 +2,7 @@ package com.troblecodings.launcher;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.troblecodings.launcher.di.ContentHost;
+import com.troblecodings.launcher.di.ContentPane;
 import com.troblecodings.launcher.views.IView;
 import com.troblecodings.launcher.views.ViewId;
 import javafx.scene.Node;
@@ -25,7 +25,7 @@ public final class ViewManager {
     private IView currentView;
 
     @Inject
-    public ViewManager(@ContentHost StackPane contentPane, Map<ViewId, Provider<IView>> providers) {
+    public ViewManager(@ContentPane StackPane contentPane, Map<ViewId, Provider<IView>> providers) {
         this.contentPane = Objects.requireNonNull(contentPane);
         this.providers = providers;
     }

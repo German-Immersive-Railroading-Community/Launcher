@@ -1,21 +1,21 @@
 package com.troblecodings.launcher.services
 
+import com.google.gson.JsonObject
 import com.google.inject.Inject
 import com.troblecodings.launcher.util.FileUtil
 import com.troblecodings.launcher.util.LauncherPaths
 import net.lenni0451.commons.httpclient.HttpClient
 import net.raphimc.minecraftauth.java.JavaAuthManager
 import net.raphimc.minecraftauth.java.model.MinecraftProfile
-import net.raphimc.minecraftauth.msa.model.MsaApplicationConfig
 import net.raphimc.minecraftauth.msa.model.MsaDeviceCode
 import net.raphimc.minecraftauth.msa.service.impl.DeviceCodeMsaAuthService
+import net.raphimc.minecraftauth.msa.service.util.MsaAuthServiceSupplier
 import org.apache.logging.log4j.LogManager
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import java.util.function.Consumer
@@ -25,73 +25,48 @@ class UserServiceKt @Inject constructor(
     private val executorService: ExecutorService
 ) : IUserServiceKt {
     companion object {
-        private val logger = LogManager.getLogger(javaClass.name)
+        private val logger = LogManager.getLogger(UserServiceKt::class.java)
     }
 
-    private val authActionInProgress: AtomicBoolean = AtomicBoolean(false)
+    private val authOperationInProgress = AtomicBoolean(false)
+    private val authSession = AtomicReference<JavaAuthManager?>(null)
 
-    @Volatile
-    private var session: JavaAuthManager? = null
+    override fun loginAsync(deviceCodeCallback: Consumer<MsaDeviceCode?>?): CompletableFuture<Unit> = handleAuthAction {
+        if (authSession.get() != null) throw AlreadyLoggedIn()
 
-    @Volatile
-    private var currentRequest: Future<*>? = null
-
-    override val profile: MinecraftProfile?
-        get() = session?.minecraftProfile?.cached
-
-    @Throws(IOException::class)
-    override fun login(deviceCodeCallback: Consumer<MsaDeviceCode?>?) {
-        while (!authActionInProgress.compareAndSet(false, true)) {
-            logger.debug("Waiting for entry into critical section.")
-        }
-        
-        if (session != null && session?.minecraftToken?.upToDate != null) {
-            logger.info("Session is up to date.")
-            return
+        if (Files.exists(LauncherPaths.getSessionFilePath()) && loadSession()) {
+            logger.info("Loaded local session")
+            return@handleAuthAction
         }
 
-        // Critical section (we dont want to login twice at the same time)
-        if (!authActionInProgress.compareAndSet(false, true)) {
-            logger.info("Login already in progress.")
-            return
+        val supplier = MsaAuthServiceSupplier { client, config ->
+            DeviceCodeMsaAuthService(client, config, deviceCodeCallback)
         }
 
-        try {
-            val builder = JavaAuthManager.create(httpClient)
-            val session = builder.login({ httpClient: HttpClient?, applicationConfig: MsaApplicationConfig?, callback: Consumer<MsaDeviceCode?>? ->
-                DeviceCodeMsaAuthService(
-                    httpClient,
-                    applicationConfig,
-                    callback
-                )
-            }, deviceCodeCallback)
+        val builder = JavaAuthManager.create(httpClient)
+        val authManager = builder.login(supplier)
 
-            // Get these here already so that we don't have to do any refresh operations.
-            session.minecraftToken?.getUpToDate()
-            session.minecraftProfile?.getUpToDate()
-            session.changeListeners?.add { this.saveSession() }
-
-            this.session = session
-        } finally {
-            authActionInProgress.set(false)
-        }
+        authSession.set(authManager)
+        logger.info("Logged in")
     }
 
-    override fun loginAsync(deviceCodeCallback: Consumer<MsaDeviceCode?>?): CompletableFuture<Void> =
-        CompletableFuture
-            .runAsync({ login(deviceCodeCallback) }, executorService)
-            .exceptionally { error -> logger.error("Login failed", error); null }
-
-    override fun logout() {
-        TODO("Not yet implemented")
+    override fun logoutAsync(): CompletableFuture<Unit> = handleAuthAction {
+        if (authSession.get() == null) throw NotLoggedIn()
+        authSession.set(null)
+        Files.deleteIfExists(LauncherPaths.getSessionFilePath())
+        logger.info("Logged out")
     }
-
-    override fun logoutAsync(): CompletableFuture<Void> {
-        TODO("Not yet implemented")
-    }
-
-    override fun loadSession(): Boolean {
-        TODO("Not yet implemented")
+    override fun loadSession(): Boolean = try {
+        Files.newBufferedReader(LauncherPaths.getSessionFilePath())
+            .use { reader ->
+                val json = FileUtil.GSON.fromJson(reader, JsonObject::class.java)
+                authSession.set(JavaAuthManager.fromJson(httpClient, json))
+                logger.info("Loaded session from file.")
+            }
+        true
+    } catch (e: IOException) {
+        logger.error("Failed loading local session!", e)
+        false
     }
 
     /**
@@ -101,7 +76,7 @@ class UserServiceKt @Inject constructor(
      * Intended to be called by registering a callback with [JavaAuthManager]'s getChangeListeners.
      */
     override fun saveSession() {
-        if (session == null) return
+        val session = authSession.get() ?: throw SessionNotFound()
 
         val json = JavaAuthManager.toJson(session)
 
@@ -114,4 +89,35 @@ class UserServiceKt @Inject constructor(
             logger.error("Failed saving session locally!", e)
         }
     }
+
+    override val profile: MinecraftProfile?
+        get() = authSession.get()?.minecraftProfile?.cached
+
+    override fun isAuthenticated(): Boolean = authSession.get() != null
+    override fun isAuthOperationInProgress(): Boolean = authOperationInProgress.get()
+
+    private fun <T> handleAuthAction(operation: () -> T): CompletableFuture<T> {
+        if (!authOperationInProgress.compareAndSet(false, true)) {
+            return CompletableFuture.failedFuture(AuthenticationInProgress())
+        }
+
+        return try {
+            CompletableFuture.supplyAsync(operation, executorService).whenComplete { _, _ ->
+                authOperationInProgress.set(false)
+            }
+        } finally {
+            authOperationInProgress.set(false)
+        }
+    }
 }
+
+class AuthenticationInProgress : IllegalStateException(
+    "A login or logout operation is already in progress."
+)
+
+class AlreadyLoggedIn : IllegalStateException("You are already logged in.")
+class NotLoggedIn : IllegalStateException("You are not logged in.")
+
+class SessionAlreadyLoaded : IllegalStateException("A session is already loaded. Log out first.")
+
+class SessionNotFound : IllegalStateException("No active session found.")

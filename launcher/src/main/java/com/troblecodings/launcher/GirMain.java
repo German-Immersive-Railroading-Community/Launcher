@@ -6,10 +6,11 @@ import com.troblecodings.launcher.di.GirModule;
 import com.troblecodings.launcher.di.JavaFxModule;
 import com.troblecodings.launcher.di.ViewModule;
 import com.troblecodings.launcher.services.IUserServiceKt;
-import com.troblecodings.launcher.views.MainWindow;
-import com.troblecodings.launcher.views.ViewId;
 import com.troblecodings.launcher.util.FileUtil;
 import com.troblecodings.launcher.utils.LauncherPaths;
+import com.troblecodings.launcher.views.MainWindow;
+import com.troblecodings.launcher.views.NotificationOverlay;
+import com.troblecodings.launcher.views.ViewId;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -18,7 +19,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -34,7 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public final class GirMain extends Application {
     private static final Logger LOGGER;
@@ -66,10 +65,13 @@ public final class GirMain extends Application {
 
             this.viewManager = injector.getInstance(ViewManager.class);
             this.userService = injector.getInstance(IUserServiceKt.class);
+            userService.loadSession();
             this.executorService = injector.getInstance(ExecutorService.class);
 
+            var notificationManager = injector.getInstance(NotificationManager.class);
+
             MainWindow mainWindow = injector.getInstance(MainWindow.class);
-            mainWindow.setCenter(contentPane);
+            mainWindow.setCenter(new NotificationOverlay(notificationManager, contentPane));
 
             var scene = new Scene(mainWindow, 760, 520);
 
@@ -90,6 +92,7 @@ public final class GirMain extends Application {
     @Override
     public void stop() throws Exception {
         executorService.close();
+
     }
 
     /**

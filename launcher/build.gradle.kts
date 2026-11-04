@@ -12,19 +12,30 @@ javafx {
 }
 
 dependencies {
+    compileOnly("org.jetbrains:annotations:26.1.0")
+
     implementation(kotlin("stdlib"))
+
     implementation("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     implementation("org.kordamp.ikonli:ikonli-fontawesome5-pack:12.4.0")
+
     implementation("dev.dirs:directories:26")
+
     implementation("org.apache.commons:commons-lang3:3.20.0")
     implementation("commons-io:commons-io:2.21.0")
+
     implementation("org.apache.logging.log4j:log4j-api:2.25.5")
     implementation("org.apache.logging.log4j:log4j-core:2.25.5")
+
     implementation("com.google.code.gson:gson:2.14.0")
     implementation("com.google.inject:guice:7.0.0")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.22.3")
+
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.22.4")
+
     implementation("org.json:json:20260814")
+
     implementation("net.raphimc:MinecraftAuth:5.0.2")
+
     testImplementation(kotlin("test"))
 }
 

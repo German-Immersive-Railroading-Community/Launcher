@@ -149,7 +149,7 @@ public final class UserService implements IUserService {
         if (session == null) return;
 
         log.info("Refreshing session...");
-        session.getMinecraftProfile().refreshAsync().then;
+        session.getMinecraftProfile().refreshAsync();
         session.getMinecraftToken().refreshAsync();
     }
 

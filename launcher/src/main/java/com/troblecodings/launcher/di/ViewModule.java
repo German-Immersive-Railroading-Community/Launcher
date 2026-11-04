@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
 import com.troblecodings.launcher.views.HomeView;
 import com.troblecodings.launcher.views.IView;
+import com.troblecodings.launcher.views.SettingsView;
 import com.troblecodings.launcher.views.ViewId;
 
 public class ViewModule extends AbstractModule {
@@ -17,5 +18,6 @@ public class ViewModule extends AbstractModule {
         );
 
         views.addBinding(ViewId.HOME).to(HomeView.class);
+        views.addBinding(ViewId.SETTINGS).to(SettingsView.class);
     }
 }

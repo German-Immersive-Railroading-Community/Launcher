@@ -3,6 +3,7 @@ package com.troblecodings.launcher.di;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.troblecodings.launcher.NotificationManager;
 import com.troblecodings.launcher.ViewManager;
 import javafx.scene.layout.StackPane;
 
@@ -20,8 +21,14 @@ public class JavaFxModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @ContentHost
+    @ContentPane
     StackPane contentPane() {
         return contentPane;
+    }
+
+    @Provides
+    @Singleton
+    NotificationManager notificationManager() {
+        return new NotificationManager();
     }
 }
